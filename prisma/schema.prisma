@@ -1,0 +1,83 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+}
+
+model Project {
+  id                          Int      @id @default(autoincrement())
+  name                        String
+  slug                        String   @unique
+  city                        String
+  appearsInResaleProjects     Boolean  @default(false)
+  appearsInProjects           Boolean  @default(false)
+  appearsInAlexandriaProjects Boolean  @default(false)
+  appearsInAlexandriaResale   Boolean  @default(false)
+  logoUrl                     String?
+  shortDescription            String?
+  amenities                   String?
+  units                       Unit[]
+  leads                       Lead[]
+  createdAt                   DateTime @default(now())
+  updatedAt                   DateTime @updatedAt
+}
+
+model Unit {
+  id                     Int         @id @default(autoincrement())
+  project                Project     @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  projectId              Int
+  title                  String
+  type                   String      // "resale" | "primary"
+  price                  Int
+  area                   Int
+  bedrooms               Int
+  bathrooms              Int
+  location               String
+  status                 String      // "available" | "sold"
+  mainImageUrl           String?
+  description            String?
+  isFeaturedOnHomepage   Boolean     @default(false)
+  images                 UnitImage[]
+  leads                  Lead[]
+  createdAt              DateTime    @default(now())
+  updatedAt              DateTime    @updatedAt
+}
+
+model UnitImage {
+  id       Int    @id @default(autoincrement())
+  unit     Unit   @relation(fields: [unitId], references: [id], onDelete: Cascade)
+  unitId   Int
+  imageUrl String
+}
+
+model Lead {
+  id        Int      @id @default(autoincrement())
+  project   Project? @relation(fields: [projectId], references: [id], onDelete: SetNull)
+  projectId Int?
+  unit      Unit?    @relation(fields: [unitId], references: [id], onDelete: SetNull)
+  unitId    Int?
+  fullName  String
+  phone     String
+  email     String?
+  message   String?
+  createdAt DateTime @default(now())
+}
+
+model AdminUser {
+  id           Int    @id @default(autoincrement())
+  username     String @unique
+  passwordHash String
+}
+
+model Settings {
+  id               Int     @id @default(autoincrement())
+  companyPhone     String  @default("+20 1234567890")
+  whatsappNumber   String  @default("+20 1234567890")
+  heroTitle        String  @default("اكتشف منزل أحلامك مع Mars Realestates")
+  heroSubtitle     String  @default("نقدم لك أفضل العقارات والمشروعات السكنية في مصر")
+}
