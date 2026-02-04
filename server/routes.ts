@@ -1,10 +1,10 @@
 import type { Express, Request, Response, NextFunction } from "express";
 import { createServer, type Server } from "http";
-import { storage } from "./storage";
+import { storage } from "./storage.js";
 import bcrypt from "bcryptjs";
 import jwt from "jsonwebtoken";
-import type { UnitFilters } from "@shared/schema";
-import { insertProjectSchema, updateProjectSchema, insertUnitSchema, updateUnitSchema, insertLeadSchema } from "@shared/schema";
+import type { UnitFilters } from "../shared/schema.js";
+import { insertProjectSchema, updateProjectSchema, insertUnitSchema, updateUnitSchema, insertLeadSchema } from "../shared/schema.js";
 
 if (!process.env.JWT_SECRET) {
   console.warn("⚠️  JWT_SECRET not set, using default (not secure for production)");

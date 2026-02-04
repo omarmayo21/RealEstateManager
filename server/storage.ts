@@ -3,8 +3,9 @@ import { Pool, neonConfig } from "@neondatabase/serverless";
 import ws from "ws";
 import { eq, and, gte, lte, sql } from "drizzle-orm";
 import bcrypt from "bcryptjs";
-import type { Project, Unit, UnitImage, Lead, AdminUser, Settings, InsertProject, InsertUnit, InsertLead, UnitFilters } from "@shared/schema";
-import * as schema from "@shared/schema";
+import type { Project, Unit, UnitImage, Lead, AdminUser, Settings, InsertProject, InsertUnit, InsertLead, UnitFilters } from "../shared/schema.js";
+import * as schema from "../shared/schema.js";
+
 
 neonConfig.webSocketConstructor = ws;
 
