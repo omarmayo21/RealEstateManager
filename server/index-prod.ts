@@ -31,3 +31,4 @@ const distPath = path.resolve(import.meta.dirname, "../dist/public");
 (async () => {
   await runApp(serveStatic);
 })();
+// mayo
