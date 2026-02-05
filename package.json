@@ -5,13 +5,11 @@
   "license": "MIT",
 "scripts": {
   "dev": "cross-env NODE_ENV=development tsx ./server/index-dev.ts",
-
   "build": "vite build",
-
   "start": "cross-env NODE_ENV=production tsx ./server/index-prod.ts",
-
-  "railway": "npm run build && npm run start"
+  "railway": "npm install && npm run build && npm run start"
 }
+
 
 ,
   "dependencies": {
