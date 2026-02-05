@@ -1,0 +1,430 @@
+You are an expert full-stack engineer and UI/UX designer.
+
+Build a **completely new real estate web application** for a brokerage company called **“Mars Realestates”** with the following stack and requirements.
+
+========================================
+0) TECH STACK & STRUCTURE
+========================================
+Use this tech stack:
+
+- Frontend: React + Vite + TypeScript
+- Backend: Node.js + Express
+- Database: SQLite (using Prisma ORM)
+- Styling: Tailwind CSS
+- Animations: Framer Motion (or a similar lightweight animation library)
+- Auth: Custom username/password (NO email auth, NO external auth provider)
+- Language: Public site in **Arabic (RTL)**
+
+Project structure:
+
+- `/client` → React + Vite frontend
+- `/server` → Express backend API
+- `/prisma` → Prisma schema and migrations
+- Shared types if needed under `/shared`.
+
+The public site and admin dashboard must share the **same database**.
+
+========================================
+1) BRANDING & DESIGN
+========================================
+Brand: **Mars Realestates**
+
+Main color: `#f89722` (Mars orange).
+
+Design guidelines:
+
+- Use #f89722 as a **dominant** color:
+  - Main buttons
+  - Section titles
+  - Navbar accents
+  - Cards highlights
+- Overall style: premium, modern, clean.
+- Dark/neutral background with white/light cards looks good.
+- Use:
+  - rounded-xl / rounded-2xl
+  - soft shadows
+  - hover scale / shadow transitions
+  - smooth scrolling and simple page transitions
+
+All public pages must support **RTL layout** and show Arabic text.
+
+========================================
+2) PUBLIC NAVBAR (RTL, TRANSPARENT)
+========================================
+Build a main navbar in Arabic with these items:
+
+1. "ريسيل مشروعات"
+2. "مشروعات"
+3. "مشروعات الإسكندرية"
+4. "ريسيل الإسكندرية"
+
+Each item opens a dropdown listing projects related to that category (read from DB).  
+Seed at least 2 example projects for each category + a real project “The One” in Alexandria.
+
+Also:
+
+- Show the company phone number on the right.
+- Next to the phone number show a small “settings / user” icon that links to **`/admin/login`**.
+
+VISUAL BEHAVIOR:
+
+- On the home page top:
+  - Navbar background is **transparent** over the hero section (`bg-transparent`).
+  - Text is white with #f89722 on hover/active.
+- When scrolling down:
+  - Change navbar to a translucent dark background:
+    - e.g. `bg-black/70` with `backdrop-blur`.
+  - Keep links readable and keep #f89722 as accent.
+- On internal pages (project/unit/admin) it’s OK to use the solid dark/translucent background by default.
+
+IMPORTANT:
+- If you use any “Select” components (like from shadcn/ui), make sure every option has a **non-empty value**. Avoid any `<Select.Item>` with `value=""` or missing value, to prevent runtime errors.
+
+========================================
+3) PUBLIC PAGES & CONTENT
+========================================
+
+### HOME PAGE `/`
+Arabic, RTL, animated landing page.
+
+Sections:
+
+1. **Hero section**
+   - Full-width background (image or gradient).
+   - Mars Realestates logo/name.
+   - Main Arabic heading about real estate projects.
+   - Short paragraph describing Mars Realestates as a brokerage.
+   - Primary CTA button: "اطلب عرض الآن".
+   - Optional secondary button: "تصفح المشروعات".
+   - Use Framer Motion for fade-in / slide-up on text and buttons.
+
+2. **Featured units – "أبرز الشقق المتاحة"**
+   - Shows a grid of **featured units** from DB (`isFeaturedOnHomepage = true`).
+   - Each card shows:
+     - Project name
+     - Unit title
+     - Price
+     - City/location (e.g. الإسكندرية)
+     - Area
+     - Bedrooms
+   - Each card has a button "تفاصيل أكثر" that opens the **unit detail page**.
+   - Place the **filter bar** above this grid (see section 5).
+
+3. **About Mars Realestates**
+   - Two-column layout:
+     - Text in Arabic explaining who they are.
+     - Image / illustration.
+   - Animate on scroll (fade/slide).
+
+4. **Categories section**
+   - Four cards for:
+     - Resale projects
+     - New projects
+     - Alexandria projects
+     - Alexandria resale
+   - Each card:
+     - Icon
+     - Short text
+     - Uses #f89722 strongly.
+   - Clicking card can scroll to relevant units or navigate to filtered page.
+
+5. **Contact section**
+   - Short lead form:
+     - Name
+     - Phone
+     - Message
+   - Submitting creates a generic lead (no projectId / unitId).
+   - Show Arabic success message.
+
+6. **Footer**
+   - Company name, phone, WhatsApp, social placeholders.
+   - RTL layout, with Mars orange accent.
+
+---
+
+### PROJECT PAGE `/projects/:slug`
+Dynamic page for each project.
+
+Shows:
+
+- Project logo and name.
+- City and basic location info.
+- Hero-style header with Mars orange accent background or strip.
+- Short description text.
+- Amenities/services list (Arabic bullet list or icons).
+
+Under that:
+
+- A **lead form**:
+  - Name, phone, email, message.
+  - Saves to `leads` with `projectId`.
+  - Arabic success message.
+
+Then:
+
+- **Units section** listing units belonging to this project.
+- Same card design as home page.
+- Includes a **filter bar** (section 5) pre-filtered for this project.
+
+---
+
+### UNIT DETAIL PAGE `/units/:id`
+Dedicated page for each unit/property.
+
+Contents:
+
+1. **Image gallery**
+   - Main large image.
+   - Thumbnails below.
+   - Click thumbnail → update main image with smooth transition.
+
+2. **Main info**
+   - Unit title.
+   - Project name (with link back to the project page).
+   - Price.
+   - Area (m²).
+   - Bedrooms.
+   - Bathrooms.
+   - Status: Available / Sold.
+   - Type: Resale / Primary.
+   - Location (city / brief address).
+
+3. **Description**
+   - Full text description of the property.
+
+4. **Lead form**
+   - Name, phone, email, message.
+   - When submitted:
+     - Save a lead record with both `projectId` and `unitId`.
+   - Show Arabic success message.
+
+5. **Similar units**
+   - Show 3–4 similar units from the same project or similar price range.
+
+========================================
+4) DATABASE SCHEMA (PRISMA + SQLITE)
+========================================
+Define Prisma models similar to:
+
+MODEL `Project`:
+- id        Int     @id @default(autoincrement())
+- name      String
+- slug      String  @unique
+- city      String
+- appearsInResaleProjects        Boolean @default(false)
+- appearsInProjects              Boolean @default(false)
+- appearsInAlexandriaProjects    Boolean @default(false)
+- appearsInAlexandriaResale      Boolean @default(false)
+- logoUrl           String?
+- shortDescription  String?
+- amenities         String?   // multiline text
+- units             Unit[]
+- createdAt         DateTime  @default(now())
+- updatedAt         DateTime  @updatedAt
+
+MODEL `Unit`:
+- id        Int     @id @default(autoincrement())
+- project   Project @relation(fields: [projectId], references: [id])
+- projectId Int
+- title     String
+- type      String   // "resale" | "primary"
+- price     Int
+- area      Int
+- bedrooms  Int
+- bathrooms Int
+- location  String
+- status    String   // "available" | "sold"
+- mainImageUrl String?
+- description   String?
+- isFeaturedOnHomepage Boolean @default(false)
+- images    UnitImage[]
+- leads     Lead[]
+- createdAt DateTime @default(now())
+- updatedAt DateTime @updatedAt
+
+MODEL `UnitImage`:
+- id      Int   @id @default(autoincrement())
+- unit    Unit  @relation(fields: [unitId], references: [id])
+- unitId  Int
+- imageUrl String
+
+MODEL `Lead`:
+- id        Int @id @default(autoincrement())
+- project   Project? @relation(fields: [projectId], references: [id])
+- projectId Int?
+- unit      Unit?    @relation(fields: [unitId], references: [id])
+- unitId    Int?
+- fullName  String
+- phone     String
+- email     String?
+- message   String?
+- createdAt DateTime @default(now())
+
+MODEL `AdminUser`:
+- id       Int    @id @default(autoincrement())
+- username String @unique
+- passwordHash String
+
+Seed data:
+
+- At least:
+  - Project "The One" in Alexandria.
+  - 2 more Alexandria projects.
+  - 2 Cairo projects.
+- A few units with different areas and bedrooms, some marked `isFeaturedOnHomepage = true`.
+
+========================================
+5) FILTER SYSTEM (AREA + PROJECT + BEDROOMS)
+========================================
+Implement a **filter bar** above units listing.
+
+Where:
+
+- On home page “Featured units”.
+- On project page units section.
+
+Filter bar (Arabic, RTL):
+
+- Dropdown: "المشروع"
+  - On home page: list all projects.
+  - On project page: pre-selected to current project or optional.
+
+- Two numeric inputs:
+  - "أقل مساحة" → minArea
+  - "أكبر مساحة" → maxArea
+
+- Bedrooms dropdown "عدد الغرف":
+  - "الكل"
+  - "غرفة واحدة"
+  - "غرفتين"
+  - "3 غرف"
+  - "4 غرف أو أكثر"
+
+- Buttons:
+  - Primary: "تطبيق الفلتر"
+  - Secondary: "مسح الفلتر" (reset filters)
+
+Backend API (`/api/units` or `/api/units/filter`) should accept:
+
+- projectId (optional)
+- minArea (optional)
+- maxArea (optional)
+- bedrooms (optional)
+
+Apply all provided filters and return filtered units.  
+Show “عدد النتائج: X” under the filter bar.
+
+IMPORTANT:
+If you use a Select component library, ensure every option has a **non-empty value** to avoid runtime errors.
+
+========================================
+6) ADMIN AUTH (USERNAME/PASSWORD ONLY)
+========================================
+Create a separate admin area at `/admin`.
+
+### Login page `/admin/login`
+- Show Arabic form with:
+  - Username field (input type text)
+  - Password field (input type password)
+  - Login button
+- NO email field. NO signup. NO “forgot password”.
+
+Admin user:
+
+- username: `mars`
+- password: `mars@3011#`
+
+Implementation:
+
+- Store a bcrypt-hashed password in the `AdminUser` table seed for username `mars`, or hard-code it server-side.
+- Create an Express route `/api/auth/login`:
+  - Accepts username & password.
+  - Verifies credentials.
+  - On success, issues a JWT or session cookie.
+- Protect all `/admin/*` routes:
+  - If no valid session/JWT → redirect to `/admin/login`.
+
+Public routes (`/`, `/projects/:slug`, `/units/:id`) must NOT require auth.
+
+========================================
+7) ADMIN DASHBOARD FEATURES
+========================================
+Admin layout at `/admin`:
+
+- Sidebar with links:
+  - Dashboard (overview)
+  - Projects
+  - Units
+  - Leads
+  - Settings
+- Top bar with username and logout.
+
+**Overview page:**
+- Cards showing:
+  - Total projects
+  - Total units
+  - Total leads
+- Optional small chart (e.g. leads per project).
+
+**Projects management:**
+- CRUD interface for Project model.
+- Toggling category booleans controls whether project appears in each navbar dropdown.
+
+**Units management:**
+- CRUD interface for Unit model.
+- Ability to:
+  - Assign unit to a project.
+  - Set type (resale / primary).
+  - Set price, area, bedrooms, bathrooms, status, location.
+  - Set `isFeaturedOnHomepage`.
+  - Manage multiple images (using UnitImage model).
+
+**Leads list:**
+- Table of leads.
+- Show:
+  - projectName (if exists)
+  - unitTitle (if exists)
+  - fullName
+  - phone
+  - email
+  - message
+  - createdAt
+- Filter by project / unit.
+- Allow deleting leads.
+
+**Settings:**
+- Store basic settings in DB:
+  - Company phone number.
+  - WhatsApp number.
+  - Homepage hero title & subtitle text.
+- Use these values in public site (navbar, footer, hero).
+
+========================================
+8) BACKEND API
+========================================
+Implement Express API routes:
+
+- `POST /api/auth/login` → admin login, returns session/JWT.
+- `GET /api/projects` + `POST /api/projects` + `PUT /api/projects/:id` + `DELETE /api/projects/:id`
+- `GET /api/units` (with query filters) + `POST /api/units` + `PUT /api/units/:id` + `DELETE /api/units/:id`
+- `GET /api/units/:id`
+- `GET /api/leads` + `POST /api/leads`
+- `GET /api/settings` + `PUT /api/settings`
+
+Use middleware to check admin auth for admin routes.
+
+========================================
+9) QUALITY & FINAL CHECK
+========================================
+- Home page `/` must render correctly with transparent navbar over hero and Mars orange accent everywhere.
+- Project pages `/projects/:slug` must work from navbar dropdowns.
+- Unit detail pages `/units/:id` must work from cards and admin.
+- Filters for project/area/bedrooms must work on home and project pages.
+- Admin login with `mars / mars@3011#` must work and redirect to `/admin`.
+- Admin area must be protected.
+- No runtime errors related to Select components (all Select options have valid non-empty values).
+
+Finally, provide a short summary of:
+- Files created/updated.
+- How to run the project (commands for client/server).
+- Any environment variables needed (if any).
