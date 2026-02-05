@@ -42,7 +42,8 @@ export default function AdminLogin() {
     setIsLoading(true);
     try {
       const response = await apiRequest("POST", "/api/auth/login", data);
-      localStorage.setItem("adminToken", response.token);
+      const result = await response.json();
+      localStorage.setItem("adminToken", result.token);
       toast({
         title: "تم تسجيل الدخول بنجاح",
         description: "مرحباً بك في لوحة التحكم",
