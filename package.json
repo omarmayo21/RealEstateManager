@@ -3,15 +3,11 @@
   "version": "1.0.0",
   "type": "module",
   "license": "MIT",
-"scripts": {
-  "dev": "cross-env NODE_ENV=development tsx ./server/index-dev.ts",
-  "build": "vite build",
-  "start": "cross-env NODE_ENV=production tsx ./server/index-prod.ts",
-  "railway": "npm install && npm run build && npm run start"
-}
-
-
-,
+  "scripts": {
+    "dev": "cross-env NODE_ENV=development tsx ./server/index-dev.ts",
+    "build": "vite build",
+    "start": "cross-env NODE_ENV=production tsx ./server/index-prod.ts"
+  },
   "dependencies": {
     "@hookform/resolvers": "^3.10.0",
     "@jridgewell/trace-mapping": "^0.3.25",
@@ -107,9 +103,9 @@
     "esbuild": "^0.25.0",
     "postcss": "^8.4.47",
     "tailwindcss": "^3.4.17",
-    "tsx": "^4.20.5",
     "typescript": "5.6.3",
-    "vite": "^5.4.21"
+    "vite": "^5.4.21",
+    "tsx": "^4.20.5"
   },
   "optionalDependencies": {
     "bufferutil": "^4.0.8"
