@@ -1,6 +1,6 @@
 import { QueryClient, QueryFunction } from "@tanstack/react-query";
 
-const API_BASE = "https://tambra-bloodier-michelle.ngrok-free.dev";
+const API_BASE = "https://realestatemanager-production.up.railway.app/";
 
 async function throwIfResNotOk(res: Response) {
   if (!res.ok) {
