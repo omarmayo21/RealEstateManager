@@ -229,12 +229,16 @@ const createMutation = useMutation({
     setDialogOpen(true);
   };
 
+  // const onSubmit = (data: UnitFormData) => {
+  //   if (editingUnit) {
+  //     updateMutation.mutate({ id: editingUnit.id, data });
+  //   } else {
+  //     createMutation.mutate(data);
+  //   }
+  // };
   const onSubmit = (data: UnitFormData) => {
-    if (editingUnit) {
-      updateMutation.mutate({ id: editingUnit.id, data });
-    } else {
-      createMutation.mutate(data);
-    }
+    alert("SUBMIT FIRED");
+    console.log("FORM DATA:", data);
   };
 
   const formatPrice = (price: number) => {
