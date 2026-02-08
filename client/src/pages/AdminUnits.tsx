@@ -440,7 +440,19 @@ const createMutation = useMutation({
                       </FormItem>
                     )}
                   />
-
+                  <FormField
+                    control={form.control}
+                    name="location"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>الموقع</FormLabel>
+                        <FormControl>
+                          <Input placeholder="مثال: التجمع الخامس" {...field} />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />        
 
                   {/* الحالة */}
                   <FormField

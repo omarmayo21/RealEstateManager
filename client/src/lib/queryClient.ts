@@ -31,19 +31,14 @@ export async function apiRequest(
   if (data) {
     headers["Content-Type"] = "application/json";
   }
-  const finalUrl = url.startsWith("http")
-  ? url
-  : `${API_BASE}/${url}`.replace(/\/+/g, "/");
+  const finalUrl = url.startsWith("http") ? url : new URL(url, API_BASE).toString();
 
-  const res = await fetch(
-  `${API_BASE}/${url}`.replace(/\/+/g, "/"),
-  {
+  const res = await fetch(finalUrl, {
     method,
     headers,
     body: data ? JSON.stringify(data) : undefined,
     credentials: "include",
-  }
-);
+  });
 
 
   await throwIfResNotOk(res);
@@ -57,13 +52,11 @@ export const getQueryFn: <T>(options: {
 }) => QueryFunction<T> =
   ({ on401: unauthorizedBehavior }) =>
   async ({ queryKey }) => {
-    const res = await fetch(
-    `${API_BASE}/${queryKey.join("/")}`.replace(/\/+/g, "/"),
-    {
+    const finalUrl = new URL(queryKey.join("/"), API_BASE).toString();
+    const res = await fetch(finalUrl, {
       headers: getAuthHeaders(),
       credentials: "include",
-    }
-  );
+    });
 
 
     if (unauthorizedBehavior === "returnNull" && res.status === 401) {
