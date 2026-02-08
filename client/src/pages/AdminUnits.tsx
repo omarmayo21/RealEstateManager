@@ -294,126 +294,112 @@ const createMutation = useMutation({
                     )}
                   />
 
+                  {/* كود الوحدة */}
                   <FormField
                     control={form.control}
-                    name="title"
+                    name="unitCode"
                     render={({ field }) => (
                       <FormItem>
-                        <FormLabel> كود الوحدة </FormLabel>
+                        <FormLabel>كود الوحدة</FormLabel>
                         <FormControl>
-                          <Input {...field} data-testid="input-unit-title" />
+                          <Input placeholder="مثال: B07-1102" {...field} />
                         </FormControl>
                         <FormMessage />
                       </FormItem>
                     )}
                   />
 
-                  <div className="grid grid-cols-2 gap-4">
-                    <FormField
-                      control={form.control}
-                      name="type"
-                      render={({ field }) => (
-                        <FormItem>
-                          <FormLabel>النوع</FormLabel>
-                          <Select value={field.value} onValueChange={field.onChange}>
-                            <FormControl>
-                              <SelectTrigger data-testid="select-unit-type">
-                                <SelectValue />
-                              </SelectTrigger>
-                            </FormControl>
-                            <SelectContent>
-                              <SelectItem value="primary">جديد</SelectItem>
-                              <SelectItem value="resale"> ريسيل </SelectItem>
-                            </SelectContent>
-                          </Select>
-                          <FormMessage />
-                        </FormItem>
-                      )}
-                    />
+                  {/* نوع العقار */}
+                  <FormField
+                    control={form.control}
+                    name="propertyType"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>نوع العقار</FormLabel>
+                        <FormControl>
+                          <Input placeholder="شقة / فيلا" {...field} />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
 
-                    <FormField
-                      control={form.control}
-                      name="status"
-                      render={({ field }) => (
-                        <FormItem>
-                          <FormLabel>نوع القعار</FormLabel>
-                          <Select value={field.value} onValueChange={field.onChange}>
-                            <FormControl>
-                              <SelectTrigger data-testid="select-unit-status">
-                                <SelectValue />
-                              </SelectTrigger>
-                            </FormControl>
-                            <SelectContent>
-                              <SelectItem value="available">شقه</SelectItem>
-                              <SelectItem value="sold">فيلا</SelectItem>
-                            </SelectContent>
-                          </Select>
-                          <FormMessage />
-                        </FormItem>
-                      )}
-                    />
-                  </div>
+                  {/* السعر */}
+                  <FormField
+                    control={form.control}
+                    name="price"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>السعر (جنيه)</FormLabel>
+                        <FormControl>
+                          <Input type="number" placeholder="1450000" {...field} />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
 
-                  <div className="grid grid-cols-2 gap-4">
-                    <FormField
-                      control={form.control}
-                      name="price"
-                      render={({ field }) => (
-                        <FormItem>
-                          <FormLabel>السعر (جنيه)</FormLabel>
-                          <FormControl>
-                            <Input {...field} type="number" data-testid="input-unit-price" />
-                          </FormControl>
-                          <FormMessage />
-                        </FormItem>
-                      )}
-                    />
+                  {/* الأوفر برايس */}
+                  <FormField
+                    control={form.control}
+                    name="overPrice"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>الأوفر برايس (جنيه)</FormLabel>
+                        <FormControl>
+                          <Input type="number" placeholder="200000" {...field} />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
 
-                    <FormField
-                      control={form.control}
-                      name="area"
-                      render={({ field }) => (
-                        <FormItem>
-                          <FormLabel>المساحة (م²)</FormLabel>
-                          <FormControl>
-                            <Input {...field} type="number" data-testid="input-unit-area" />
-                          </FormControl>
-                          <FormMessage />
-                        </FormItem>
-                      )}
-                    />
-                  </div>
+                  {/* المساحة */}
+                  <FormField
+                    control={form.control}
+                    name="area"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>المساحة (م²)</FormLabel>
+                        <FormControl>
+                          <Input type="number" placeholder="120" {...field} />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
 
-                  <div className="grid grid-cols-2 gap-4">
-                    <FormField
-                      control={form.control}
-                      name="bedrooms"
-                      render={({ field }) => (
-                        <FormItem>
-                          <FormLabel>عدد الغرف</FormLabel>
-                          <FormControl>
-                            <Input {...field} type="number" data-testid="input-unit-bedrooms" />
-                          </FormControl>
-                          <FormMessage />
-                        </FormItem>
-                      )}
-                    />
+                  {/* عدد الغرف */}
+                  <FormField
+                    control={form.control}
+                    name="bedrooms"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>عدد الغرف</FormLabel>
+                        <FormControl>
+                          <Input type="number" placeholder="3" {...field} />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
 
-                    <FormField
-                      control={form.control}
-                      name="bathrooms"
-                      render={({ field }) => (
-                        <FormItem>
-                          <FormLabel>دورات </FormLabel>
-                          <FormControl>
-                            <Input {...field} type="number" data-testid="input-unit-bathrooms" />
-                          </FormControl>
-                          <FormMessage />
-                        </FormItem>
-                      )}
-                    />
-                  </div>
+                  {/* عدد دورات المياه */}
+                  <FormField
+                    control={form.control}
+                    name="bathrooms"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>عدد دورات المياه</FormLabel>
+                        <FormControl>
+                          <Input type="number" placeholder="2" {...field} />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
 
+                  {/* الموقع */}
                   <FormField
                     control={form.control}
                     name="location"
@@ -421,13 +407,14 @@ const createMutation = useMutation({
                       <FormItem>
                         <FormLabel>الموقع</FormLabel>
                         <FormControl>
-                          <Input {...field} data-testid="input-unit-location" />
+                          <Input placeholder="القاهرة الجديدة" {...field} />
                         </FormControl>
                         <FormMessage />
                       </FormItem>
                     )}
                   />
 
+                  {/* رابط الصورة الرئيسية */}
                   <FormField
                     control={form.control}
                     name="mainImageUrl"
@@ -435,13 +422,14 @@ const createMutation = useMutation({
                       <FormItem>
                         <FormLabel>رابط الصورة الرئيسية (اختياري)</FormLabel>
                         <FormControl>
-                          <Input {...field} data-testid="input-unit-image" />
+                          <Input placeholder="https://..." {...field} />
                         </FormControl>
                         <FormMessage />
                       </FormItem>
                     )}
                   />
 
+                  {/* الوصف */}
                   <FormField
                     control={form.control}
                     name="description"
@@ -449,7 +437,7 @@ const createMutation = useMutation({
                       <FormItem>
                         <FormLabel>الوصف (اختياري)</FormLabel>
                         <FormControl>
-                          <Textarea {...field} className="min-h-[100px]" data-testid="input-unit-description" />
+                          <Textarea placeholder="وصف الوحدة..." {...field} />
                         </FormControl>
                         <FormMessage />
                       </FormItem>
