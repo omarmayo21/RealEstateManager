@@ -30,6 +30,9 @@ export async function apiRequest(
   if (data) {
     headers["Content-Type"] = "application/json";
   }
+  const finalUrl = url.startsWith("http")
+  ? url
+  : `${API_BASE}/${url}`.replace(/\/+/g, "/");
 
   const res = await fetch(
   `${API_BASE}/${url}`.replace(/\/+/g, "/"),
