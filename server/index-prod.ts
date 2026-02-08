@@ -6,6 +6,9 @@ import type { Express } from "express";
 
 import runApp, { app } from "./app.js";
 
+/**
+ * نحدد فين build بتاع الفرونت
+ */
 function resolveDistPath() {
   const candidates = [
     path.resolve(process.cwd(), "dist/public"),
@@ -15,6 +18,9 @@ function resolveDistPath() {
   return candidates.find((candidate) => fs.existsSync(candidate));
 }
 
+/**
+ * static + react fallback
+ */
 async function serveStatic(app: Express) {
   const distPath = resolveDistPath();
 
@@ -22,28 +28,26 @@ async function serveStatic(app: Express) {
     throw new Error("Frontend build not found. Run npm run build first.");
   }
 
-  // static files
-// 1️⃣ static files (أول حاجة)
+  // 1️⃣ static files
   app.use(express.static(distPath));
 
-  // 2️⃣ API (سيبه زي ما هو)
-
-  // 3️⃣ React fallback (GET فقط + مش API)
-  app.get("*", (req, res, next) => {
+  // 2️⃣ react fallback (GET فقط + مش API)
+  app.get("*", (req, res) => {
     if (req.path.startsWith("/api")) {
-      return next();
+      return res.status(404).json({ error: "API route not found" });
     }
 
     res.sendFile(path.join(distPath, "index.html"));
   });
-
-
 }
 
+/**
+ * bootstrap
+ */
 (async () => {
-  // 1️⃣ شغّل API (لازم function حتى لو فاضية)
+  // 1️⃣ شغّل الـ API routes
   await runApp(async () => {});
 
-  // 2️⃣ بعده فعّل static + react
+  // 2️⃣ بعدها فعّل static + react
   await serveStatic(app);
 })();
