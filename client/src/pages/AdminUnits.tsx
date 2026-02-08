@@ -247,7 +247,7 @@ export default function AdminUnits() {
                     name="title"
                     render={({ field }) => (
                       <FormItem>
-                        <FormLabel>عنوان الوحدة</FormLabel>
+                        <FormLabel> كود الوحدة </FormLabel>
                         <FormControl>
                           <Input {...field} data-testid="input-unit-title" />
                         </FormControl>
@@ -271,7 +271,7 @@ export default function AdminUnits() {
                             </FormControl>
                             <SelectContent>
                               <SelectItem value="primary">جديد</SelectItem>
-                              <SelectItem value="resale">إعادة بيع</SelectItem>
+                              <SelectItem value="resale"> ريسيل </SelectItem>
                             </SelectContent>
                           </Select>
                           <FormMessage />
@@ -284,7 +284,7 @@ export default function AdminUnits() {
                       name="status"
                       render={({ field }) => (
                         <FormItem>
-                          <FormLabel>الحالة</FormLabel>
+                          <FormLabel>نوع القعار</FormLabel>
                           <Select value={field.value} onValueChange={field.onChange}>
                             <FormControl>
                               <SelectTrigger data-testid="select-unit-status">
@@ -292,8 +292,8 @@ export default function AdminUnits() {
                               </SelectTrigger>
                             </FormControl>
                             <SelectContent>
-                              <SelectItem value="available">متاح</SelectItem>
-                              <SelectItem value="sold">مباع</SelectItem>
+                              <SelectItem value="available">شقه</SelectItem>
+                              <SelectItem value="sold">فيلا</SelectItem>
                             </SelectContent>
                           </Select>
                           <FormMessage />
@@ -347,14 +347,14 @@ export default function AdminUnits() {
                       )}
                     />
 
-                    <FormField
+                   <FormField
                       control={form.control}
-                      name="bathrooms"
+                      name="price"
                       render={({ field }) => (
                         <FormItem>
-                          <FormLabel>دورات المياه</FormLabel>
+                          <FormLabel> الاوفر برايس </FormLabel>
                           <FormControl>
-                            <Input {...field} type="number" data-testid="input-unit-bathrooms" />
+                            <Input {...field} type="number" data-testid="input-unit-price" />
                           </FormControl>
                           <FormMessage />
                         </FormItem>
