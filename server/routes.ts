@@ -34,7 +34,7 @@ const authMiddleware = (req: AuthRequest, res: Response, next: NextFunction) => 
 
 export async function registerRoutes(app: Express): Promise<Server> {
   
-  app.post("/api/auth/login", async (req: Request, res: Response) => {
+  app.post("api/auth/login", async (req: Request, res: Response) => {
     try {
       const { username, password } = req.body;
 
