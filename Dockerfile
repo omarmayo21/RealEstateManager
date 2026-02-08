@@ -6,7 +6,7 @@ WORKDIR /app
 ENV PRISMA_SKIP_POSTINSTALL_GENERATE=true
 
 COPY package*.json ./
-RUN npm ci
+RUN npm install --omit=dev
 
 COPY . .
 
