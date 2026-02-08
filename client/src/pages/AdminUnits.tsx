@@ -229,16 +229,12 @@ const createMutation = useMutation({
     setDialogOpen(true);
   };
 
-  // const onSubmit = (data: UnitFormData) => {
-  //   if (editingUnit) {
-  //     updateMutation.mutate({ id: editingUnit.id, data });
-  //   } else {
-  //     createMutation.mutate(data);
-  //   }
-  // };
   const onSubmit = (data: UnitFormData) => {
-    alert("SUBMIT FIRED");
-    console.log("FORM DATA:", data);
+    if (editingUnit) {
+      updateMutation.mutate({ id: editingUnit.id, data });
+    } else {
+      createMutation.mutate(data);
+    }
   };
 
   const formatPrice = (price: number) => {
@@ -429,19 +425,21 @@ const createMutation = useMutation({
                   />
 
                   {/* الموقع */}
+                  {/* عنوان الوحدة */}
                   <FormField
                     control={form.control}
-                    name="location"
+                    name="title"
                     render={({ field }) => (
                       <FormItem>
-                        <FormLabel>الموقع</FormLabel>
+                        <FormLabel>عنوان الوحدة</FormLabel>
                         <FormControl>
-                          <Input placeholder="القاهرة الجديدة" {...field} />
+                          <Input placeholder="مثال: شقة 120م في التجمع" {...field} />
                         </FormControl>
                         <FormMessage />
                       </FormItem>
                     )}
                   />
+
 
                   {/* الحالة */}
                   <FormField
