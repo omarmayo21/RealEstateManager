@@ -1,40 +1,36 @@
 import "dotenv/config";
+import http from "node:http";
 import path from "node:path";
 import fs from "node:fs";
 import express from "express";
-import type { Express } from "express";
-import runApp from "./app.js";
+import { app } from "./app.js";
 
 function resolveDistPath() {
   const candidates = [
     path.resolve(process.cwd(), "dist/public"),
     path.resolve(process.cwd(), "client/dist"),
   ];
-
-  return candidates.find((candidate) => fs.existsSync(candidate));
+  return candidates.find((p) => fs.existsSync(p));
 }
 
-async function setupStatic(app: Express) {
-  const distPath = resolveDistPath();
+// static + react
+const distPath = resolveDistPath();
+if (!distPath) {
+  throw new Error("Frontend build not found. Run npm run build first.");
+}
 
-  if (!distPath) {
-    throw new Error("Frontend build not found. Run npm run build first.");
+app.use(express.static(distPath));
+app.get("*", (req, res) => {
+  if (req.path.startsWith("/api")) {
+    return res.status(404).json({ error: "API route not found" });
   }
+  res.sendFile(path.join(distPath, "index.html"));
+});
 
-  // static assets
-  app.use(express.static(distPath));
+// 🔥 هنا الصح
+const server = http.createServer(app);
 
-  // React fallback (GET only)
-  app.get("*", (req, res) => {
-    if (req.path.startsWith("/api")) {
-      return res.status(404).json({ error: "API route not found" });
-    }
-
-    res.sendFile(path.join(distPath, "index.html"));
-  });
-}
-
-(async () => {
-  // ❗❗❗ متعملش override
-  await runApp(setupStatic);
-})();
+const port = Number(process.env.PORT) || 5000;
+server.listen(port, "0.0.0.0", () => {
+  console.log(`Server running on port ${port}`);
+});
