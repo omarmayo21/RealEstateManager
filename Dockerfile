@@ -6,11 +6,13 @@ ENV PRISMA_SKIP_POSTINSTALL_GENERATE=true
 ENV NODE_ENV=production
 
 COPY package*.json ./
-RUN npm install --omit=dev
+
+# 👇 هنا من غير --omit=dev
+RUN npm install
 
 COPY . .
 
-# 👈 السطر الحاسم
+# 👇 build محتاج vite
 RUN npm run build
 
 EXPOSE 5000
