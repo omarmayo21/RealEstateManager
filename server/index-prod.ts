@@ -23,18 +23,20 @@ async function serveStatic(app: Express) {
   }
 
   // static files
-app.use((req, res, next) => {
-  // 👇 مهم جدًا
-  if (req.method !== "GET") {
-    return next();
-  }
+// 1️⃣ static files (أول حاجة)
+  app.use(express.static(distPath));
 
-  if (req.path.startsWith("/api")) {
-    return next();
-  }
+  // 2️⃣ API (سيبه زي ما هو)
 
-  res.sendFile(path.join(distPath, "index.html"));
-});
+  // 3️⃣ React fallback (GET فقط + مش API)
+  app.get("*", (req, res, next) => {
+    if (req.path.startsWith("/api")) {
+      return next();
+    }
+
+    res.sendFile(path.join(distPath, "index.html"));
+  });
+
 
 }
 
