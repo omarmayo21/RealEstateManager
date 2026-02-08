@@ -38,16 +38,21 @@ export default function AdminLogin() {
     },
   });
 
+    
   const onSubmit = async (data: LoginFormData) => {
     setIsLoading(true);
     try {
-      const response = await apiRequest("POST", "/api/auth/login", data);
+      const response = await apiRequest("POST", "api/auth/login", data);
       const result = await response.json();
+
+      // ✅ السطر المهم
       localStorage.setItem("adminToken", result.token);
+
       toast({
         title: "تم تسجيل الدخول بنجاح",
         description: "مرحباً بك في لوحة التحكم",
       });
+
       setLocation("/admin/dashboard");
     } catch (error) {
       toast({
@@ -59,6 +64,8 @@ export default function AdminLogin() {
       setIsLoading(false);
     }
   };
+
+
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-background via-background to-primary/5">
