@@ -6,11 +6,16 @@
   "engines": {
      "node": ">=20.19.0"
   },
+
+
   "scripts": {
-    "dev": "cross-env NODE_ENV=development tsx ./server/index-dev.ts",
-    "build": "vite build",
-    "start": "cross-env NODE_ENV=production tsx ./server/index-prod.ts"
-  },
+    "dev": "cross-env NODE_ENV=development tsx server/index-dev.ts",
+    "build:client": "vite build",
+    "build": "npm run build:client",
+    "start": "cross-env NODE_ENV=production tsx server/index-prod.ts"
+  }
+
+,
   "dependencies": {
     "@hookform/resolvers": "^3.10.0",
     "@jridgewell/trace-mapping": "^0.3.25",
