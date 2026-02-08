@@ -269,6 +269,8 @@ const createMutation = useMutation({
               </DialogHeader>
               <Form {...form}>
                 <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
+
+                  {/* المشروع */}
                   <FormField
                     control={form.control}
                     name="projectId"
@@ -277,7 +279,7 @@ const createMutation = useMutation({
                         <FormLabel>المشروع</FormLabel>
                         <Select value={field.value} onValueChange={field.onChange}>
                           <FormControl>
-                            <SelectTrigger data-testid="select-unit-project">
+                            <SelectTrigger>
                               <SelectValue placeholder="اختر المشروع" />
                             </SelectTrigger>
                           </FormControl>
@@ -302,7 +304,7 @@ const createMutation = useMutation({
                       <FormItem>
                         <FormLabel>كود الوحدة</FormLabel>
                         <FormControl>
-                          <Input placeholder="مثال: B07-1102" {...field} />
+                          <Input placeholder="B07-1102" {...field} />
                         </FormControl>
                         <FormMessage />
                       </FormItem>
@@ -319,6 +321,29 @@ const createMutation = useMutation({
                         <FormControl>
                           <Input placeholder="شقة / فيلا" {...field} />
                         </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+
+                  {/* نوع الوحدة */}
+                  <FormField
+                    control={form.control}
+                    name="type"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>نوع الوحدة</FormLabel>
+                        <Select value={field.value} onValueChange={field.onChange}>
+                          <FormControl>
+                            <SelectTrigger>
+                              <SelectValue placeholder="اختر النوع" />
+                            </SelectTrigger>
+                          </FormControl>
+                          <SelectContent>
+                            <SelectItem value="primary">جديد</SelectItem>
+                            <SelectItem value="resale">إعادة بيع</SelectItem>
+                          </SelectContent>
+                        </Select>
                         <FormMessage />
                       </FormItem>
                     )}
@@ -414,7 +439,30 @@ const createMutation = useMutation({
                     )}
                   />
 
-                  {/* رابط الصورة الرئيسية */}
+                  {/* الحالة */}
+                  <FormField
+                    control={form.control}
+                    name="status"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>الحالة</FormLabel>
+                        <Select value={field.value} onValueChange={field.onChange}>
+                          <FormControl>
+                            <SelectTrigger>
+                              <SelectValue placeholder="اختر الحالة" />
+                            </SelectTrigger>
+                          </FormControl>
+                          <SelectContent>
+                            <SelectItem value="available">متاحة</SelectItem>
+                            <SelectItem value="sold">مباعة</SelectItem>
+                          </SelectContent>
+                        </Select>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+
+                  {/* رابط الصورة */}
                   <FormField
                     control={form.control}
                     name="mainImageUrl"
@@ -444,6 +492,7 @@ const createMutation = useMutation({
                     )}
                   />
 
+                  {/* مميز في الرئيسية */}
                   <FormField
                     control={form.control}
                     name="isFeaturedOnHomepage"
@@ -451,17 +500,20 @@ const createMutation = useMutation({
                       <FormItem className="flex items-center justify-between p-4 bg-secondary rounded-md">
                         <FormLabel>عرض في الصفحة الرئيسية</FormLabel>
                         <FormControl>
-                          <Switch checked={field.value} onCheckedChange={field.onChange} data-testid="switch-featured" />
+                          <Switch checked={field.value} onCheckedChange={field.onChange} />
                         </FormControl>
                       </FormItem>
                     )}
                   />
 
-                  <Button type="submit" className="w-full bg-primary" data-testid="button-save-unit">
+                  {/* زر الحفظ */}
+                  <Button type="submit" className="w-full bg-primary">
                     {editingUnit ? "تحديث" : "إضافة"}
                   </Button>
+
                 </form>
               </Form>
+
             </DialogContent>
           </Dialog>
         </div>
