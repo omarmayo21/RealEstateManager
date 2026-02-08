@@ -1,6 +1,6 @@
 import { QueryClient, QueryFunction } from "@tanstack/react-query";
 
-const API_BASE = "https://realestatemanager-production.up.railway.app/";
+const API_BASE = "";
 
 function getAuthHeaders(): Record<string, string> {
   if (typeof window === "undefined") {
