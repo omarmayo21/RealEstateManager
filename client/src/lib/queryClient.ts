@@ -31,12 +31,16 @@ export async function apiRequest(
     headers["Content-Type"] = "application/json";
   }
 
-  const res = await fetch(`${API_BASE}${url}`, {
+  const res = await fetch(
+  `${API_BASE}/${url}`.replace(/\/+/g, "/"),
+  {
     method,
     headers,
     body: data ? JSON.stringify(data) : undefined,
     credentials: "include",
-  });
+  }
+);
+
 
   await throwIfResNotOk(res);
   return res;
