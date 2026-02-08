@@ -31,22 +31,36 @@ model Unit {
   id                     Int         @id @default(autoincrement())
   project                Project     @relation(fields: [projectId], references: [id], onDelete: Cascade)
   projectId              Int
+
   title                  String
-  type                   String      // "resale" | "primary"
+  unitCode               String?     // كود الوحدة
+  propertyType           String?     // نوع العقار (شقة / فيلا)
+
   price                  Int
+  overPrice              Int?        // الأوفر برايس
+  installmentValue       Int?        // قيمة القسط
+  maintenanceDeposit     Int?        // وديعة الصيانة
+
+  totalPaid              Int?        // إجمالي المدفوع من الوحدة
+  totalPaidWithOver      Int?        // إجمالي المدفوع + الأوفر
+
   area                   Int
   bedrooms               Int
   bathrooms              Int
   location               String
-  status                 String      // "available" | "sold"
+  status                 String
+
   mainImageUrl           String?
   description            String?
   isFeaturedOnHomepage   Boolean     @default(false)
+
   images                 UnitImage[]
   leads                  Lead[]
+
   createdAt              DateTime    @default(now())
   updatedAt              DateTime    @updatedAt
 }
+
 
 model UnitImage {
   id       Int    @id @default(autoincrement())

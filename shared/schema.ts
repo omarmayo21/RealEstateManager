@@ -22,21 +22,39 @@ export const projects = pgTable("projects", {
 
 export const units = pgTable("units", {
   id: serial("id").primaryKey(),
-  projectId: integer("project_id").notNull().references(() => projects.id, { onDelete: "cascade" }),
+
+  projectId: integer("project_id")
+    .notNull()
+    .references(() => projects.id, { onDelete: "cascade" }),
+
   title: text("title").notNull(),
+  unitCode: text("unit_code"),
+  propertyType: text("property_type"),
+
   type: text("type").notNull(),
+
   price: integer("price").notNull(),
+  overPrice: integer("over_price"), // ✅ بس دول
+
   area: integer("area").notNull(),
   bedrooms: integer("bedrooms").notNull(),
   bathrooms: integer("bathrooms").notNull(),
+
   location: text("location").notNull(),
   status: text("status").notNull(),
+
   mainImageUrl: text("main_image_url"),
   description: text("description"),
-  isFeaturedOnHomepage: boolean("is_featured_on_homepage").default(false).notNull(),
+
+  isFeaturedOnHomepage: boolean("is_featured_on_homepage")
+    .default(false)
+    .notNull(),
+
   createdAt: timestamp("created_at").defaultNow().notNull(),
   updatedAt: timestamp("updated_at").defaultNow().notNull(),
 });
+
+
 
 export const unitImages = pgTable("unit_images", {
   id: serial("id").primaryKey(),
