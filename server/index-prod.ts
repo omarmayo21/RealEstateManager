@@ -14,17 +14,17 @@ function resolveDistPath() {
   return candidates.find((candidate) => fs.existsSync(candidate));
 }
 
-async function serveStatic(app: Express) {
+async function setupStatic(app: Express) {
   const distPath = resolveDistPath();
 
   if (!distPath) {
     throw new Error("Frontend build not found. Run npm run build first.");
   }
 
-  // 1️⃣ static files
+  // static assets
   app.use(express.static(distPath));
 
-  // 2️⃣ React fallback (GET فقط + مش API)
+  // React fallback (GET only)
   app.get("*", (req, res) => {
     if (req.path.startsWith("/api")) {
       return res.status(404).json({ error: "API route not found" });
@@ -35,6 +35,6 @@ async function serveStatic(app: Express) {
 }
 
 (async () => {
-  // ⚠️ المهم: runApp من غير override
-  const server = await runApp(serveStatic);
+  // ❗❗❗ متعملش override
+  await runApp(setupStatic);
 })();
