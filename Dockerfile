@@ -3,17 +3,16 @@ FROM node:22.12.0-alpine
 WORKDIR /app
 
 ENV PRISMA_SKIP_POSTINSTALL_GENERATE=true
-ENV NODE_ENV=production
 
 COPY package*.json ./
-
-# 👇 هنا من غير --omit=dev
 RUN npm install
 
 COPY . .
 
-# 👇 build محتاج vite
+# 👇 build لازم يحصل قبل NODE_ENV=production
 RUN npm run build
+
+ENV NODE_ENV=production
 
 EXPOSE 5000
 CMD ["npm", "start"]
