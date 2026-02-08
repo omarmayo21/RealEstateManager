@@ -61,7 +61,8 @@ export default function AdminProjects() {
   const [editingProject, setEditingProject] = useState<Project | null>(null);
 
   const { data: projects = [] } = useQuery<Project[]>({
-    queryKey: ["/api/projects"],
+   queryKey: ["api", "projects"]
+
   });
 
   const form = useForm<ProjectFormData>({
@@ -92,7 +93,8 @@ export default function AdminProjects() {
     },
     onSuccess: () => {
       toast({ title: "تم إضافة المشروع بنجاح" });
-      queryClient.invalidateQueries({ queryKey: ["/api/projects"] });
+      queryClient.invalidateQueries({queryKey: ["api", "projects"]
+ });
       setDialogOpen(false);
       form.reset();
     },
@@ -110,7 +112,7 @@ export default function AdminProjects() {
     },
     onSuccess: () => {
       toast({ title: "تم تحديث المشروع بنجاح" });
-      queryClient.invalidateQueries({ queryKey: ["/api/projects"] });
+      queryClient.invalidateQueries({ queryKey: ["api", "projects"] });
       setDialogOpen(false);
       setEditingProject(null);
       form.reset();
@@ -123,7 +125,7 @@ export default function AdminProjects() {
     },
     onSuccess: () => {
       toast({ title: "تم حذف المشروع بنجاح" });
-      queryClient.invalidateQueries({ queryKey: ["/api/projects"] });
+      queryClient.invalidateQueries({queryKey: ["api", "projects"]});
     },
   });
 

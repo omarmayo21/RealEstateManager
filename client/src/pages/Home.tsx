@@ -21,7 +21,8 @@ export default function Home() {
   });
 
   const { data: projects = [] } = useQuery<Project[]>({
-    queryKey: ["/api/projects"],
+   queryKey: ["api", "projects"]
+
   });
 
   const { data: allUnits = [] } = useQuery<(Unit & { project?: Project })[]>({

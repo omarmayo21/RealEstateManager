@@ -84,7 +84,8 @@ export default function AdminUnits() {
   const [editingUnit, setEditingUnit] = useState<Unit | null>(null);
 
   const { data: projects = [] } = useQuery<Project[]>({
-    queryKey: ["/api/projects"],
+    queryKey: ["api", "projects"]
+
   });
 
   const { data: units = [] } = useQuery<(Unit & { project?: Project })[]>({

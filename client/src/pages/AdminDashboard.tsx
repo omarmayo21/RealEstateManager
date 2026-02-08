@@ -6,7 +6,8 @@ import type { Project, Unit, Lead } from "@shared/schema";
 
 export default function AdminDashboard() {
   const { data: projects = [] } = useQuery<Project[]>({
-    queryKey: ["/api/projects"],
+    queryKey: ["api", "projects"]
+
   });
 
   const { data: units = [] } = useQuery<Unit[]>({

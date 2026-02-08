@@ -18,7 +18,8 @@ export default function Navbar() {
   const isHomePage = location === "/";
 
   const { data: projects = [] } = useQuery<Project[]>({
-    queryKey: ["/api/projects"],
+    queryKey: ["api", "projects"]
+
   });
 
   const { data: settings } = useQuery<{ companyPhone: string }>({

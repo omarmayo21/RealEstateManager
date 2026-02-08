@@ -34,7 +34,8 @@ export default function AdminLeads() {
   });
 
   const { data: projects = [] } = useQuery<Project[]>({
-    queryKey: ["/api/projects"],
+    queryKey: ["api", "projects"]
+
   });
 
   const deleteMutation = useMutation({

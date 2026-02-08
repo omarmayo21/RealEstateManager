@@ -1,6 +1,6 @@
 import { QueryClient, QueryFunction } from "@tanstack/react-query";
 
-const API_BASE = "";
+const API_BASE = "https://realestatemanager-production.up.railway.app/";
 
 function getAuthHeaders(): Record<string, string> {
   if (typeof window === "undefined") {
@@ -49,10 +49,14 @@ export const getQueryFn: <T>(options: {
 }) => QueryFunction<T> =
   ({ on401: unauthorizedBehavior }) =>
   async ({ queryKey }) => {
-    const res = await fetch(`${API_BASE}${queryKey.join("/")}`, {
+    const res = await fetch(
+    `${API_BASE}/${queryKey.join("/")}`.replace(/\/+/g, "/"),
+    {
       headers: getAuthHeaders(),
       credentials: "include",
-    });
+    }
+  );
+
 
     if (unauthorizedBehavior === "returnNull" && res.status === 401) {
       return null;

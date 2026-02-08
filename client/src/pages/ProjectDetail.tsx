@@ -15,7 +15,8 @@ export default function ProjectDetail() {
   const [filters, setFilters] = useState<UnitFilters>({});
 
   const { data: projects = [] } = useQuery<Project[]>({
-    queryKey: ["/api/projects"],
+   queryKey: ["api", "projects"]
+
   });
 
   const project = projects.find((p) => p.slug === slug);
