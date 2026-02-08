@@ -57,18 +57,28 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const token = jwt.sign({ userId: admin.id }, JWT_SECRET, { expiresIn: '7d' });
 
       res.json({ token, username: admin.username });
-    } catch (error) {
-      res.status(500).json({ error: "حدث خطأ في الخادم" });
-    }
+    } catch (error: any) {
+      console.error("LOGIN ERROR 👉", error);
+      res.status(500).json({
+        error: "حدث خطأ في الخادم",
+        message: error?.message,
+      });
+}
+
   });
 
   app.get("/api/projects", async (_req: Request, res: Response) => {
     try {
       const projects = await storage.getProjects();
       res.json(projects);
-    } catch (error) {
-      res.status(500).json({ error: "حدث خطأ في الخادم" });
-    }
+    } catch (error: any) {
+  console.error("LOGIN ERROR 👉", error);
+  res.status(500).json({
+    error: "حدث خطأ في الخادم",
+    message: error?.message,
+  });
+}
+
   });
 
   app.post("/api/projects", authMiddleware, async (req: Request, res: Response) => {
