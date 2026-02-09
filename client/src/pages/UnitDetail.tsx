@@ -43,14 +43,25 @@ const formatMoney = (value: unknown) => {
 export default function UnitDetail() {
   const { id } = useParams<{ id: string }>();
   const unitId = parseInt(id || "0");
-
+  
   const [selectedImage, setSelectedImage] = useState<string | null>(null);
 
-  const { data: allUnits = [] } = useQuery<(Unit & { project?: Project; images?: UnitImage[] })[]>({
+  const { data: allUnits = [] } = useQuery<
+    (Unit & {
+      project?: Project;
+      images?: UnitImage[];
+      paymentPlanPdf?: string | null;
+    })[]
+  >({
     queryKey: ["/api/units"],
   });
 
+
   const unit = allUnits.find((u) => u.id === unitId);
+  const paymentPlanFileName = unit?.paymentPlanPdf
+  ? unit.paymentPlanPdf.split("/").pop()
+  : null;
+
   const images = unit?.images || [];
   const displayImage = selectedImage || unit?.mainImageUrl || "https://images.unsplash.com/photo-1545324418-cc1a3fa10c00?w=800";
 
@@ -149,6 +160,32 @@ export default function UnitDetail() {
                 )}
               </motion.div>
             </div>
+            {/* 📄 Payment Plan PDF */}
+            {unit?.paymentPlanPdf && (
+              <div className="mt-4 flex items-center justify-between rounded-lg border p-3">
+                
+                {/* اسم الملف */}
+                <span className="text-sm text-muted-foreground">
+                  📄 Payment plan {paymentPlanFileName}
+                </span>
+
+                {/* زر التحميل */}
+                <a
+                  href={unit.paymentPlanPdf}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="flex items-center gap-2 rounded-md bg-green-500 px-4 py-2 text-white hover:bg-green-600"
+                  download
+                >
+                  تحميل
+                </a>
+              </div>
+            )}
+
+
+                  
+
+
 
             <div>
               <motion.div

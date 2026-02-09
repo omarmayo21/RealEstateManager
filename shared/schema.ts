@@ -124,6 +124,8 @@ export type Settings = typeof settings.$inferSelect;
 export type UnitWithImages = Unit & {
   images: UnitImage[];
   project?: Project;
+  paymentPlanPdf?: string | null;
+
 };
 
 export type ProjectWithUnits = Project & {

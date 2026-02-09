@@ -6,8 +6,10 @@ generator client {
 }
 
 datasource db {
-  provider = "sqlite"
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
 }
+
 
 model Project {
   id                          Int      @id @default(autoincrement())
@@ -28,39 +30,39 @@ model Project {
 }
 
 model Unit {
-  id                     Int         @id @default(autoincrement())
-  project                Project     @relation(fields: [projectId], references: [id], onDelete: Cascade)
-  projectId              Int
+  id        Int     @id @default(autoincrement())
+  project   Project @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  projectId Int
 
-  title                  String
-  unitCode               String?     // كود الوحدة
-  propertyType           String?     // نوع العقار (شقة / فيلا)
+  title        String
+  unitCode     String? // كود الوحدة
+  propertyType String? // نوع العقار (شقة / فيلا)
 
-  price                  Int
-  overPrice              Int?        // الأوفر برايس
-  installmentValue       Int?        // قيمة القسط
-  maintenanceDeposit     Int?        // وديعة الصيانة
+  price              Int
+  overPrice          Int? // الأوفر برايس
+  installmentValue   Int? // قيمة القسط
+  maintenanceDeposit Int? // وديعة الصيانة
 
-  totalPaid              Int?        // إجمالي المدفوع من الوحدة
-  totalPaid              Int?        // إجمالي المدفوع + الأوفر
-  repaymentYears         Int? 
-  area                   Int
-  bedrooms               Int
-  bathrooms              Int
-  location               String
-  status                 String
+  paymentPlanPdf String?
 
-  mainImageUrl           String?
-  description            String?
-  isFeaturedOnHomepage   Boolean     @default(false)
+  totalPaid      Int? // إجمالي المدفوع من الوحدة
+  repaymentYears Int?
+  area           Int
+  bedrooms       Int
+  bathrooms      Int
+  location       String
+  status         String
 
-  images                 UnitImage[]
-  leads                  Lead[]
+  mainImageUrl         String?
+  description          String?
+  isFeaturedOnHomepage Boolean @default(false)
 
-  createdAt              DateTime    @default(now())
-  updatedAt              DateTime    @updatedAt
+  images UnitImage[]
+  leads  Lead[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 }
-
 
 model UnitImage {
   id       Int    @id @default(autoincrement())
@@ -89,9 +91,9 @@ model AdminUser {
 }
 
 model Settings {
-  id               Int     @id @default(autoincrement())
-  companyPhone     String  @default("+20 1234567890")
-  whatsappNumber   String  @default("+20 1234567890")
-  heroTitle        String  @default("اكتشف منزل أحلامك مع Mars Realestates")
-  heroSubtitle     String  @default("نقدم لك أفضل العقارات والمشروعات السكنية في مصر")
+  id             Int    @id @default(autoincrement())
+  companyPhone   String @default("+20 1234567890")
+  whatsappNumber String @default("+20 1234567890")
+  heroTitle      String @default("اكتشف منزل أحلامك مع Mars Realestates")
+  heroSubtitle   String @default("نقدم لك أفضل العقارات والمشروعات السكنية في مصر")
 }

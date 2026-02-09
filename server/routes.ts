@@ -5,6 +5,7 @@ import bcrypt from "bcryptjs";
 import jwt from "jsonwebtoken";
 import type { UnitFilters } from "../shared/schema.js";
 import { insertProjectSchema, updateProjectSchema, insertUnitSchema, updateUnitSchema, insertLeadSchema } from "../shared/schema.js";
+import { upload } from "./middleware/upload";
 
 if (!process.env.JWT_SECRET) {
   console.warn("⚠️  JWT_SECRET not set, using default (not secure for production)");
@@ -67,6 +68,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
   });
 
+
+  
+
   app.get("/api/projects", async (_req: Request, res: Response) => {
     try {
       const projects = await storage.getProjects();
@@ -127,6 +131,44 @@ export async function registerRoutes(app: Express): Promise<Server> {
       res.status(500).json({ error: "حدث خطأ في الخادم" });
     }
   });
+  app.post("/api/test-upload", upload.single("file"), (req, res) => {
+    const file = req.file as any;
+
+    if (!file) {
+      return res.status(400).json({ message: "No file uploaded" });
+    }
+
+    res.json({
+      url: file.path,
+    });
+  });
+
+
+  app.post(
+    "/api/uploads/unit-assets",
+    authMiddleware,
+    upload.fields([
+      { name: "images", maxCount: 10 },
+      { name: "paymentPlanPdf", maxCount: 1 },
+    ]),
+    async (req, res) => {
+      const files = req.files as {
+        images?: Express.Multer.File[];
+        paymentPlanPdf?: Express.Multer.File[];
+      };
+
+      const images =
+        files?.images?.map((file) => file.path) || [];
+
+      const paymentPlanPdf =
+        files?.paymentPlanPdf?.[0]?.path || null;
+
+      res.json({
+        images,
+        paymentPlanPdf,
+      });
+    }
+  );
 
   app.get("/api/units", async (req: Request, res: Response) => {
     try {
@@ -178,18 +220,64 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.post("/api/units", authMiddleware, async (req: Request, res: Response) => {
-    try {
-      const validatedData = insertUnitSchema.parse(req.body);
-      const unit = await storage.createUnit(validatedData);
-      res.json(unit);
-    } catch (error: any) {
-      if (error.name === 'ZodError') {
-        return res.status(400).json({ error: "بيانات غير صالحة", details: error.errors });
+  app.post(
+    "/api/units",
+    authMiddleware,
+    upload.fields([
+      { name: "images", maxCount: 10 },
+      { name: "paymentPlanPdf", maxCount: 1 },
+    ]),
+    async (req: Request, res: Response) => {
+      try {
+        // 1️⃣ البيانات النصية
+        const validatedData = insertUnitSchema.parse({
+          ...req.body,
+          projectId: Number(req.body.projectId),
+          price: Number(req.body.price),
+          area: Number(req.body.area),
+          bedrooms: Number(req.body.bedrooms),
+          bathrooms: Number(req.body.bathrooms),
+        });
+
+
+        // 2️⃣ الصور
+        const files = req.files as {
+          images?: Express.Multer.File[];
+          paymentPlanPdf?: Express.Multer.File[];
+        };
+
+        const imageUrls =
+          files?.images?.map((file) => file.path) ?? [];
+
+        // 3️⃣ PDF
+        const paymentPlanPdfUrl =
+          files?.paymentPlanPdf?.[0]?.path ?? null;
+
+        // 4️⃣ إنشاء الوحدة + الأصول
+        const unit = await storage.createUnitWithAssets(
+          validatedData,
+          imageUrls,
+          paymentPlanPdfUrl
+        );
+
+        res.json(unit);
+      } catch (error: any) {
+        console.error("CREATE UNIT ERROR 👉", error);
+
+        if (error.name === "ZodError") {
+          return res.status(400).json({
+            error: "بيانات غير صالحة",
+            details: error.errors,
+          });
+        }
+
+        res.status(500).json({
+          error: "حدث خطأ في الخادم",
+          message: error?.message,
+        });
       }
-      res.status(500).json({ error: "حدث خطأ في الخادم" });
     }
-  });
+  );
 
   app.put("/api/units/:id", authMiddleware, async (req: Request, res: Response) => {
     try {

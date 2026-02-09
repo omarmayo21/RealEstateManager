@@ -46,8 +46,7 @@ import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { apiRequest } from "@/lib/queryClient";
 import type { Unit, Project, InsertUnit } from "@shared/schema";
 import { NumberInput } from "@/components/ui/NumberInput";
-
-
+import type { UnitWithImages } from "../../../shared/schema";
 
 const parseOptionalNumber = (value: string | undefined) => {
   if (value === undefined || value === "") return null;
@@ -86,6 +85,9 @@ const unitSchema = z.object({
 
   mainImageUrl: z.string().optional(),
   description: z.string().optional(),
+  paymentPlanPdf: z.any().optional().nullable(), // ✅ ده المهم
+  images: z.array(z.instanceof(File)).optional(),
+
 
   isFeaturedOnHomepage: z.boolean(),
 });
@@ -103,74 +105,46 @@ export default function AdminUnits() {
 
   });
 
-  const { data: units = [] } = useQuery<(Unit & { project?: Project })[]>({
-    queryKey: ["/api/units"],
-  });
-  const form = useForm<UnitFormData>({
-    resolver: zodResolver(unitSchema),
-    defaultValues: {
-      projectId: "",
-      title: "",
-      unitCode: "",          // ✅
-      propertyType: "",      // ✅
-      repaymentYears: "",
+    const { data: units = [] } = useQuery<UnitWithImages[]>({
+      queryKey: ["/api/units"],
+    });
+    const form = useForm<UnitFormData>({
+      resolver: zodResolver(unitSchema),
+      defaultValues: {
+        projectId: "",
+        title: "",
+        unitCode: "",
+        propertyType: "",
+        repaymentYears: "",
 
-      type: "primary",
-      price: "",
-      overPrice: "",
-      installmentValue: "",
-      maintenanceDeposit: "",
-      totalPaid: "",
+        type: "primary",
+        price: "",
+        overPrice: "",
+        installmentValue: "",
+        maintenanceDeposit: "",
+        totalPaid: "",
 
-      area: "",
-      bedrooms: "",
-      bathrooms: "",
+        area: "",
+        bedrooms: "",
+        bathrooms: "",
 
-      location: "",
-      status: "available",
+        location: "",
+        status: "available",
 
-      mainImageUrl: "",
-      description: "",
-      isFeaturedOnHomepage: false,
-    },
-  });
+        mainImageUrl: "",
+        description: "",
+        isFeaturedOnHomepage: false,
+
+        images: [],                // ✅
+        paymentPlanPdf: null,      // ✅ ده المهم
+      },
+    });
 
 
 const createMutation = useMutation({
-  mutationFn: async (data: UnitFormData) => {
-    const unitData: InsertUnit = {
-      projectId: parseInt(data.projectId),
-
-      title: data.title,
-      unitCode: data.unitCode || null,          // ✅ كود الوحدة
-      propertyType: data.propertyType || null,  // ✅ نوع العقار
-      repaymentYears: parseOptionalNumber(data.repaymentYears),
-
-
-      type: data.type,
-
-      price: parseInt(data.price),
-      overPrice: parseOptionalNumber(data.overPrice),
-      installmentValue: parseOptionalNumber(data.installmentValue),
-      maintenanceDeposit: parseOptionalNumber(data.maintenanceDeposit),
-
-      area: parseInt(data.area),
-      bedrooms: parseInt(data.bedrooms),
-      bathrooms: parseInt(data.bathrooms),
-
-      location: data.location,
-      status: data.status,
-
-      mainImageUrl: data.mainImageUrl || null,
-      description: data.description || null,
-      totalPaid: parseOptionalNumber(data.totalPaid),
-
-      isFeaturedOnHomepage: data.isFeaturedOnHomepage,
-    };
-
-    return await apiRequest("POST", "/api/units", unitData);
+  mutationFn: async (formData: FormData) => {
+    return apiRequest("POST", "/api/units", formData);
   },
-
   onSuccess: () => {
     toast({ title: "تم إضافة الوحدة بنجاح" });
     queryClient.invalidateQueries({ queryKey: ["/api/units"] });
@@ -178,6 +152,8 @@ const createMutation = useMutation({
     form.reset();
   },
 });
+
+
 
 
   const updateMutation = useMutation({
@@ -264,12 +240,40 @@ const createMutation = useMutation({
   };
 
   const onSubmit = (data: UnitFormData) => {
+    const formData = new FormData();
+
+    // 1️⃣ الحقول النصية فقط
+    Object.entries(data).forEach(([key, value]) => {
+      if (
+        value !== undefined &&
+        value !== null &&
+        key !== "images" &&
+        key !== "paymentPlanPdf"
+      ) {
+        formData.append(key, value.toString());
+      }
+    });
+
+    // 2️⃣ الصور
+    data.images?.forEach((file) => {
+      formData.append("images", file);
+    });
+
+    // 3️⃣ PDF Payment Plan
+    if (data.paymentPlanPdf) {
+      formData.append("paymentPlanPdf", data.paymentPlanPdf);
+    }
+
+    // 4️⃣ الإرسال
     if (editingUnit) {
-      updateMutation.mutate({ id: editingUnit.id, data });
+    createMutation.mutate(formData);
+
     } else {
-      createMutation.mutate(data);
+      createMutation.mutate(formData);
     }
   };
+
+
 
   const formatPrice = (price: number) => {
     return new Intl.NumberFormat('ar-EG', {
@@ -599,6 +603,27 @@ const createMutation = useMutation({
                       </FormItem>
                     )}
                   />
+                  {/* 📄 Payment Plan PDF */}
+                    <FormField
+                      control={form.control}
+                      name="paymentPlanPdf"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel>ملف خطة السداد (PDF)</FormLabel>
+                          <FormControl>
+                            <Input
+                              type="file"
+                              accept="application/pdf"
+                              onChange={(e) => {
+                                field.onChange(e.target.files?.[0] ?? null);
+                              }}
+                            />
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+
 
                   {/* مميز في الرئيسية */}
                   <FormField

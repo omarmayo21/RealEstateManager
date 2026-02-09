@@ -28,6 +28,11 @@ export interface IStorage {
 
   getUnitImages(unitId: number): Promise<UnitImage[]>;
   createUnitImage(unitId: number, imageUrl: string): Promise<UnitImage>;
+  createUnitWithAssets(
+    unit: InsertUnit,
+    imageUrls: string[],
+    paymentPlanPdf?: string | null
+  ): Promise<Unit>;
 
   getLeads(): Promise<Lead[]>;
   createLead(lead: InsertLead): Promise<Lead>;
@@ -103,6 +108,8 @@ export class DatabaseStorage implements IStorage {
   async createUnit(unit: InsertUnit): Promise<Unit> {
     const results = await db.insert(schema.units).values(unit).returning();
     return results[0];
+
+    
   }
 
   async updateUnit(id: number, unit: InsertUnit): Promise<Unit | undefined> {
@@ -126,6 +133,33 @@ export class DatabaseStorage implements IStorage {
     const results = await db.insert(schema.unitImages).values({ unitId, imageUrl }).returning();
     return results[0];
   }
+async createUnitWithAssets(
+  unit: InsertUnit,
+  imageUrls: string[],
+  paymentPlanPdf?: string | null
+): Promise<Unit> {
+  const results = await db
+    .insert(schema.units)
+    .values({
+      ...(unit as any),
+      paymentPlanPdf: paymentPlanPdf ?? null,
+    })
+    .returning();
+
+  const newUnit = results[0];
+
+  if (imageUrls.length > 0) {
+    await db.insert(schema.unitImages).values(
+      imageUrls.map((url) => ({
+        unitId: newUnit.id,
+        imageUrl: url,
+      }))
+    );
+  }
+
+  return newUnit;
+}
+
 
   async getLeads(): Promise<Lead[]> {
     return await db.select().from(schema.leads);
