@@ -254,7 +254,7 @@ export default function UnitDetail() {
                     <span className="text-muted-foreground">سنوات السداد</span>
                   </div>
                   <span className="font-semibold">
-                    {unit.repaymentYears ? `${unit.repaymentYears} سنة` : "-"}
+                    {unit.repaymentYears ? `${unit.repaymentYears} سنوات` : "-"}
                   </span>
                 </div>
 
@@ -271,6 +271,15 @@ export default function UnitDetail() {
                         : "—"}
                     </span>
                   </div>
+                <div className="flex items-center justify-between py-3 border-b">
+                  <div className="flex items-center gap-2">
+                    <Maximize className="w-5 h-5 text-primary" />
+                    <span className="text-muted-foreground">المساحة</span>
+                  </div>
+                  <span className="font-semibold">
+                    {unit.area ? `${unit.area} م²` : "-"}
+                  </span>
+                </div>
 
 
 
