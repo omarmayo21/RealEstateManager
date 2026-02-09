@@ -11,11 +11,11 @@ export default async function runApp(setup?: SetupFn) {
   const server = createServer(app);
 
   app.use(cors({ origin: true, credentials: true }));
-  app.use(express.json());
-  app.use(express.urlencoded({ extended: false }));
+
 
   registerRoutes(app);
-
+  app.use(express.json());
+  app.use(express.urlencoded({ extended: false }));
   if (setup) {
     await setup(app, server);
   }
