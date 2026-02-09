@@ -242,32 +242,36 @@ const createMutation = useMutation({
   const onSubmit = (data: UnitFormData) => {
     const formData = new FormData();
 
-    // 1️⃣ الحقول النصية فقط
-    Object.entries(data).forEach(([key, value]) => {
-      if (
-        value !== undefined &&
-        value !== null &&
-        key !== "images" &&
-        key !== "paymentPlanPdf"
-      ) {
-        formData.append(key, value.toString());
-      }
-    });
+    // 🔢 أرقام (لازم تتحول هنا)
+    formData.append("projectId", data.projectId);
+    formData.append("price", data.price);
+    formData.append("area", data.area);
+    formData.append("bedrooms", data.bedrooms);
+    formData.append("bathrooms", data.bathrooms);
 
-    // 2️⃣ الصور
+    // 🧾 Strings المطلوبة
+    formData.append("title", data.title);
+    formData.append("type", data.type);
+    formData.append("location", data.location);
+    formData.append("status", data.status);
+
+    // اختياري
+    if (data.unitCode) formData.append("unitCode", data.unitCode);
+    if (data.propertyType) formData.append("propertyType", data.propertyType);
+    if (data.description) formData.append("description", data.description);
+
+    // 🖼️ الصور
     data.images?.forEach((file) => {
       formData.append("images", file);
     });
 
-    // 3️⃣ PDF Payment Plan
+    // 📄 PDF
     if (data.paymentPlanPdf) {
       formData.append("paymentPlanPdf", data.paymentPlanPdf);
     }
 
-    // 4️⃣ الإرسال
     if (editingUnit) {
-    createMutation.mutate(formData);
-
+      updateMutation.mutate({ id: editingUnit.id, data: formData });
     } else {
       createMutation.mutate(formData);
     }
