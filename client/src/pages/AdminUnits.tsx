@@ -113,6 +113,7 @@ export default function AdminUnits() {
       title: "",
       unitCode: "",          // ✅
       propertyType: "",      // ✅
+      repaymentYears: "",
 
       type: "primary",
       price: "",
