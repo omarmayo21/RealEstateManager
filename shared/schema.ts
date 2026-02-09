@@ -36,6 +36,8 @@ export const units = pgTable("units", {
   price: integer("price").notNull(),
   overPrice: integer("over_price"), // ✅ بس دول
   totalPaid: integer("total_paid"),
+  totalPaidWithOver: integer("total_paid_with_over"),
+
   area: integer("area").notNull(),
   bedrooms: integer("bedrooms").notNull(),
   bathrooms: integer("bathrooms").notNull(),
