@@ -29,6 +29,7 @@ app.get("*", (req, res) => {
 
 // 🔥 هنا الصح
 const server = http.createServer(app);
+console.log("DATABASE_URL =", process.env.DATABASE_URL);
 
 const port = Number(process.env.PORT) || 5000;
 server.listen(port, "0.0.0.0", () => {
