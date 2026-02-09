@@ -19,6 +19,7 @@ import {
   Wrench,
   Calculator,
   Wallet,
+  Calendar,
 } from "lucide-react";
 
 
@@ -247,6 +248,15 @@ export default function UnitDetail() {
                     </div>
                       {formatMoney(unit.totalPaid)}
                   </div>
+                <div className="flex items-center justify-between py-3 border-b">
+                  <div className="flex items-center gap-2">
+                    <Calendar className="w-5 h-5 text-primary" />
+                    <span className="text-muted-foreground">سنوات السداد</span>
+                  </div>
+                  <span className="font-semibold">
+                    {unit.repaymentYears ? `${unit.repaymentYears} سنة` : "-"}
+                  </span>
+                </div>
 
                   {/* قيمة القسط */}
                   <div className="flex items-center justify-between py-3 border-b">
