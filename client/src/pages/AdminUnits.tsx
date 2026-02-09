@@ -189,7 +189,7 @@ const createMutation = useMutation({
         maintenanceDeposit: parseOptionalNumber(data.maintenanceDeposit),
 
         
-
+        totalPaid: parseOptionalNumber(data.totalPaid),
 
         area: parseInt(data.area),
         bedrooms: parseInt(data.bedrooms),
