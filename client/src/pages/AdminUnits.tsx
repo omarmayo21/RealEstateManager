@@ -156,6 +156,7 @@ const createMutation = useMutation({
 
       mainImageUrl: data.mainImageUrl || null,
       description: data.description || null,
+      totalPaid: parseOptionalNumber(data.totalPaid),
 
       isFeaturedOnHomepage: data.isFeaturedOnHomepage,
     };
