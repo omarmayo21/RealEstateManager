@@ -93,9 +93,6 @@ export default async function runApp(
 
   // شغال على ويندوز + أي استضافة (Replit, Render, VPS... إلخ)
   // من غير 0.0.0.0 ولا reusePort
-  server.listen(port, () => {
-    const url = `http://localhost:${port}`;
-    log(`Server running at ${url}`);
-  });
+
 }
  
