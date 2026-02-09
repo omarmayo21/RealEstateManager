@@ -154,8 +154,10 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
       res.json(unitsWithProjects);
     } catch (error) {
-      res.status(500).json({ error: "حدث خطأ في الخادم" });
-    }
+  console.error("❌ GET /api/units ERROR:", error);
+  res.status(500).json({ error: "حدث خطأ في الخادم" });
+  }
+
   });
 
   app.get("/api/units/:id", async (req: Request, res: Response) => {
