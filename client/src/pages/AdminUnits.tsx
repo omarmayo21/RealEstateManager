@@ -45,6 +45,10 @@ import { useToast } from "@/hooks/use-toast";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { apiRequest } from "@/lib/queryClient";
 import type { Unit, Project, InsertUnit } from "@shared/schema";
+import { NumberInput } from "@/components/ui/NumberInput";
+
+
+
 const parseOptionalNumber = (value: string | undefined) => {
   if (value === undefined || value === "") return null;
   const num = Number(value);
@@ -383,7 +387,7 @@ const createMutation = useMutation({
                       <FormItem>
                         <FormLabel>السعر (جنيه)</FormLabel>
                         <FormControl>
-                          <Input type="number" placeholder="1450000" {...field} />
+                            <NumberInput placeholder="1450000" {...field} />
                         </FormControl>
                         <FormMessage />
                       </FormItem>
@@ -398,7 +402,7 @@ const createMutation = useMutation({
                       <FormItem>
                         <FormLabel>الأوفر برايس (جنيه)</FormLabel>
                         <FormControl>
-                          <Input type="number" placeholder="200000" {...field} />
+                            <NumberInput placeholder="200000" {...field} />
                         </FormControl>
                         <FormMessage />
                       </FormItem>
@@ -413,7 +417,7 @@ const createMutation = useMutation({
                       <FormItem>
                         <FormLabel>قيمة القسط (جنيه)</FormLabel>
                         <FormControl>
-                          <Input type="number" placeholder="10000" {...field} />
+                            <NumberInput placeholder="10000" {...field} />
                         </FormControl>
                         <FormMessage />
                       </FormItem>
@@ -428,7 +432,7 @@ const createMutation = useMutation({
                       <FormItem>
                         <FormLabel>وديعة الصيانة (جنيه)</FormLabel>
                         <FormControl>
-                          <Input type="number" placeholder="50000" {...field} />
+                            <NumberInput placeholder="50000" {...field} />
                         </FormControl>
                         <FormMessage />
                       </FormItem>
@@ -443,7 +447,7 @@ const createMutation = useMutation({
                       <FormItem>
                         <FormLabel>إجمالي المدفوع (جنيه)</FormLabel>
                         <FormControl>
-                          <Input type="number" placeholder="250000" {...field} />
+                            <NumberInput placeholder="250000" {...field} />
                         </FormControl>
                         <FormMessage />
                       </FormItem>
@@ -457,7 +461,7 @@ const createMutation = useMutation({
                       <FormItem>
                         <FormLabel>المساحة (م²)</FormLabel>
                         <FormControl>
-                          <Input type="number" placeholder="120" {...field} />
+                            <NumberInput placeholder="120" {...field} />
                         </FormControl>
                         <FormMessage />
                       </FormItem>
@@ -472,7 +476,7 @@ const createMutation = useMutation({
                       <FormItem>
                         <FormLabel>عدد الغرف</FormLabel>
                         <FormControl>
-                          <Input type="number" placeholder="3" {...field} />
+                            <NumberInput placeholder="3" {...field} />
                         </FormControl>
                         <FormMessage />
                       </FormItem>
@@ -487,7 +491,7 @@ const createMutation = useMutation({
                       <FormItem>
                         <FormLabel>عدد دورات المياه</FormLabel>
                         <FormControl>
-                          <Input type="number" placeholder="2" {...field} />
+                            <NumberInput placeholder="2" {...field} />
                         </FormControl>
                         <FormMessage />
                       </FormItem>
