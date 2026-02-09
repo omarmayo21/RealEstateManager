@@ -75,6 +75,7 @@ const unitSchema = z.object({
   maintenanceDeposit: optionalNumberField, // وديعة الصيانة
   totalPaid: optionalNumberField, // إجمالي المدفوع
  // إجمالي المدفوع // إجمالي + الأوفر
+  repaymentYears: optionalNumberField, // سنوات السداد
 
   area: z.string().min(1, "المساحة مطلوبة"),
   bedrooms: z.string().min(1, "عدد الغرف مطلوب"),
@@ -142,6 +143,7 @@ const createMutation = useMutation({
       title: data.title,
       unitCode: data.unitCode || null,          // ✅ كود الوحدة
       propertyType: data.propertyType || null,  // ✅ نوع العقار
+      repaymentYears: parseOptionalNumber(data.repaymentYears),
 
 
       type: data.type,
@@ -191,6 +193,7 @@ const createMutation = useMutation({
         overPrice: parseOptionalNumber(data.overPrice),
         installmentValue: parseOptionalNumber(data.installmentValue),
         maintenanceDeposit: parseOptionalNumber(data.maintenanceDeposit),
+        repaymentYears: parseOptionalNumber(data.repaymentYears),
 
         
         totalPaid: parseOptionalNumber(data.totalPaid),
@@ -477,6 +480,22 @@ const createMutation = useMutation({
                         <FormLabel>عدد الغرف</FormLabel>
                         <FormControl>
                             <NumberInput placeholder="3" {...field} />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                  <FormField
+                    control={form.control}
+                    name="repaymentYears"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>سنوات السداد</FormLabel>
+                        <FormControl>
+                          <NumberInput
+                            placeholder="مثال: 10"
+                            {...field}
+                          />
                         </FormControl>
                         <FormMessage />
                       </FormItem>

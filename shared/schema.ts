@@ -16,12 +16,14 @@ export const projects = pgTable("projects", {
   logoUrl: text("logo_url"),
   shortDescription: text("short_description"),
   amenities: text("amenities"),
+  
   createdAt: timestamp("created_at").defaultNow().notNull(),
   updatedAt: timestamp("updated_at").defaultNow().notNull(),
 });
 
 export const units = pgTable("units", {
   id: serial("id").primaryKey(),
+  repaymentYears: integer("repayment_years"),
 
   projectId: integer("project_id")
     .notNull()
