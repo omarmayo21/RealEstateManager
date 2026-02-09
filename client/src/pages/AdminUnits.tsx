@@ -45,6 +45,16 @@ import { useToast } from "@/hooks/use-toast";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { apiRequest } from "@/lib/queryClient";
 import type { Unit, Project, InsertUnit } from "@shared/schema";
+const parseOptionalNumber = (value: string | undefined) => {
+  if (value === undefined || value === "") return null;
+  const num = Number(value);
+  return Number.isFinite(num) ? num : null;
+};
+
+const optionalNumberField = z
+  .string()
+  .optional()
+  .transform((val) => (val === "" ? undefined : val));
 
 const unitSchema = z.object({
   projectId: z.string().min(1, "المشروع مطلوب"),
@@ -56,13 +66,10 @@ const unitSchema = z.object({
   propertyType: z.string().optional(), // نوع العقار (شقة / فيلا)
 
   price: z.string().min(1, "السعر مطلوب"),
-  overPrice: z.string().optional(), // الأوفر برايس
-  installmentValue: z.string().optional(), // قيمة القسط
-  maintenanceDeposit: z.string().optional(), // وديعة الصيانة
-  totalPaid: z
-    .string()
-    .optional()
-    .transform((val) => (val === "" ? undefined : val)),
+  overPrice: optionalNumberField, // الأوفر برايس
+  installmentValue: optionalNumberField, // قيمة القسط
+  maintenanceDeposit: optionalNumberField, // وديعة الصيانة
+  totalPaid: optionalNumberField, // إجمالي المدفوع
  // إجمالي المدفوع // إجمالي + الأوفر
 
   area: z.string().min(1, "المساحة مطلوبة"),
@@ -94,33 +101,33 @@ export default function AdminUnits() {
   const { data: units = [] } = useQuery<(Unit & { project?: Project })[]>({
     queryKey: ["/api/units"],
   });
-const form = useForm<UnitFormData>({
-  resolver: zodResolver(unitSchema),
-  defaultValues: {
-    projectId: "",
-    title: "",
-    unitCode: "",          // ✅
-    propertyType: "",      // ✅
+  const form = useForm<UnitFormData>({
+    resolver: zodResolver(unitSchema),
+    defaultValues: {
+      projectId: "",
+      title: "",
+      unitCode: "",          // ✅
+      propertyType: "",      // ✅
 
-    type: "primary",
-    price: "",
-    overPrice: "",
-    installmentValue: "",
-    maintenanceDeposit: "",
-    totalPaid: "",
+      type: "primary",
+      price: "",
+      overPrice: "",
+      installmentValue: "",
+      maintenanceDeposit: "",
+      totalPaid: "",
 
-    area: "",
-    bedrooms: "",
-    bathrooms: "",
+      area: "",
+      bedrooms: "",
+      bathrooms: "",
 
-    location: "",
-    status: "available",
+      location: "",
+      status: "available",
 
-    mainImageUrl: "",
-    description: "",
-    isFeaturedOnHomepage: false,
-  },
-});
+      mainImageUrl: "",
+      description: "",
+      isFeaturedOnHomepage: false,
+    },
+  });
 
 
 const createMutation = useMutation({
@@ -136,19 +143,9 @@ const createMutation = useMutation({
       type: data.type,
 
       price: parseInt(data.price),
-      overPrice: data.overPrice
-        ? parseInt(data.overPrice)
-        : null,
-
-
-      totalPaid:
-        data.totalPaid !== undefined
-          ? Number(data.totalPaid)
-          : null,
-
-
-
-
+      overPrice: parseOptionalNumber(data.overPrice),
+      installmentValue: parseOptionalNumber(data.installmentValue),
+      maintenanceDeposit: parseOptionalNumber(data.maintenanceDeposit),
 
       area: parseInt(data.area),
       bedrooms: parseInt(data.bedrooms),
@@ -186,7 +183,10 @@ const createMutation = useMutation({
         type: data.type,
 
         price: parseInt(data.price),
-        overPrice: data.overPrice ? parseInt(data.overPrice) : null,
+        overPrice: parseOptionalNumber(data.overPrice),
+        installmentValue: parseOptionalNumber(data.installmentValue),
+        maintenanceDeposit: parseOptionalNumber(data.maintenanceDeposit),
+
         
 
 
@@ -196,13 +196,6 @@ const createMutation = useMutation({
 
         location: data.location,
         status: data.status,
-        installmentValue: data.installmentValue
-            ? Number(data.installmentValue)
-            : null,
-
-          maintenanceDeposit: data.maintenanceDeposit
-            ? Number(data.maintenanceDeposit)
-            : null,
         mainImageUrl: data.mainImageUrl || null,
         description: data.description || null,
 
@@ -229,14 +222,25 @@ const createMutation = useMutation({
       queryClient.invalidateQueries({ queryKey: ["/api/units"] });
     },
   });
+  const toFormString = (value?: number | null) =>
+    value != null ? String(value) : "";
 
   const handleEdit = (unit: Unit) => {
     setEditingUnit(unit);
     form.reset({
       projectId: unit.projectId.toString(),
       title: unit.title,
-      type: unit.type as "resale" | "primary",
+      unitCode: unit.unitCode || "",
+      propertyType: unit.propertyType || "",
+
       price: unit.price.toString(),
+      overPrice: unit.overPrice?.toString() || "",
+      installmentValue: unit.installmentValue?.toString() || "",
+      maintenanceDeposit: unit.maintenanceDeposit?.toString() || "",
+      totalPaid: toFormString(unit.totalPaid),
+
+
+      type: unit.type as "resale" | "primary",
       area: unit.area.toString(),
       bedrooms: unit.bedrooms.toString(),
       bathrooms: unit.bathrooms.toString(),
@@ -246,6 +250,7 @@ const createMutation = useMutation({
       description: unit.description || "",
       isFeaturedOnHomepage: unit.isFeaturedOnHomepage,
     });
+
     setDialogOpen(true);
   };
 
@@ -399,6 +404,50 @@ const createMutation = useMutation({
                     )}
                   />
 
+                 {/* قيمة القسط */}
+                  <FormField
+                    control={form.control}
+                    name="installmentValue"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>قيمة القسط (جنيه)</FormLabel>
+                        <FormControl>
+                          <Input type="number" placeholder="10000" {...field} />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+
+                  {/* وديعة الصيانة */}
+                  <FormField
+                    control={form.control}
+                    name="maintenanceDeposit"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>وديعة الصيانة (جنيه)</FormLabel>
+                        <FormControl>
+                          <Input type="number" placeholder="50000" {...field} />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+
+                  {/* إجمالي المدفوع */}
+                  <FormField
+                    control={form.control}
+                    name="totalPaid"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>إجمالي المدفوع (جنيه)</FormLabel>
+                        <FormControl>
+                          <Input type="number" placeholder="250000" {...field} />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
                   {/* المساحة */}
                   <FormField
                     control={form.control}

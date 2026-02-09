@@ -22,11 +22,21 @@ import {
 } from "lucide-react";
 
 
-const formatMoney = (value: any) => {
+
+const parseNumber = (value: unknown) => {
+  if (value === null || value === undefined || value === "") {
+    return null;
+  }
   const num = Number(value);
-  if (!num) return "—";
-  return num.toLocaleString() + " ج.م";
+  return Number.isFinite(num) ? num : null;
 };
+
+const formatMoney = (value: unknown) => {
+  const num = parseNumber(value);
+  if (num === null) return "—";
+  return `${num.toLocaleString()} ج.م`;
+};
+
 
 
 export default function UnitDetail() {
@@ -66,6 +76,12 @@ export default function UnitDetail() {
       </div>
     );
   }
+
+
+  const totalPaidValue = parseNumber(unit.totalPaid);
+  const overPriceValue = parseNumber(unit.overPrice);
+  const totalWithOver = (totalPaidValue ?? 0) + (overPriceValue ?? 0);
+  const hasTotalWithOver = totalPaidValue !== null || overPriceValue !== null;
 
   return (
     <div className="min-h-screen bg-background">
@@ -221,8 +237,7 @@ export default function UnitDetail() {
                       <span className="text-muted-foreground">الأوفر برايس</span>
                     </div>
                     <span className="font-semibold">
-                      {unit.overPrice ? `${unit.overPrice.toLocaleString()} ج.م` : "—"}
-                    </span>
+                      {formatMoney(unit.overPrice)}</span>
                   </div>
                   {/* إجمالي المدفوع من الوحدة */}
                   <div className="flex items-center justify-between py-3 border-b">
@@ -230,11 +245,7 @@ export default function UnitDetail() {
                       <Wallet className="w-5 h-5 text-primary" />
                       <span className="text-muted-foreground">إجمالي المدفوع من الوحدة</span>
                     </div>
-                    <span className="font-semibold">
-                      {typeof unit.totalPaid === "number"
-                        ? unit.totalPaid.toLocaleString() + " ج.م"
-                        : "—"}
-                    </span>
+                      {formatMoney(unit.totalPaid)}
                   </div>
 
                   {/* قيمة القسط */}
@@ -276,12 +287,7 @@ export default function UnitDetail() {
                       <span className="text-muted-foreground">الإجمالي</span>
                     </div>
                     <span className="font-bold text-primary">
-                      {typeof unit.totalPaid === "number" || typeof unit.overPrice === "number"
-                        ? (
-                            Number(unit.totalPaid || 0) +
-                            Number(unit.overPrice || 0)
-                          ).toLocaleString() + " ج.م"
-                        : "—"}
+                      {hasTotalWithOver ? `${totalWithOver.toLocaleString()} ج.م` : "—"}
                     </span>
 
                   </div>
