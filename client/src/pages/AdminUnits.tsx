@@ -59,8 +59,11 @@ const unitSchema = z.object({
   overPrice: z.string().optional(), // الأوفر برايس
   installmentValue: z.string().optional(), // قيمة القسط
   maintenanceDeposit: z.string().optional(), // وديعة الصيانة
-  totalPaid: z.string().optional(), // إجمالي المدفوع
-  totalPaidWithOver: z.string().optional(), // إجمالي + الأوفر
+  totalPaid: z
+    .string()
+    .optional()
+    .transform((val) => (val === "" ? undefined : val)),
+ // إجمالي المدفوع // إجمالي + الأوفر
 
   area: z.string().min(1, "المساحة مطلوبة"),
   bedrooms: z.string().min(1, "عدد الغرف مطلوب"),
@@ -105,7 +108,6 @@ const form = useForm<UnitFormData>({
     installmentValue: "",
     maintenanceDeposit: "",
     totalPaid: "",
-    totalPaidWithOver: "",
 
     area: "",
     bedrooms: "",
@@ -130,12 +132,21 @@ const createMutation = useMutation({
       unitCode: data.unitCode || null,          // ✅ كود الوحدة
       propertyType: data.propertyType || null,  // ✅ نوع العقار
 
+
       type: data.type,
 
       price: parseInt(data.price),
       overPrice: data.overPrice
         ? parseInt(data.overPrice)
         : null,
+
+
+      totalPaid:
+        data.totalPaid !== undefined
+          ? Number(data.totalPaid)
+          : null,
+
+
 
 
 
@@ -176,6 +187,8 @@ const createMutation = useMutation({
 
         price: parseInt(data.price),
         overPrice: data.overPrice ? parseInt(data.overPrice) : null,
+        
+
 
         area: parseInt(data.area),
         bedrooms: parseInt(data.bedrooms),
@@ -183,7 +196,13 @@ const createMutation = useMutation({
 
         location: data.location,
         status: data.status,
+        installmentValue: data.installmentValue
+            ? Number(data.installmentValue)
+            : null,
 
+          maintenanceDeposit: data.maintenanceDeposit
+            ? Number(data.maintenanceDeposit)
+            : null,
         mainImageUrl: data.mainImageUrl || null,
         description: data.description || null,
 

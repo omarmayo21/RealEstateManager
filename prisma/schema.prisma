@@ -42,7 +42,7 @@ model Unit {
   maintenanceDeposit     Int?        // وديعة الصيانة
 
   totalPaid              Int?        // إجمالي المدفوع من الوحدة
-  totalPaidWithOver      Int?        // إجمالي المدفوع + الأوفر
+  totalPaid              Int?        // إجمالي المدفوع + الأوفر
 
   area                   Int
   bedrooms               Int

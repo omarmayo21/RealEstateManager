@@ -11,6 +11,23 @@ import UnitCard from "@/components/UnitCard";
 import LeadForm from "@/components/LeadForm";
 import { useQuery } from "@tanstack/react-query";
 import type { Unit, Project, UnitImage } from "@shared/schema";
+import {
+  Hash,
+  DollarSign,
+  TrendingUp,
+  CreditCard,
+  Wrench,
+  Calculator,
+  Wallet,
+} from "lucide-react";
+
+
+const formatMoney = (value: any) => {
+  const num = Number(value);
+  if (!num) return "—";
+  return num.toLocaleString() + " ج.م";
+};
+
 
 export default function UnitDetail() {
   const { id } = useParams<{ id: string }>();
@@ -166,36 +183,111 @@ export default function UnitDetail() {
                 </div>
 
                 <Card>
-                  <CardContent className="p-6 space-y-4">
-                    <div className="flex items-center justify-between py-3 border-b">
-                      <div className="flex items-center gap-2">
-                        <Maximize className="w-5 h-5 text-primary" />
-                        <span className="text-muted-foreground">المساحة</span>
-                      </div>
-                      <span className="font-semibold" data-testid="text-area">{unit.area} م²</span>
+                <CardContent className="p-6 space-y-4">
+
+                  {/* كود الوحدة */}
+                  <div className="flex items-center justify-between py-3 border-b">
+                    <div className="flex items-center gap-2">
+                      <Hash className="w-5 h-5 text-primary" />
+                      <span className="text-muted-foreground">كود الوحدة</span>
                     </div>
-                    <div className="flex items-center justify-between py-3 border-b">
-                      <div className="flex items-center gap-2">
-                        <Bed className="w-5 h-5 text-primary" />
-                        <span className="text-muted-foreground">غرف النوم</span>
-                      </div>
-                      <span className="font-semibold" data-testid="text-bedrooms">{unit.bedrooms}</span>
+                    <span className="font-semibold">{unit.unitCode || "-"}</span>
+                  </div>
+
+                  {/* نوع العقار */}
+                  <div className="flex items-center justify-between py-3 border-b">
+                    <div className="flex items-center gap-2">
+                      <Home className="w-5 h-5 text-primary" />
+                      <span className="text-muted-foreground">نوع العقار</span>
                     </div>
-                    <div className="flex items-center justify-between py-3 border-b">
-                      <div className="flex items-center gap-2">
-                        <Bath className="w-5 h-5 text-primary" />
-                        <span className="text-muted-foreground">دورات المياه</span>
-                      </div>
-                      <span className="font-semibold" data-testid="text-bathrooms">{unit.bathrooms}</span>
+                    <span className="font-semibold">{unit.propertyType || "غير محدد"}</span>
+                  </div>
+
+                  {/* السعر */}
+                  <div className="flex items-center justify-between py-3 border-b">
+                    <div className="flex items-center gap-2">
+                      <DollarSign className="w-5 h-5 text-primary" />
+                      <span className="text-muted-foreground">السعر</span>
                     </div>
-                    <div className="flex items-center justify-between py-3">
-                      <div className="flex items-center gap-2">
-                        <MapPin className="w-5 h-5 text-primary" />
-                        <span className="text-muted-foreground">الموقع</span>
-                      </div>
-                      <span className="font-semibold" data-testid="text-location">{unit.location}</span>
+                    <span className="font-semibold">
+                      {unit.price?.toLocaleString()} ج.م
+                    </span>
+                  </div>
+
+                  {/* الأوفر برايس */}
+                  <div className="flex items-center justify-between py-3 border-b">
+                    <div className="flex items-center gap-2">
+                      <TrendingUp className="w-5 h-5 text-primary" />
+                      <span className="text-muted-foreground">الأوفر برايس</span>
                     </div>
-                  </CardContent>
+                    <span className="font-semibold">
+                      {unit.overPrice ? `${unit.overPrice.toLocaleString()} ج.م` : "—"}
+                    </span>
+                  </div>
+                  {/* إجمالي المدفوع من الوحدة */}
+                  <div className="flex items-center justify-between py-3 border-b">
+                    <div className="flex items-center gap-2">
+                      <Wallet className="w-5 h-5 text-primary" />
+                      <span className="text-muted-foreground">إجمالي المدفوع من الوحدة</span>
+                    </div>
+                    <span className="font-semibold">
+                      {typeof unit.totalPaid === "number"
+                        ? unit.totalPaid.toLocaleString() + " ج.م"
+                        : "—"}
+                    </span>
+                  </div>
+
+                  {/* قيمة القسط */}
+                  <div className="flex items-center justify-between py-3 border-b">
+                    <div className="flex items-center gap-2">
+                      <CreditCard className="w-5 h-5 text-primary" />
+                      <span className="text-muted-foreground">قيمة القسط</span>
+                    </div>
+
+                    <span className="font-semibold">
+                      {typeof unit.installmentValue === "number"
+                        ? unit.installmentValue.toLocaleString() + " ج.م"
+                        : "—"}
+                    </span>
+                  </div>
+
+
+
+                  {/* وديعة الصيانة */}
+                  <div className="flex items-center justify-between py-3 border-b">
+                    <div className="flex items-center gap-2">
+                      <Wrench className="w-5 h-5 text-primary" />
+                      <span className="text-muted-foreground">وديعة الصيانة</span>
+                    </div>
+                    <span className="font-semibold">
+                      {typeof unit.maintenanceDeposit === "number"
+                        ? unit.maintenanceDeposit.toLocaleString() + " ج.م"
+                        : "—"}
+                    </span>
+                  </div>
+
+
+
+
+                  {/* إجمالي السعر + الأوفر */}
+                  <div className="flex items-center justify-between py-3">
+                    <div className="flex items-center gap-2">
+                      <Calculator className="w-5 h-5 text-primary" />
+                      <span className="text-muted-foreground">الإجمالي</span>
+                    </div>
+                    <span className="font-bold text-primary">
+                      {typeof unit.totalPaid === "number" || typeof unit.overPrice === "number"
+                        ? (
+                            Number(unit.totalPaid || 0) +
+                            Number(unit.overPrice || 0)
+                          ).toLocaleString() + " ج.م"
+                        : "—"}
+                    </span>
+
+                  </div>
+
+                </CardContent>
+
                 </Card>
               </motion.div>
             </div>
