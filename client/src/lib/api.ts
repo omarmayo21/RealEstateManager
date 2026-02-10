@@ -1,13 +1,17 @@
-export async function apiRequest(
+export async function apiRequest<T = any>(
   method: string,
   url: string,
   body?: any
-) {
+): Promise<T> {
   const headers: Record<string, string> = {};
+
+  const token = localStorage.getItem("token");
+  if (token) {
+    headers["Authorization"] = `Bearer ${token}`;
+  }
 
   let finalBody = body;
 
-  // لو body object → JSON
   if (body && !(body instanceof FormData)) {
     headers["Content-Type"] = "application/json";
     finalBody = JSON.stringify(body);
@@ -17,7 +21,6 @@ export async function apiRequest(
     method,
     headers,
     body: finalBody,
-    credentials: "include",
   });
 
   if (!res.ok) {

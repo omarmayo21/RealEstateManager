@@ -16,7 +16,8 @@ import {
 import { Input } from "@/components/ui/input";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { useToast } from "@/hooks/use-toast";
-import { apiRequest } from "@/lib/queryClient";
+// import { apiRequest } from "@/lib/queryClient";
+import { apiRequest } from "@/lib/api";
 
 const loginSchema = z.object({
   username: z.string().min(1, "اسم المستخدم مطلوب"),
@@ -38,21 +39,24 @@ export default function AdminLogin() {
     },
   });
 
+
+
+type LoginResponse = {
+  token: string;
+  username: string;
+};
+
 const onSubmit = async (data: LoginFormData) => {
   setIsLoading(true);
   try {
-    // 👇 apiRequest بيرجع JSON مباشرة
-    const result = await apiRequest("POST", "/api/auth/login", data);
+    const result = await apiRequest<LoginResponse>(
+      "POST",
+      "/api/auth/login",
+      data
+    );
 
-    // ✅ اسم التوكن لازم يكون "token"
     localStorage.setItem("token", result.token);
-
-    toast({
-      title: "تم تسجيل الدخول بنجاح",
-      description: "مرحباً بك في لوحة التحكم",
-    });
-
-    setLocation("/admin/dashboard");
+    window.location.href = "/admin";
   } catch (error) {
     toast({
       title: "خطأ في تسجيل الدخول",
@@ -63,6 +67,9 @@ const onSubmit = async (data: LoginFormData) => {
     setIsLoading(false);
   }
 };
+
+
+
 
 
 
