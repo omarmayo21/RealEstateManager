@@ -159,28 +159,6 @@ export default function UnitDetail() {
                   </div>
                 )}
 
-                            {/* 📄 Payment Plan PDF */}
-
-              {unit.paymentPlanPdf && (
-                <div className="mt-4 flex items-center justify-between rounded-lg border bg-muted/30 p-4">
-                  <div className="flex items-center gap-2 text-sm text-muted-foreground">
-                    <span>📄</span>
-                    <span className="truncate max-w-[220px]">
-                      {paymentPlanFileName}
-                    </span>
-                  </div>
-
-                  <a
-                    href={unit.paymentPlanPdf}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="rounded-md bg-primary px-4 py-2 text-sm text-white hover:bg-primary/90"
-                  >
-                    تحميل
-                  </a>
-                </div>
-              )}
-
               </motion.div>
             </div>
 
@@ -371,6 +349,36 @@ export default function UnitDetail() {
                   <p className="text-card-foreground leading-relaxed whitespace-pre-line" data-testid="text-description">
                     {unit.description}
                   </p>
+                </CardContent>
+              </Card>
+            </motion.div>
+          )}
+          {/* 📄 Payment Plan PDF */}
+          {unit.paymentPlanPdf && (
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              transition={{ duration: 0.6 }}
+              className="mb-12"
+            >
+              <Card>
+                <CardContent className="p-6 flex items-center justify-between gap-4">
+                  <div className="flex items-center gap-2 text-sm text-muted-foreground">
+                    <span>📄</span>
+                    <span className="truncate max-w-[240px]">
+                      {paymentPlanFileName}
+                    </span>
+                  </div>
+
+                  <a
+                    href={unit.paymentPlanPdf}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="rounded-md bg-primary px-4 py-2 text-sm text-white hover:bg-primary/90"
+                  >
+                    تحميل خطة السداد
+                  </a>
                 </CardContent>
               </Card>
             </motion.div>
