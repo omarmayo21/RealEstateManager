@@ -55,7 +55,7 @@ const onSubmit = async (data: LoginFormData) => {
       data
     );
 
-    localStorage.setItem("token", result.token);
+    localStorage.setItem("adminToken", result.token);
     window.location.href = "/admin/dashboard";
   } catch (error) {
     toast({

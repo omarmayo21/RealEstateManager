@@ -4,8 +4,8 @@ export async function apiRequest<T = any>(
   body?: any
 ): Promise<T> {
   const headers: Record<string, string> = {};
-
-  const token = localStorage.getItem("token");
+  const token =
+    localStorage.getItem("adminToken") ?? localStorage.getItem("token");
   if (token) {
     headers["Authorization"] = `Bearer ${token}`;
   }
