@@ -48,6 +48,7 @@ import type { Unit, Project, InsertUnit } from "@shared/schema";
 import { NumberInput } from "@/components/ui/NumberInput";
 import type { UnitWithImages } from "../../../shared/schema";
 
+
 const parseOptionalNumber = (value: string | undefined) => {
   if (value === undefined || value === "") return null;
   const num = Number(value);
@@ -140,10 +141,9 @@ export default function AdminUnits() {
       },
     });
 
-
 const createMutation = useMutation({
-  mutationFn: async (formData: FormData) => {
-    return apiRequest("POST", "/api/units", formData);
+  mutationFn: async (data: any) => {
+    return apiRequest("POST", "/api/units", data);
   },
   onSuccess: () => {
     toast({ title: "تم إضافة الوحدة بنجاح" });
@@ -156,18 +156,20 @@ const createMutation = useMutation({
 
 
 
+
 const updateMutation = useMutation({
-  mutationFn: async ({ id, data }: { id: number; data: FormData }) => {
-    return await apiRequest("PUT", `/api/units/${id}`, data);
+  mutationFn: async ({ id, data }: { id: number; data: any }) => {
+    return apiRequest("PUT", `/api/units/${id}`, data);
   },
   onSuccess: () => {
     toast({ title: "تم تحديث الوحدة بنجاح" });
-    queryClient.invalidateQueries({ queryKey: ["/api/units"] });[]
+    queryClient.invalidateQueries({ queryKey: ["/api/units"] });
     setDialogOpen(false);
     setEditingUnit(null);
     form.reset();
   },
 });
+
 
 
   const deleteMutation = useMutation({
@@ -211,48 +213,78 @@ const updateMutation = useMutation({
     setDialogOpen(true);
   };
 
-  const onSubmit = (data: UnitFormData) => {
-    const formData = new FormData();
+  type UploadResponse = {
+    images?: string[];
+    paymentPlanPdf?: string | null;
+  };
 
-    // 🔢 أرقام (لازم تتحول هنا)
-    formData.append("projectId", data.projectId);
-    formData.append("price", data.price);
-    formData.append("area", data.area);
-    formData.append("bedrooms", data.bedrooms);
-    formData.append("bathrooms", data.bathrooms);
+  const onSubmit = async (data: UnitFormData) => {
+  let uploadedImages: string[] = [];
+  let uploadedPdf: string | null = null;
 
-    // 🧾 Strings المطلوبة
-    formData.append("title", data.title);
-    formData.append("type", data.type);
-    formData.append("location", data.location);
-    formData.append("status", data.status);
-    formData.append("isFeaturedOnHomepage", String(data.isFeaturedOnHomepage));
-    // اختياري
-    if (data.unitCode) formData.append("unitCode", data.unitCode);
-    if (data.propertyType) formData.append("propertyType", data.propertyType);
-    if (data.description) formData.append("description", data.description);
-    if (data.mainImageUrl) formData.append("mainImageUrl", data.mainImageUrl);
-    if (data.overPrice) formData.append("overPrice", data.overPrice);
-    if (data.installmentValue) formData.append("installmentValue", data.installmentValue);
-    if (data.maintenanceDeposit) formData.append("maintenanceDeposit", data.maintenanceDeposit);
-    if (data.totalPaid) formData.append("totalPaid", data.totalPaid);
-    if (data.repaymentYears) formData.append("repaymentYears", data.repaymentYears);
-    // 🖼️ الصور
+  // 1️⃣ Upload files
+  if (data.images?.length || data.paymentPlanPdf) {
+    const uploadForm = new FormData();
+
     data.images?.forEach((file) => {
-      formData.append("images", file);
+      uploadForm.append("images", file);
     });
 
-    // 📄 PDF
     if (data.paymentPlanPdf) {
-      formData.append("paymentPlanPdf", data.paymentPlanPdf);
+      uploadForm.append("paymentPlanPdf", data.paymentPlanPdf);
     }
 
-    if (editingUnit) {
-      updateMutation.mutate({ id: editingUnit.id, data: formData });
-    } else {
-      createMutation.mutate(formData);
-    }
+const res = (await apiRequest(
+      "POST",
+      "/api/uploads/unit-assets",
+      uploadForm
+    )) as UploadResponse;
+
+    uploadedImages = res.images || [];
+    uploadedPdf = res.paymentPlanPdf || null;
+  
+
+  }
+
+  // 2️⃣ JSON payload
+  const payload = {
+    projectId: Number(data.projectId),
+    title: data.title,
+    unitCode: data.unitCode || null,
+    propertyType: data.propertyType || null,
+    type: data.type,
+
+    price: Number(data.price),
+    overPrice: data.overPrice ? Number(data.overPrice) : null,
+    installmentValue: data.installmentValue ? Number(data.installmentValue) : null,
+    maintenanceDeposit: data.maintenanceDeposit ? Number(data.maintenanceDeposit) : null,
+    totalPaid: data.totalPaid ? Number(data.totalPaid) : null,
+    repaymentYears: data.repaymentYears ? Number(data.repaymentYears) : null,
+
+    area: Number(data.area),
+    bedrooms: Number(data.bedrooms),
+    bathrooms: Number(data.bathrooms),
+
+    location: data.location,
+    status: data.status,
+    description: data.description || null,
+    mainImageUrl: data.mainImageUrl || null,
+    isFeaturedOnHomepage: data.isFeaturedOnHomepage,
+
+    images: uploadedImages,
+    paymentPlanPdf: uploadedPdf,
   };
+
+  // 3️⃣ Create / Update
+  if (editingUnit) {
+    updateMutation.mutate({ id: editingUnit.id, data: payload });
+  } else {
+    createMutation.mutate(payload);
+  }
+};
+
+
+
 
 
   const formatPrice = (price: number) => {
