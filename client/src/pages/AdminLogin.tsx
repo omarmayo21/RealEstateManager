@@ -38,32 +38,31 @@ export default function AdminLogin() {
     },
   });
 
-    
-  const onSubmit = async (data: LoginFormData) => {
-    setIsLoading(true);
-    try {
-      const response = await apiRequest("POST", "api/auth/login", data);
-      const result = await response.json();
+const onSubmit = async (data: LoginFormData) => {
+  setIsLoading(true);
+  try {
+    // 👇 apiRequest بيرجع JSON مباشرة
+    const result = await apiRequest("POST", "/api/auth/login", data);
 
-      // ✅ السطر المهم
-      localStorage.setItem("adminToken", result.token);
+    // ✅ اسم التوكن لازم يكون "token"
+    localStorage.setItem("token", result.token);
 
-      toast({
-        title: "تم تسجيل الدخول بنجاح",
-        description: "مرحباً بك في لوحة التحكم",
-      });
+    toast({
+      title: "تم تسجيل الدخول بنجاح",
+      description: "مرحباً بك في لوحة التحكم",
+    });
 
-      setLocation("/admin/dashboard");
-    } catch (error) {
-      toast({
-        title: "خطأ في تسجيل الدخول",
-        description: "اسم المستخدم أو كلمة المرور غير صحيحة",
-        variant: "destructive",
-      });
-    } finally {
-      setIsLoading(false);
-    }
-  };
+    setLocation("/admin/dashboard");
+  } catch (error) {
+    toast({
+      title: "خطأ في تسجيل الدخول",
+      description: "اسم المستخدم أو كلمة المرور غير صحيحة",
+      variant: "destructive",
+    });
+  } finally {
+    setIsLoading(false);
+  }
+};
 
 
 
