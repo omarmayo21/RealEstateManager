@@ -158,29 +158,31 @@ export default function UnitDetail() {
                       ))}
                   </div>
                 )}
+
+                            {/* 📄 Payment Plan PDF */}
+
+              {unit.paymentPlanPdf && (
+                <div className="mt-4 flex items-center justify-between rounded-lg border bg-muted/30 p-4">
+                  <div className="flex items-center gap-2 text-sm text-muted-foreground">
+                    <span>📄</span>
+                    <span className="truncate max-w-[220px]">
+                      {paymentPlanFileName}
+                    </span>
+                  </div>
+
+                  <a
+                    href={unit.paymentPlanPdf}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="rounded-md bg-primary px-4 py-2 text-sm text-white hover:bg-primary/90"
+                  >
+                    تحميل
+                  </a>
+                </div>
+              )}
+
               </motion.div>
             </div>
-            {/* 📄 Payment Plan PDF */}
-          {/* 📄 Payment Plan PDF */}
-          {unit.paymentPlanPdf && (
-            <div className="mt-4 flex items-center justify-between rounded-lg border bg-muted/30 p-4">
-              <div className="flex items-center gap-2 text-sm text-muted-foreground">
-                <span>📄</span>
-                <span className="truncate max-w-[220px]">
-                  {paymentPlanFileName}
-                </span>
-              </div>
-
-              <a
-                href={unit.paymentPlanPdf}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="rounded-md bg-primary px-4 py-2 text-sm text-white hover:bg-primary/90"
-              >
-                تحميل
-              </a>
-            </div>
-          )}
 
 
                   
