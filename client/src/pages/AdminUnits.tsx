@@ -47,6 +47,7 @@ import { apiRequest } from "@/lib/queryClient";
 import type { Unit, Project, InsertUnit } from "@shared/schema";
 import { NumberInput } from "@/components/ui/NumberInput";
 import type { UnitWithImages } from "../../../shared/schema";
+import { apiRequest } from "@/lib/api";
 
 
 const parseOptionalNumber = (value: string | undefined) => {
