@@ -6,6 +6,7 @@ import type { Settings } from "@shared/schema";
 export default function Footer() {
   const { data: settings } = useQuery<Settings>({
     queryKey: ["/api/settings"],
+    enabled: false, 
   });
 
   return (

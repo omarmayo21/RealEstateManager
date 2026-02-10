@@ -35,6 +35,7 @@ export default function AdminSettings() {
 
   const { data: settings } = useQuery<Settings>({
     queryKey: ["/api/settings"],
+    
   });
 
   const form = useForm<SettingsFormData>({

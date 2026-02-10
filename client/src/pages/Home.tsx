@@ -18,6 +18,7 @@ export default function Home() {
 
   const { data: settings } = useQuery<Settings>({
     queryKey: ["/api/settings"],
+    enabled: false, 
   });
 
   const { data: projects = [] } = useQuery<Project[]>({

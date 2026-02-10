@@ -24,6 +24,7 @@ export default function Navbar() {
 
   const { data: settings } = useQuery<{ companyPhone: string }>({
     queryKey: ["/api/settings"],
+    enabled: false, 
   });
 
   useEffect(() => {
