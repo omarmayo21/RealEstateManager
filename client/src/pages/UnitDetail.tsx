@@ -353,7 +353,7 @@ export default function UnitDetail() {
               </Card>
             </motion.div>
           )}
-          {/* 📄 Payment Plan PDF */}
+          {/* 📄 Payment Plan PDF
           {unit.paymentPlanPdf && (
             <motion.div
               initial={{ opacity: 0, y: 20 }}
@@ -382,7 +382,10 @@ export default function UnitDetail() {
                 </CardContent>
               </Card>
             </motion.div>
-          )}
+          )} */}
+          <div style={{ background: "red", color: "white", padding: 10 }}>
+            TEST PDF BLOCK
+          </div>
 
           <motion.div
             initial={{ opacity: 0, y: 20 }}
