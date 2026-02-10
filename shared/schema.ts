@@ -48,7 +48,7 @@ export const units = pgTable("units", {
   status: text("status").notNull(),
   installmentValue: integer("installment_value"),
   maintenanceDeposit: integer("maintenance_deposit"),
-
+  paymentPlanPdf: text("payment_plan_pdf"),
   mainImageUrl: text("main_image_url"),
   description: text("description"),
 
