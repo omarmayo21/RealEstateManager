@@ -7,6 +7,10 @@ import type { UnitFilters } from "../shared/schema.js";
 import { insertProjectSchema, updateProjectSchema, insertUnitSchema, updateUnitSchema, insertLeadSchema } from "../shared/schema.js";
 import { upload } from "./middleware/upload";
 
+
+
+
+
 if (!process.env.JWT_SECRET) {
   console.warn("⚠️  JWT_SECRET not set, using default (not secure for production)");
 }
@@ -71,7 +75,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
   
 
-  app.get("/api/projects", async (_req: Request, res: Response) => {
+  app.get("/api/projects",  async (_req: Request, res: Response) =>{
     try {
       const projects = await storage.getProjects();
       res.json(projects);
@@ -85,7 +89,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
   });
 
-  app.post("/api/projects", authMiddleware, async (req: Request, res: Response) => {
+  app.post("/api/projects",  async (req: Request, res: Response) => {
     try {
       const validatedData = insertProjectSchema.parse(req.body);
       const project = await storage.createProject(validatedData);
@@ -98,7 +102,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.put("/api/projects/:id", authMiddleware, async (req: Request, res: Response) => {
+  app.put("/api/projects/:id",  async (req: Request, res: Response) => {
     try {
       const id = parseInt(req.params.id);
       const validatedData = updateProjectSchema.parse(req.body);
@@ -117,7 +121,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.delete("/api/projects/:id", authMiddleware, async (req: Request, res: Response) => {
+  app.delete("/api/projects/:id",  async (req: Request, res: Response) => {
     try {
       const id = parseInt(req.params.id);
       const success = await storage.deleteProject(id);
@@ -175,7 +179,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   );
 
-  app.get("/api/units", async (req: Request, res: Response) => {
+  app.get("/api/units",  async (req: Request, res: Response) =>{
     try {
       const filters: UnitFilters = {
         projectId: req.query.projectId ? parseInt(req.query.projectId as string) : undefined,
@@ -207,7 +211,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
   });
 
-  app.get("/api/units/:id", async (req: Request, res: Response) => {
+  app.get("/api/units/:id",  async (req: Request, res: Response) => {
     try {
       const id = parseInt(req.params.id);
       const unit = await storage.getUnitById(id);
@@ -284,7 +288,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   );
 
-  app.put("/api/units/:id", authMiddleware, async (req: Request, res: Response) => {
+  app.put("/api/units/:id",  async (req: Request, res: Response) => {
     try {
       const id = parseInt(req.params.id);
       const validatedData = updateUnitSchema.parse(req.body);
@@ -303,7 +307,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.delete("/api/units/:id", authMiddleware, async (req: Request, res: Response) => {
+  app.delete("/api/units/:id",  async (req: Request, res: Response) => {
     try {
       const id = parseInt(req.params.id);
       const success = await storage.deleteUnit(id);
@@ -318,7 +322,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.get("/api/leads", authMiddleware, async (_req: Request, res: Response) => {
+  app.get("/api/leads",  async (_req: Request, res: Response) => {
     try {
       const leads = await storage.getLeads();
       const projects = await storage.getProjects();
@@ -352,7 +356,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.delete("/api/leads/:id", authMiddleware, async (req: Request, res: Response) => {
+  app.delete("/api/leads/:id",  async (req: Request, res: Response) => {
     try {
       const id = parseInt(req.params.id);
       const success = await storage.deleteLead(id);
@@ -367,7 +371,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.get("/api/settings", async (_req: Request, res: Response) => {
+  app.get("/api/settings",authMiddleware, async (_req: Request, res: Response) => {
     try {
       const settings = await storage.getSettings();
       res.json(settings);
@@ -376,7 +380,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.put("/api/settings", authMiddleware, async (req: Request, res: Response) => {
+  app.put("/api/settings",  async (req: Request, res: Response) => {
     try {
       const settings = await storage.updateSettings(req.body);
       res.json(settings);
