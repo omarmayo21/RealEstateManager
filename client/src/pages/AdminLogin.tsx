@@ -56,7 +56,7 @@ const onSubmit = async (data: LoginFormData) => {
     );
 
     localStorage.setItem("token", result.token);
-    window.location.href = "/admin";
+    window.location.href = "/admin/dashboard";
   } catch (error) {
     toast({
       title: "خطأ في تسجيل الدخول",
