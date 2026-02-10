@@ -92,16 +92,17 @@ export default function UnitDetail() {
 
 
 
-
-  const paymentPlanFileName = (() => {
-    if (typeof unit?.paymentPlanPdf !== "string") return "خطة السداد";
-
-    const raw = unit.paymentPlanPdf.split("/").pop();
-    if (!raw) return "خطة السداد";
-
-    const decoded = decodeURIComponent(raw);
-    return decoded.replace(/\.pdf$/i, "");
-  })();
+    const paymentPlanFileName = unit
+      ? `payment-plan -${unit.title || "الوحدة"}-${unit.id}.pdf`
+      : "payment-plan-.pdf";
+      
+    const pdfDownloadUrl =
+      unit?.paymentPlanPdf
+        ? unit.paymentPlanPdf.replace(
+            "/upload/",
+            `/upload/fl_attachment:${encodeURIComponent(paymentPlanFileName)}/`
+          )
+        : null;
 
 
   const images = unit?.images || [];
@@ -403,18 +404,16 @@ export default function UnitDetail() {
                 📄
                 <span className="font-medium">
                   {paymentPlanFileName}
+                  
                 </span>
               </div>
-
               <a
-                href={unit.paymentPlanPdf}
-                target="_blank"
-                rel="noopener noreferrer"
-                download
+                href={pdfDownloadUrl}
                 className="bg-green-500 hover:bg-green-600 text-white px-4 py-2 rounded-md"
               >
                 تحميل
               </a>
+
             </div>
           )}
 
