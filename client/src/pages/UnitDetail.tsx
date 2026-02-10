@@ -41,23 +41,58 @@ const formatMoney = (value: unknown) => {
 
 
 export default function UnitDetail() {
+
+
   const { id } = useParams<{ id: string }>();
   const unitId = parseInt(id || "0");
   
   const [selectedImage, setSelectedImage] = useState<string | null>(null);
 
+  // ⬅️ قائمة الوحدات (للوحدات المشابهة)
   const { data: allUnits = [] } = useQuery<
     (Unit & {
       project?: Project;
       images?: UnitImage[];
-      paymentPlanPdf?: string | null;
     })[]
   >({
     queryKey: ["/api/units"],
   });
 
+  // ⬅️ الوحدة نفسها (المصدر الحقيقي)
+  const { data: unit, isLoading } = useQuery<
+    Unit & {
+      project?: Project;
+      images?: UnitImage[];
+    }
+  >({
+    queryKey: ["/api/units", unitId],
+    queryFn: async () => {
+      const res = await fetch(`/api/units/${unitId}`);
+      if (!res.ok) throw new Error("Failed to fetch unit");
+      return res.json();
+    },
+    enabled: !!unitId,
+  });
 
-  const unit = allUnits.find((u) => u.id === unitId);
+
+
+  if (isLoading || !unit) {
+    return (
+      <div className="min-h-screen bg-background">
+        <Navbar />
+        <div className="max-w-7xl mx-auto px-4 py-24 text-center">
+          <h1 className="text-3xl font-bold text-muted-foreground">
+            جاري تحميل الوحدة...
+          </h1>
+        </div>
+        <Footer />
+      </div>
+    );
+  }
+
+
+
+
   const paymentPlanFileName = (() => {
     if (typeof unit?.paymentPlanPdf !== "string") return "خطة السداد";
 
