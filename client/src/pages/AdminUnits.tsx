@@ -142,9 +142,10 @@ export default function AdminUnits() {
       },
     });
 
+    
 const createMutation = useMutation({
-  mutationFn: async (data: any) => {
-    return apiRequest("POST", "/api/units", data);
+  mutationFn: async (formData: FormData) => {
+    return apiRequest("POST", "/api/units", formData);
   },
   onSuccess: () => {
     toast({ title: "تم إضافة الوحدة بنجاح" });
@@ -219,71 +220,58 @@ const updateMutation = useMutation({
     paymentPlanPdf?: string | null;
   };
 
-  const onSubmit = async (data: UnitFormData) => {
-  let uploadedImages: string[] = [];
-  let uploadedPdf: string | null = null;
+const onSubmit = async (data: UnitFormData) => {
+  const formData = new FormData();
 
-  // 1️⃣ Upload files
-  if (data.images?.length || data.paymentPlanPdf) {
-    const uploadForm = new FormData();
+  // ======================
+  // النصوص
+  // ======================
+  formData.append("projectId", String(data.projectId));
+  formData.append("title", data.title);
+  formData.append("type", data.type);
 
-    data.images?.forEach((file) => {
-      uploadForm.append("images", file);
-    });
+  if (data.unitCode) formData.append("unitCode", data.unitCode);
+  if (data.propertyType) formData.append("propertyType", data.propertyType);
+  if (data.description) formData.append("description", data.description);
+  if (data.location) formData.append("location", data.location);
+  if (data.status) formData.append("status", data.status);
+  if (data.mainImageUrl) formData.append("mainImageUrl", data.mainImageUrl);
 
-    if (data.paymentPlanPdf) {
-      uploadForm.append("paymentPlanPdf", data.paymentPlanPdf);
-    }
+  formData.append("price", String(data.price));
+  formData.append("area", String(data.area));
+  formData.append("bedrooms", String(data.bedrooms));
+  formData.append("bathrooms", String(data.bathrooms));
+  formData.append("isFeaturedOnHomepage", String(data.isFeaturedOnHomepage));
 
-const res = (await apiRequest(
-      "POST",
-      "/api/uploads/unit-assets",
-      uploadForm
-    )) as UploadResponse;
+  if (data.overPrice) formData.append("overPrice", String(data.overPrice));
+  if (data.installmentValue) formData.append("installmentValue", String(data.installmentValue));
+  if (data.maintenanceDeposit) formData.append("maintenanceDeposit", String(data.maintenanceDeposit));
+  if (data.totalPaid) formData.append("totalPaid", String(data.totalPaid));
+  if (data.repaymentYears) formData.append("repaymentYears", String(data.repaymentYears));
 
-    uploadedImages = res.images || [];
-    uploadedPdf = res.paymentPlanPdf || null;
-  
+  // ======================
+  // الصور
+  // ======================
+  data.images?.forEach((file) => {
+    formData.append("images", file);
+  });
 
+  // ======================
+  // 📄 PDF (النقطة الحاسمة)
+  // ======================
+  if (data.paymentPlanPdf instanceof File) {
+    formData.append("paymentPlanPdf", data.paymentPlanPdf);
   }
 
-  // 2️⃣ JSON payload
-  const payload = {
-    projectId: Number(data.projectId),
-    title: data.title,
-    unitCode: data.unitCode || null,
-    propertyType: data.propertyType || null,
-    type: data.type,
-
-    price: Number(data.price),
-    overPrice: data.overPrice ? Number(data.overPrice) : null,
-    installmentValue: data.installmentValue ? Number(data.installmentValue) : null,
-    maintenanceDeposit: data.maintenanceDeposit ? Number(data.maintenanceDeposit) : null,
-    totalPaid: data.totalPaid ? Number(data.totalPaid) : null,
-    repaymentYears: data.repaymentYears ? Number(data.repaymentYears) : null,
-
-    area: Number(data.area),
-    bedrooms: Number(data.bedrooms),
-    bathrooms: Number(data.bathrooms),
-
-    location: data.location,
-    status: data.status,
-    description: data.description || null,
-    mainImageUrl: data.mainImageUrl || null,
-    isFeaturedOnHomepage: data.isFeaturedOnHomepage,
-
-    images: uploadedImages,
-    paymentPlanPdf: uploadedPdf,
-  };
-
-  // 3️⃣ Create / Update
+  // ======================
+  // إرسال
+  // ======================
   if (editingUnit) {
-    updateMutation.mutate({ id: editingUnit.id, data: payload });
+    updateMutation.mutate({ id: editingUnit.id, data: formData });
   } else {
-    createMutation.mutate(payload);
+    createMutation.mutate(formData);
   }
 };
-
 
 
 
@@ -617,25 +605,27 @@ const res = (await apiRequest(
                     )}
                   />
                   {/* 📄 Payment Plan PDF */}
-                    <FormField
-                      control={form.control}
-                      name="paymentPlanPdf"
-                      render={({ field }) => (
-                        <FormItem>
-                          <FormLabel>ملف خطة السداد (PDF)</FormLabel>
-                          <FormControl>
-                            <Input
-                              type="file"
-                              accept="application/pdf"
-                              onChange={(e) => {
-                                field.onChange(e.target.files?.[0] ?? null);
-                              }}
-                            />
-                          </FormControl>
-                          <FormMessage />
-                        </FormItem>
-                      )}
-                    />
+                <FormField
+                  control={form.control}
+                  name="paymentPlanPdf"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>ملف خطة السداد (PDF)</FormLabel>
+                      <FormControl>
+                        <Input
+                          type="file"
+                          accept="application/pdf"
+                          onChange={(e) => {
+                            const file = e.target.files?.[0] ?? null;
+                            field.onChange(file);
+                          }}
+                        />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+
 
 
                   {/* مميز في الرئيسية */}
