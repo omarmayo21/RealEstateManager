@@ -152,6 +152,11 @@ export async function registerRoutes(app: Express): Promise<Server> {
       { name: "paymentPlanPdf", maxCount: 1 },
     ]),
     async (req, res) => {
+
+      console.log("CONTENT-TYPE:", req.headers["content-type"]);
+      console.log("BODY:", req.body);
+      console.log("FILES:", req.files);
+
       const files = req.files as {
         images?: Express.Multer.File[];
         paymentPlanPdf?: Express.Multer.File[];
