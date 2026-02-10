@@ -16,6 +16,7 @@ export default async function runApp(setup?: SetupFn) {
   registerRoutes(app);
   app.use(express.json());
   app.use(express.urlencoded({ extended: false }));
+  
   if (setup) {
     await setup(app, server);
   }

@@ -156,47 +156,19 @@ const createMutation = useMutation({
 
 
 
-  const updateMutation = useMutation({
-    mutationFn: async ({ id, data }: { id: number; data: UnitFormData }) => {
-      const unitData: InsertUnit = {
-        projectId: parseInt(data.projectId),
-        title: data.title,
-        unitCode: data.unitCode || null,
-        propertyType: data.propertyType || null,
+const updateMutation = useMutation({
+  mutationFn: async ({ id, data }: { id: number; data: FormData }) => {
+    return await apiRequest("PUT", `/api/units/${id}`, data);
+  },
+  onSuccess: () => {
+    toast({ title: "تم تحديث الوحدة بنجاح" });
+    queryClient.invalidateQueries({ queryKey: ["/api/units"] });
+    setDialogOpen(false);
+    setEditingUnit(null);
+    form.reset();
+  },
+});
 
-        type: data.type,
-
-        price: parseInt(data.price),
-        overPrice: parseOptionalNumber(data.overPrice),
-        installmentValue: parseOptionalNumber(data.installmentValue),
-        maintenanceDeposit: parseOptionalNumber(data.maintenanceDeposit),
-        repaymentYears: parseOptionalNumber(data.repaymentYears),
-
-        
-        totalPaid: parseOptionalNumber(data.totalPaid),
-
-        area: parseInt(data.area),
-        bedrooms: parseInt(data.bedrooms),
-        bathrooms: parseInt(data.bathrooms),
-
-        location: data.location,
-        status: data.status,
-        mainImageUrl: data.mainImageUrl || null,
-        description: data.description || null,
-
-        isFeaturedOnHomepage: data.isFeaturedOnHomepage,
-      };
-
-      return await apiRequest("PUT", `/api/units/${id}`, unitData);
-    },
-    onSuccess: () => {
-      toast({ title: "تم تحديث الوحدة بنجاح" });
-      queryClient.invalidateQueries({ queryKey: ["/api/units"] });
-      setDialogOpen(false);
-      setEditingUnit(null);
-      form.reset();
-    },
-  });
 
   const deleteMutation = useMutation({
     mutationFn: async (id: number) => {
