@@ -58,9 +58,16 @@ export default function UnitDetail() {
 
 
   const unit = allUnits.find((u) => u.id === unitId);
-  const paymentPlanFileName = unit?.paymentPlanPdf
-  ? unit.paymentPlanPdf.split("/").pop()
-  : null;
+  const paymentPlanFileName = (() => {
+    if (typeof unit?.paymentPlanPdf !== "string") return "خطة السداد";
+
+    const raw = unit.paymentPlanPdf.split("/").pop();
+    if (!raw) return "خطة السداد";
+
+    const decoded = decodeURIComponent(raw);
+    return decoded.replace(/\.pdf$/i, "");
+  })();
+
 
   const images = unit?.images || [];
   const displayImage = selectedImage || unit?.mainImageUrl || "https://images.unsplash.com/photo-1545324418-cc1a3fa10c00?w=800";
@@ -353,35 +360,30 @@ export default function UnitDetail() {
               </Card>
             </motion.div>
           )}
-          📄 Payment Plan PDF
-          {unit.paymentPlanPdf && (
-            <motion.div
-              initial={{ opacity: 0, y: 20 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true }}
-              transition={{ duration: 0.6 }}
-              className="mb-12"
-            >
-              <Card>
-                <CardContent className="p-6 flex items-center justify-between gap-4">
-                  <div className="flex items-center gap-2 text-sm text-muted-foreground">
-                    <span>📄</span>
-                    <span className="truncate max-w-[240px]">
-                      {paymentPlanFileName}
-                    </span>
-                  </div>
 
-                  <a
-                    href={unit.paymentPlanPdf}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="rounded-md bg-primary px-4 py-2 text-sm text-white hover:bg-primary/90"
-                  >
-                    تحميل خطة السداد
-                  </a>
-                </CardContent>
-              </Card>
-            </motion.div>
+                    
+          {unit.paymentPlanPdf && (
+            <div className="mb-12 rounded-xl border-2 border-primary/60 p-4 flex items-center justify-between gap-4">
+              
+              {/* اسم الملف */}
+              <div className="flex items-center gap-2 min-w-0">
+                <span className="text-lg">📄</span>
+                <span className="truncate text-sm font-medium text-foreground">
+                  {paymentPlanFileName || "Payment Plan"}
+                </span>
+              </div>
+
+              {/* زر التحميل */}
+              <a
+                href={unit.paymentPlanPdf}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="flex items-center gap-2 rounded-lg bg-green-500 px-5 py-2 text-sm font-semibold text-white hover:bg-green-600 transition-colors"
+              >
+                ⬇ تحميل
+              </a>
+
+            </div>
           )}
 
           <motion.div
