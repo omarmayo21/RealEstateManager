@@ -162,7 +162,7 @@ const updateMutation = useMutation({
   },
   onSuccess: () => {
     toast({ title: "تم تحديث الوحدة بنجاح" });
-    queryClient.invalidateQueries({ queryKey: ["/api/units"] });
+    queryClient.invalidateQueries({ queryKey: ["/api/units"] });[]
     setDialogOpen(false);
     setEditingUnit(null);
     form.reset();
@@ -195,7 +195,7 @@ const updateMutation = useMutation({
       installmentValue: unit.installmentValue?.toString() || "",
       maintenanceDeposit: unit.maintenanceDeposit?.toString() || "",
       totalPaid: toFormString(unit.totalPaid),
-
+      repaymentYears: toFormString(unit.repaymentYears),
 
       type: unit.type as "resale" | "primary",
       area: unit.area.toString(),
@@ -226,12 +226,17 @@ const updateMutation = useMutation({
     formData.append("type", data.type);
     formData.append("location", data.location);
     formData.append("status", data.status);
-
+    formData.append("isFeaturedOnHomepage", String(data.isFeaturedOnHomepage));
     // اختياري
     if (data.unitCode) formData.append("unitCode", data.unitCode);
     if (data.propertyType) formData.append("propertyType", data.propertyType);
     if (data.description) formData.append("description", data.description);
-
+    if (data.mainImageUrl) formData.append("mainImageUrl", data.mainImageUrl);
+    if (data.overPrice) formData.append("overPrice", data.overPrice);
+    if (data.installmentValue) formData.append("installmentValue", data.installmentValue);
+    if (data.maintenanceDeposit) formData.append("maintenanceDeposit", data.maintenanceDeposit);
+    if (data.totalPaid) formData.append("totalPaid", data.totalPaid);
+    if (data.repaymentYears) formData.append("repaymentYears", data.repaymentYears);
     // 🖼️ الصور
     data.images?.forEach((file) => {
       formData.append("images", file);
@@ -248,7 +253,6 @@ const updateMutation = useMutation({
       createMutation.mutate(formData);
     }
   };
-
 
 
   const formatPrice = (price: number) => {
