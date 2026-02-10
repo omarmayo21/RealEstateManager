@@ -43,7 +43,7 @@ import { Plus, Pencil, Trash2 } from "lucide-react";
 import AdminLayout from "@/components/AdminLayout";
 import { useToast } from "@/hooks/use-toast";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { apiRequest } from "@/lib/queryClient";
+// import { apiRequest } from "@/lib/queryClient";
 import type { Unit, Project, InsertUnit } from "@shared/schema";
 import { NumberInput } from "@/components/ui/NumberInput";
 import type { UnitWithImages } from "../../../shared/schema";
