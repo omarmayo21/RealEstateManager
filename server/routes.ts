@@ -239,14 +239,26 @@ export async function registerRoutes(app: Express): Promise<Server> {
     async (req: Request, res: Response) => {
       try {
         // 1️⃣ البيانات النصية
-        const validatedData = insertUnitSchema.parse({
-          ...req.body,
-          projectId: Number(req.body.projectId),
-          price: Number(req.body.price),
-          area: Number(req.body.area),
-          bedrooms: Number(req.body.bedrooms),
-          bathrooms: Number(req.body.bathrooms),
-        });
+      const validatedData = insertUnitSchema.parse({
+        ...req.body,
+
+        projectId: Number(req.body.projectId),
+        price: Number(req.body.price),
+        area: Number(req.body.area),
+        bedrooms: Number(req.body.bedrooms),
+        bathrooms: Number(req.body.bathrooms),
+
+        overPrice: req.body.overPrice ? Number(req.body.overPrice) : null,
+        installmentValue: req.body.installmentValue ? Number(req.body.installmentValue) : null,
+        maintenanceDeposit: req.body.maintenanceDeposit ? Number(req.body.maintenanceDeposit) : null,
+        totalPaid: req.body.totalPaid ? Number(req.body.totalPaid) : null,
+        repaymentYears: req.body.repaymentYears ? Number(req.body.repaymentYears) : null,
+
+        isFeaturedOnHomepage:
+          req.body.isFeaturedOnHomepage === "true" ||
+          req.body.isFeaturedOnHomepage === true,
+      });
+
 
 
         // 2️⃣ الصور
