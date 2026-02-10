@@ -164,8 +164,6 @@ export default function UnitDetail() {
           {/* 📄 Payment Plan PDF */}
           {unit.paymentPlanPdf && (
             <div className="mt-4 flex items-center justify-between rounded-lg border bg-muted/30 p-4">
-              
-              {/* اسم الملف */}
               <div className="flex items-center gap-2 text-sm text-muted-foreground">
                 <span>📄</span>
                 <span className="truncate max-w-[220px]">
@@ -173,12 +171,11 @@ export default function UnitDetail() {
                 </span>
               </div>
 
-              {/* زر التحميل */}
               <a
                 href={unit.paymentPlanPdf}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="flex items-center gap-2 rounded-md bg-primary px-4 py-2 text-sm text-white hover:bg-primary/90"
+                className="rounded-md bg-primary px-4 py-2 text-sm text-white hover:bg-primary/90"
               >
                 تحميل
               </a>
