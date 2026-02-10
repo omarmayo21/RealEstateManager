@@ -396,34 +396,28 @@ export default function UnitDetail() {
             </motion.div>
           )}
 
-                    
-        {unit.paymentPlanPdf && (
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true }}
-          transition={{ duration: 0.6 }}
-          className="mb-12"
-        >
-          <div className="rounded-xl border-2 border-primary/60 p-4 flex items-center justify-between gap-4">
-            <div className="flex items-center gap-2 min-w-0">
-              <span className="text-lg">📄</span>
-              <span className="truncate text-sm font-medium">
-                {paymentPlanFileName}
-              </span>
-            </div>
+                              
+          {unit.paymentPlanPdf && (
+            <div className="mt-6 rounded-xl border border-orange-400 p-4 flex items-center justify-between">
+              <div className="flex items-center gap-2">
+                📄
+                <span className="font-medium">
+                  {paymentPlanFileName}
+                </span>
+              </div>
 
-            <a
-              href={unit.paymentPlanPdf}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="flex items-center gap-2 rounded-lg bg-green-500 px-5 py-2 text-sm font-semibold text-white hover:bg-green-600"
-            >
-              تحميل
-            </a>
-          </div>
-        </motion.div>
-      )}
+              <a
+                href={unit.paymentPlanPdf}
+                target="_blank"
+                rel="noopener noreferrer"
+                download
+                className="bg-green-500 hover:bg-green-600 text-white px-4 py-2 rounded-md"
+              >
+                تحميل
+              </a>
+            </div>
+          )}
+
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             whileInView={{ opacity: 1, y: 0 }}
