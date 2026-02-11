@@ -150,59 +150,39 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
 
   app.post(
-    "/api/uploads/unit-assets",
-    authMiddleware,
-    upload.fields([
-      { name: "images", maxCount: 10 },
-      { name: "paymentPlanPdf", maxCount: 1 },
-    ]),
-    async (req, res) => {
+  "/api/units",
+  authMiddleware,
+  async (req: Request, res: Response) => {
+    try {
+      const validatedData = insertUnitSchema.parse({
+        ...req.body,
+        projectId: Number(req.body.projectId),
+        price: Number(req.body.price),
+        area: Number(req.body.area),
+        bedrooms: Number(req.body.bedrooms),
+        bathrooms: Number(req.body.bathrooms),
+      });
 
-      console.log("CONTENT-TYPE:", req.headers["content-type"]);
-      console.log("BODY:", req.body);
-      console.log("FILES:", req.files);
+      const unit = await storage.createUnitWithAssets(
+        validatedData,
+        req.body.images || [],
+        req.body.paymentPlanPdf || null
+      );
 
-      const files = req.files as {
-        images?: Express.Multer.File[];
-        paymentPlanPdf?: Express.Multer.File[];
-      };
-
-      const images =
-        files?.images?.map((file) => file.path) || [];
-
-      let paymentPlanPdf: string | null = null;
-
-      if (files?.paymentPlanPdf?.[0]) {
-        const file = files.paymentPlanPdf[0];
-
-        const fileName = `payment-plans/${Date.now()}-${file.originalname}`;
-
-        const { error } = await supabase.storage
-          .from("payment-plans")
-          .upload(fileName, file.buffer, {
-            contentType: file.mimetype,
-            upsert: false,
-          });
-
-        if (error) {
-          console.error("Supabase upload error:", error);
-          return res.status(500).json({ error: "فشل رفع PDF" });
-        }
-
-        const { data } = supabase.storage
-          .from("payment-plans")
-          .getPublicUrl(fileName);
-
-        paymentPlanPdf = data.publicUrl;
+      res.json(unit);
+    } catch (error: any) {
+      if (error.name === "ZodError") {
+        return res.status(400).json({
+          error: "بيانات غير صالحة",
+          details: error.errors,
+        });
       }
 
-
-      res.json({
-        images,
-        paymentPlanPdf,
-      });
+      res.status(500).json({ error: "حدث خطأ في الخادم" });
     }
-  );
+  }
+);
+
 
   app.get("/api/units",  async (req: Request, res: Response) =>{
     try {
