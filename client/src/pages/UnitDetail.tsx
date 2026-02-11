@@ -71,21 +71,6 @@ export default function UnitDetail() {
     queryKey: ["/api/units"],
   });
 
-  // ⬅️ الوحدة نفسها (المصدر الحقيقي)
-  // const { data: unit, isLoading } = useQuery<
-  //   Unit & {
-  //     project?: Project;
-  //     images?: UnitImage[];
-  //   }
-  // >({
-  //   queryKey: ["/api/units", unit?.id],
-  //   queryFn: async () => {
-  //     const res = await fetch(`/api/units/${unit?.id}`);
-  //     if (!res.ok) throw new Error("Failed to fetch unit");
-  //     return res.json();
-  //   },
-  //   enabled: !!unit?.id,
-  // });
 
 
 
@@ -104,13 +89,6 @@ export default function UnitDetail() {
   }
 
 
-
-    // const paymentPlanFileName = unit
-    //   ? `payment-plan -${unit.title || "الوحدة"}-${unit.unitCode}.pdf`
-    //   : "payment-plan-.pdf";
-
-    //   const pdfDownloadUrl =
-    //     unit?.paymentPlanPdf?.replace("/upload/", "/upload/fl_attachment/");
 
 
   const images = unit?.images || [];
@@ -326,7 +304,9 @@ export default function UnitDetail() {
                       <Wallet className="w-5 h-5 text-primary" />
                       <span className="text-muted-foreground">إجمالي المدفوع من الوحدة</span>
                     </div>
+                    <span className="font-semibold">
                       {formatMoney(unit.totalPaid)}
+                    </span>
                   </div>
                 <div className="flex items-center justify-between py-3 border-b">
                   <div className="flex items-center gap-2">

@@ -48,6 +48,7 @@ import type { Unit, Project, InsertUnit } from "@shared/schema";
 import { NumberInput } from "@/components/ui/NumberInput";
 import type { UnitWithImages } from "../../../shared/schema";
 import { apiRequest } from "@/lib/api";
+import { PROPERTY_TYPES } from "@/lib/constants";
 
 
 const parseOptionalNumber = (value: string | undefined) => {
@@ -68,7 +69,7 @@ const unitSchema = z.object({
   unitCode: z.string().optional(), // كود الوحدة
 
   type: z.enum(["resale", "primary"]),
-  propertyType: z.string().optional(), // نوع العقار (شقة / فيلا)
+  propertyType: z.enum(PROPERTY_TYPES),// نوع العقار (شقة / فيلا)
 
   price: z.string().min(1, "السعر مطلوب"),
   overPrice: optionalNumberField, // الأوفر برايس
@@ -116,7 +117,7 @@ export default function AdminUnits() {
         projectId: "",
         title: "",
         unitCode: "",
-        propertyType: "",
+        propertyType: "شقة",
         repaymentYears: "",
 
         type: "primary",
@@ -208,7 +209,8 @@ const updateMutation = useMutation({
       projectId: unit.projectId.toString(),
       title: unit.title,
       unitCode: unit.unitCode || "",
-      propertyType: unit.propertyType || "",
+      propertyType: unit.propertyType as (typeof PROPERTY_TYPES)[number],
+
 
       price: unit.price.toString(),
       overPrice: unit.overPrice?.toString() || "",
@@ -375,12 +377,23 @@ const onSubmit = async (data: UnitFormData) => {
                       <FormItem>
                         <FormLabel>نوع العقار</FormLabel>
                         <FormControl>
-                          <Input placeholder="شقة / فيلا" {...field} />
+                          <select
+                            {...field}
+                            className="w-full h-10 rounded-md border border-input bg-background px-3 py-2 text-sm"
+                          >
+                            <option value="">اختر النوع</option>
+                            {PROPERTY_TYPES.map((type) => (
+                              <option key={type} value={type}>
+                                {type}
+                              </option>
+                            ))}
+                          </select>
                         </FormControl>
                         <FormMessage />
                       </FormItem>
                     )}
                   />
+
 
                   {/* نوع الوحدة */}
                   <FormField
