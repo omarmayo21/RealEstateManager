@@ -106,7 +106,7 @@ export default function UnitDetail() {
 
 
     // const paymentPlanFileName = unit
-    //   ? `payment-plan -${unit.title || "الوحدة"}-${unit.id}.pdf`
+    //   ? `payment-plan -${unit.title || "الوحدة"}-${unit.unitCode}.pdf`
     //   : "payment-plan-.pdf";
 
     //   const pdfDownloadUrl =
@@ -444,7 +444,7 @@ export default function UnitDetail() {
             className="mb-12"
           >
             <div className="max-w-2xl mx-auto">
-              <LeadForm unitId={unit.id} projectId={unit.projectId} title="استفسر عن هذه الوحدة" />
+              <LeadForm unitId={unit.unitCode} projectId={unit.projectId} title="استفسر عن هذه الوحدة" />
             </div>
           </motion.div>
 
@@ -458,7 +458,7 @@ export default function UnitDetail() {
               <h2 className="text-3xl font-bold mb-8 text-primary">وحدات مشابهة</h2>
               <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
                 {similarUnits.map((similarUnit, index) => (
-                  <UnitCard key={similarUnit.id} unit={similarUnit} index={index} />
+                 <UnitCard key={similarUnit.unitCode} unit={similarUnit} index={index} />
                 ))}
               </div>
             </motion.div>

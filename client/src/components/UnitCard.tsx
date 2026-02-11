@@ -27,26 +27,26 @@ export default function UnitCard({ unit, index = 0 }: UnitCardProps) {
       transition={{ duration: 0.5, delay: index * 0.1 }}
       whileHover={{ y: -8 }}
     >
-      <Card className="overflow-hidden hover:shadow-xl transition-all duration-300 h-full" data-testid={`card-unit-${unit.id}`}>
+      <Card className="overflow-hidden hover:shadow-xl transition-all duration-300 h-full" data-testid={`card-unit-${unit.unitCode}`}>
         <div className="relative h-48 overflow-hidden">
           <img
             src={unit.mainImageUrl || "https://images.unsplash.com/photo-1545324418-cc1a3fa10c00?w=600"}
             alt={unit.title}
             className="w-full h-full object-cover transition-transform duration-300 hover:scale-110"
-            data-testid={`img-unit-${unit.id}`}
+            data-testid={`img-unit-${unit.unitCode}`}
           />
           <div className="absolute top-3 right-3 flex gap-2">
             {unit.status === 'available' ? (
-              <Badge className="bg-green-500 text-white" data-testid={`badge-status-${unit.id}`}>
+              <Badge className="bg-green-500 text-white" data-testid={`badge-status-${unit.unitCode}`}>
                 متاح
               </Badge>
             ) : (
-              <Badge variant="secondary" data-testid={`badge-status-${unit.id}`}>
+              <Badge variant="secondary" data-testid={`badge-status-${unit.unitCode}`}>
                 مباع
               </Badge>
             )}
             {unit.type === 'primary' && (
-              <Badge className="bg-primary text-white" data-testid={`badge-type-${unit.id}`}>
+              <Badge className="bg-primary text-white" data-testid={`badge-type-${unit.unitCode}`}>
                 جديد
               </Badge>
             )}
@@ -55,11 +55,11 @@ export default function UnitCard({ unit, index = 0 }: UnitCardProps) {
 
         <CardContent className="p-6 space-y-4">
           <div className="space-y-2">
-            <h3 className="text-xl font-bold text-card-foreground" data-testid={`text-title-${unit.id}`}>
+            <h3 className="text-xl font-bold text-card-foreground" data-testid={`text-title-${unit.unitCode}`}>
               {unit.title}
             </h3>
             {unit.project && (
-              <p className="text-sm text-muted-foreground" data-testid={`text-project-${unit.id}`}>
+              <p className="text-sm text-muted-foreground" data-testid={`text-project-${unit.unitCode}`}>
                 {unit.project.name}
               </p>
             )}
@@ -67,21 +67,21 @@ export default function UnitCard({ unit, index = 0 }: UnitCardProps) {
 
           <div className="flex items-center gap-2 text-primary">
             <MapPin className="w-4 h-4" />
-            <span className="text-sm" data-testid={`text-location-${unit.id}`}>{unit.location}</span>
+            <span className="text-sm" data-testid={`text-location-${unit.unitCode}`}>{unit.location}</span>
           </div>
 
           <div className="flex items-center justify-between text-sm text-muted-foreground">
             <div className="flex items-center gap-1">
               <Maximize className="w-4 h-4" />
-              <span data-testid={`text-area-${unit.id}`}>{unit.area} م²</span>
+              <span data-testid={`text-area-${unit.unitCode}`}>{unit.area} م²</span>
             </div>
             <div className="flex items-center gap-1">
               <Bed className="w-4 h-4" />
-              <span data-testid={`text-bedrooms-${unit.id}`}>{unit.bedrooms} غرف</span>
+              <span data-testid={`text-bedrooms-${unit.unitCode}`}>{unit.bedrooms} غرف</span>
             </div>
             <div className="flex items-center gap-1">
               <Bath className="w-4 h-4" />
-              <span data-testid={`text-bathrooms-${unit.id}`}>{unit.bathrooms}</span>
+              <span data-testid={`text-bathrooms-${unit.unitCode}`}>{unit.bathrooms}</span>
             </div>
           </div>
 
@@ -89,12 +89,12 @@ export default function UnitCard({ unit, index = 0 }: UnitCardProps) {
             <div className="flex items-center justify-between">
               <div>
                 <p className="text-sm text-muted-foreground">السعر</p>
-                <p className="text-2xl font-bold text-primary" data-testid={`text-price-${unit.id}`}>
+                <p className="text-2xl font-bold text-primary" data-testid={`text-price-${unit.unitCode}`}>
                   {formatPrice(unit.price)}
                 </p>
               </div>
-              <Link href={`/units/${unit.id}`}>
-                <Button className="bg-primary hover:bg-primary/90" data-testid={`button-details-${unit.id}`}>
+              <Link href={`/units/${unit.unitCode}`}>
+                <Button className="bg-primary hover:bg-primary/90" data-testid={`button-details-${unit.unitCode}`}>
                   تفاصيل أكثر
                 </Button>
               </Link>

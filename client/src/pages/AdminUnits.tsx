@@ -284,6 +284,7 @@ const onSubmit = async (data: UnitFormData) => {
   // ======================
   if (editingUnit) {
     updateMutation.mutate({ id: editingUnit.id, data: formData });
+
   } else {
     createMutation.mutate(formData);
   }
@@ -685,7 +686,7 @@ const onSubmit = async (data: UnitFormData) => {
               </TableHeader>
               <TableBody>
                 {units.map((unit) => (
-                  <TableRow key={unit.id} data-testid={`row-unit-${unit.id}`}>
+                  <TableRow key={unit.unitCode} data-testid={`row-unit-${unit.unitCode}`}>
                     <TableCell className="font-medium">
                       <div>
                         {unit.title}
@@ -710,7 +711,7 @@ const onSubmit = async (data: UnitFormData) => {
                           size="icon"
                           variant="ghost"
                           onClick={() => handleEdit(unit)}
-                          data-testid={`button-edit-${unit.id}`}
+                          data-testid={`button-edit-${unit.unitCode}`}
                         >
                           <Pencil className="w-4 h-4" />
                         </Button>
@@ -718,7 +719,8 @@ const onSubmit = async (data: UnitFormData) => {
                           size="icon"
                           variant="ghost"
                           onClick={() => deleteMutation.mutate(unit.id)}
-                          data-testid={`button-delete-${unit.id}`}
+
+                          data-testid={`button-delete-${unit.unitCode}`}
                         >
                           <Trash2 className="w-4 h-4 text-destructive" />
                         </Button>

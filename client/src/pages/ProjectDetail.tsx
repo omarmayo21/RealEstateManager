@@ -136,7 +136,7 @@ export default function ProjectDetail() {
 
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                   {filteredUnits.map((unit, index) => (
-                    <UnitCard key={unit.id} unit={unit} index={index} />
+                    <UnitCard key={unit.unitCode} unit={unit} index={index} />
                   ))}
                 </div>
 
