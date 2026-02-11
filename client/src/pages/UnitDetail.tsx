@@ -113,13 +113,9 @@ export default function UnitDetail() {
     ? `payment-plan-${unit.title || "unit"}-${unit.id}.pdf`
     : "payment-plan.pdf";
 
-  // لينك تحميل صحيح من Cloudinary
   const pdfDownloadUrl =
     unit?.paymentPlanPdf
-      ? unit.paymentPlanPdf.replace(
-          "/upload/",
-          `/upload/fl_attachment:${encodeURIComponent(paymentPlanFileName)}/`
-        )
+      ? `${unit.paymentPlanPdf}?download=${encodeURIComponent(paymentPlanFileName)}`
       : null;
 
   const formatPrice = (price: number) => {
