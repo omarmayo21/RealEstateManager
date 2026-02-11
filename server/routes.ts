@@ -274,6 +274,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
           images?: Express.Multer.File[];
           paymentPlanPdf?: Express.Multer.File[];
         };
+        console.log("BODY:", req.body);
+        console.log("FILES:", req.files);
 
         const imageUrls =
           files?.images?.map((file) => file.path) ?? [];
