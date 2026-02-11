@@ -216,6 +216,24 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
   });
 
+
+  app.get("/api/units/code/:unitCode", async (req, res) => {
+  try {
+    const { unitCode } = req.params;
+
+    const unit = await storage.getUnitByCode(unitCode);
+
+    if (!unit) {
+      return res.status(404).json({ message: "Unit not found" });
+    }
+
+    res.json(unit);
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ message: "Server error" });
+  }
+});
+
   app.get("/api/units/:id",  async (req: Request, res: Response) => {
     try {
       const id = parseInt(req.params.id);

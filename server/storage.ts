@@ -120,6 +120,17 @@ export class DatabaseStorage implements IStorage {
     return results[0];
   }
 
+
+  async getUnitByCode(code: string) {
+  const result = await db
+    .select()
+    .from(schema.units)
+    .where(eq(schema.units.unitCode, code));
+
+  return result[0];
+}
+
+
   async deleteUnit(id: number): Promise<boolean> {
     const results = await db.delete(schema.units).where(eq(schema.units.id, id)).returning();
     return results.length > 0;
@@ -133,33 +144,34 @@ export class DatabaseStorage implements IStorage {
     const results = await db.insert(schema.unitImages).values({ unitId, imageUrl }).returning();
     return results[0];
   }
-async createUnitWithAssets(
-  unit: InsertUnit,
-  imageUrls: string[],
-  paymentPlanPdf?: string | null
-): Promise<Unit> {
-  const results = await db
-    .insert(schema.units)
-    .values({
-      ...(unit as any),
-      paymentPlanPdf: paymentPlanPdf ?? null,
-    })
-    .returning();
+  async createUnitWithAssets(
+    unit: InsertUnit,
+    imageUrls: string[],
+    paymentPlanPdf?: string | null
+  ): Promise<Unit> {
+    // 1️⃣ إنشاء الوحدة
+    const results = await db
+      .insert(schema.units)
+      .values({
+        ...unit,
+        paymentPlanPdf: paymentPlanPdf ?? null,
+      })
+      .returning();
 
-  const newUnit = results[0];
+    const newUnit = results[0];
 
-  if (imageUrls.length > 0) {
-    await db.insert(schema.unitImages).values(
-      imageUrls.map((url) => ({
-        unitId: newUnit.id,
-        imageUrl: url,
-      }))
-    );
-  }
+    // 2️⃣ إضافة الصور
+    if (imageUrls.length > 0) {
+      await db.insert(schema.unitImages).values(
+        imageUrls.map((url) => ({
+          unitId: newUnit.id,
+          imageUrl: url,
+        }))
+      );
+    }
 
-  return newUnit;
+    return newUnit;
 }
-
 
   async getLeads(): Promise<Lead[]> {
     return await db.select().from(schema.leads);

@@ -21,6 +21,9 @@ import {
   Wallet,
   Calendar,
 } from "lucide-react";
+import { apiRequest } from "@/lib/api";
+
+
 
 
 
@@ -43,8 +46,18 @@ const formatMoney = (value: unknown) => {
 export default function UnitDetail() {
 
 
-  const { id } = useParams<{ id: string }>();
-  const unitId = parseInt(id || "0");
+  const { unitCode } = useParams<{ unitCode: string }>();
+
+  const { data: unit, isLoading } = useQuery<any>({
+    queryKey: ["api", "units", unitCode],
+    queryFn: async () => {
+      if (!unitCode) return null;
+      return await apiRequest("GET", `/api/units/code/${unitCode}`);
+
+    },
+    enabled: !!unitCode,
+  });
+
   
   const [selectedImage, setSelectedImage] = useState<string | null>(null);
 
@@ -59,20 +72,20 @@ export default function UnitDetail() {
   });
 
   // ⬅️ الوحدة نفسها (المصدر الحقيقي)
-  const { data: unit, isLoading } = useQuery<
-    Unit & {
-      project?: Project;
-      images?: UnitImage[];
-    }
-  >({
-    queryKey: ["/api/units", unitId],
-    queryFn: async () => {
-      const res = await fetch(`/api/units/${unitId}`);
-      if (!res.ok) throw new Error("Failed to fetch unit");
-      return res.json();
-    },
-    enabled: !!unitId,
-  });
+  // const { data: unit, isLoading } = useQuery<
+  //   Unit & {
+  //     project?: Project;
+  //     images?: UnitImage[];
+  //   }
+  // >({
+  //   queryKey: ["/api/units", unit?.id],
+  //   queryFn: async () => {
+  //     const res = await fetch(`/api/units/${unit?.id}`);
+  //     if (!res.ok) throw new Error("Failed to fetch unit");
+  //     return res.json();
+  //   },
+  //   enabled: !!unit?.id,
+  // });
 
 
 
@@ -104,13 +117,14 @@ export default function UnitDetail() {
   const displayImage = selectedImage || unit?.mainImageUrl || "https://images.unsplash.com/photo-1545324418-cc1a3fa10c00?w=800";
 
   const similarUnits = allUnits
-    .filter((u) => u.id !== unitId && u.projectId === unit?.projectId)
+    .filter((u) => u.id !== unit?.id && u.projectId === unit?.projectId)
+
     .slice(0, 3);
 
 
   // اسم الملف اللي هينزل
   const paymentPlanFileName = unit
-    ? `payment-plan-${unit.title || "unit"}-${unit.id}.pdf`
+    ? `payment-plan-${unitCode}.pdf`
     : "payment-plan.pdf";
 
   const pdfDownloadUrl =
@@ -186,7 +200,7 @@ export default function UnitDetail() {
 
                 {images.length > 0 && (
                   <div className="grid grid-cols-4 gap-4">
-                    {[unit.mainImageUrl, ...images.map((img) => img.imageUrl)]
+                    {[unit.mainImageUrl, ...images.map((img: any) => img.imageUrl)]
                       .filter(Boolean)
                       .slice(0, 4)
                       .map((img, index) => (
