@@ -281,8 +281,31 @@ export async function registerRoutes(app: Express): Promise<Server> {
           files?.images?.map((file) => file.path) ?? [];
 
         // 3️⃣ PDF
-        const paymentPlanPdfUrl =
-          files?.paymentPlanPdf?.[0]?.path ?? null;
+      let paymentPlanPdfUrl: string | null = null;
+
+      if (files?.paymentPlanPdf?.[0]) {
+        const file = files.paymentPlanPdf[0];
+
+        const fileName = `payment-plan-${Date.now()}.pdf`;
+
+        const { data, error } = await supabase.storage
+          .from("payment-plans")
+          .upload(fileName, file.buffer, {
+            contentType: file.mimetype,
+            upsert: true,
+          });
+
+        if (error) {
+          console.error("SUPABASE UPLOAD ERROR:", error);
+        } else {
+          const { data: publicUrl } = supabase.storage
+            .from("payment-plans")
+            .getPublicUrl(fileName);
+
+          paymentPlanPdfUrl = publicUrl.publicUrl;
+        }
+      }
+
 
         // 4️⃣ إنشاء الوحدة + الأصول
         const unit = await storage.createUnitWithAssets(
