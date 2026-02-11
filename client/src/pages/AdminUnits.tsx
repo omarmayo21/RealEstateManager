@@ -142,25 +142,28 @@ export default function AdminUnits() {
       },
     });
 
-
+    
 const createMutation = useMutation({
   mutationFn: async (formData: FormData) => {
+    const token = localStorage.getItem("token");
+
     const res = await fetch("/api/units", {
       method: "POST",
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
       body: formData,
       credentials: "include",
     });
 
-    if (!res.ok) throw new Error("Failed");
+    if (!res.ok) {
+      throw new Error("Failed");
+    }
+
     return res.json();
   },
-  onSuccess: () => {
-    toast({ title: "تم إضافة الوحدة بنجاح" });
-    queryClient.invalidateQueries({ queryKey: ["/api/units"] });
-    setDialogOpen(false);
-    form.reset();
-  },
 });
+
 
 
 
