@@ -142,10 +142,17 @@ export default function AdminUnits() {
       },
     });
 
-    
+
 const createMutation = useMutation({
   mutationFn: async (formData: FormData) => {
-    return apiRequest("POST", "/api/units", formData);
+    const res = await fetch("/api/units", {
+      method: "POST",
+      body: formData,
+      credentials: "include",
+    });
+
+    if (!res.ok) throw new Error("Failed");
+    return res.json();
   },
   onSuccess: () => {
     toast({ title: "تم إضافة الوحدة بنجاح" });

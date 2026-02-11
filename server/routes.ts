@@ -243,6 +243,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
     ]),
     async (req: Request, res: Response) => {
       try {
+      console.log("BODY:", req.body);
+      console.log("FILES:", req.files);
+
         // 1️⃣ البيانات النصية
       const validatedData = insertUnitSchema.parse({
         ...req.body,
