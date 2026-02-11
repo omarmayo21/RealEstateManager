@@ -6,6 +6,7 @@ import jwt from "jsonwebtoken";
 import type { UnitFilters } from "../shared/schema.js";
 import { insertProjectSchema, updateProjectSchema, insertUnitSchema, updateUnitSchema, insertLeadSchema } from "../shared/schema.js";
 import { upload } from "./middleware/upload";
+import { supabase } from "./utils/supabase";
 
 
 
@@ -169,8 +170,32 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const images =
         files?.images?.map((file) => file.path) || [];
 
-      const paymentPlanPdf =
-        files?.paymentPlanPdf?.[0]?.path || null;
+      let paymentPlanPdf: string | null = null;
+
+      if (files?.paymentPlanPdf?.[0]) {
+        const file = files.paymentPlanPdf[0];
+
+        const fileName = `payment-plans/${Date.now()}-${file.originalname}`;
+
+        const { error } = await supabase.storage
+          .from("payment-plans")
+          .upload(fileName, file.buffer, {
+            contentType: file.mimetype,
+            upsert: false,
+          });
+
+        if (error) {
+          console.error("Supabase upload error:", error);
+          return res.status(500).json({ error: "فشل رفع PDF" });
+        }
+
+        const { data } = supabase.storage
+          .from("payment-plans")
+          .getPublicUrl(fileName);
+
+        paymentPlanPdf = data.publicUrl;
+      }
+
 
       res.json({
         images,

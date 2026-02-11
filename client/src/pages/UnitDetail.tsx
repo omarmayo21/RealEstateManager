@@ -92,17 +92,12 @@ export default function UnitDetail() {
 
 
 
-    const paymentPlanFileName = unit
-      ? `payment-plan -${unit.title || "الوحدة"}-${unit.id}.pdf`
-      : "payment-plan-.pdf";
-      
-    const pdfDownloadUrl =
-      unit?.paymentPlanPdf
-        ? unit.paymentPlanPdf.replace(
-            "/upload/",
-            `/upload/fl_attachment:${encodeURIComponent(paymentPlanFileName)}/`
-          )
-        : null;
+    // const paymentPlanFileName = unit
+    //   ? `payment-plan -${unit.title || "الوحدة"}-${unit.id}.pdf`
+    //   : "payment-plan-.pdf";
+
+    //   const pdfDownloadUrl =
+    //     unit?.paymentPlanPdf?.replace("/upload/", "/upload/fl_attachment/");
 
 
   const images = unit?.images || [];
@@ -111,6 +106,21 @@ export default function UnitDetail() {
   const similarUnits = allUnits
     .filter((u) => u.id !== unitId && u.projectId === unit?.projectId)
     .slice(0, 3);
+
+
+  // اسم الملف اللي هينزل
+  const paymentPlanFileName = unit
+    ? `payment-plan-${unit.title || "unit"}-${unit.id}.pdf`
+    : "payment-plan.pdf";
+
+  // لينك تحميل صحيح من Cloudinary
+  const pdfDownloadUrl =
+    unit?.paymentPlanPdf
+      ? unit.paymentPlanPdf.replace(
+          "/upload/",
+          `/upload/fl_attachment:${encodeURIComponent(paymentPlanFileName)}/`
+        )
+      : null;
 
   const formatPrice = (price: number) => {
     return new Intl.NumberFormat('ar-EG', {
@@ -397,25 +407,24 @@ export default function UnitDetail() {
             </motion.div>
           )}
 
-                              
-          {unit.paymentPlanPdf && (
+          {unit.paymentPlanPdf && pdfDownloadUrl && (
             <div className="mt-6 rounded-xl border border-orange-400 p-4 flex items-center justify-between">
               <div className="flex items-center gap-2">
                 📄
                 <span className="font-medium">
                   {paymentPlanFileName}
-                  
                 </span>
               </div>
+
               <a
                 href={pdfDownloadUrl}
                 className="bg-green-500 hover:bg-green-600 text-white px-4 py-2 rounded-md"
               >
                 تحميل
               </a>
-
             </div>
           )}
+
 
           <motion.div
             initial={{ opacity: 0, y: 20 }}
