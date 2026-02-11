@@ -286,9 +286,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
       if (files?.paymentPlanPdf?.[0]) {
         const file = files.paymentPlanPdf[0];
 
-        const fileName = `payment-plan-${Date.now()}.pdf`;
+        const fileName = `unit-${Date.now()}-${file.originalname}`;
 
-        const { data, error } = await supabase.storage
+        const { error } = await supabase.storage
           .from("payment-plans")
           .upload(fileName, file.buffer, {
             contentType: file.mimetype,
@@ -298,11 +298,11 @@ export async function registerRoutes(app: Express): Promise<Server> {
         if (error) {
           console.error("SUPABASE UPLOAD ERROR:", error);
         } else {
-          const { data: publicUrl } = supabase.storage
+          const { data } = supabase.storage
             .from("payment-plans")
             .getPublicUrl(fileName);
 
-          paymentPlanPdfUrl = publicUrl.publicUrl;
+          paymentPlanPdfUrl = data.publicUrl;
         }
       }
 

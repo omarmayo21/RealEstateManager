@@ -162,8 +162,14 @@ const createMutation = useMutation({
 
     return res.json();
   },
-});
 
+  onSuccess: () => {
+  toast({ title: "تم إضافة الوحدة بنجاح" });
+  queryClient.invalidateQueries({ queryKey: ["/api/units"] });
+  setDialogOpen(false);
+  form.reset();
+},
+});
 
 
 
