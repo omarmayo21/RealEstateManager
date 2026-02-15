@@ -86,7 +86,20 @@ export default function AdminProjects() {
       },
     });
 
-
+    const deleteImageMutation = useMutation({
+      mutationFn: async (imageId: number) => {
+        return await apiRequest(
+          "DELETE",
+          `/api/project-images/${imageId}`
+        );
+      },
+      onSuccess: () => {
+        // إعادة تحميل صور المشروع بعد الحذف
+        queryClient.invalidateQueries({
+          queryKey: ["api", "project-images", selectedProject?.id],
+        });
+      },
+    });
 
 
 
@@ -169,8 +182,7 @@ export default function AdminProjects() {
     refetchProjectImages();
 
       // 🔥 يقفل النافذة تلقائياً بعد الرفع
-    setImagesDialogOpen(false);
-    setSelectedProject(null);
+
   },
 });
 
@@ -456,68 +468,88 @@ export default function AdminProjects() {
       </DialogHeader>
 
       <div className="space-y-4">
-      <Input
-        type="file"
-        accept="image/*"
-        multiple
-        disabled={uploading}
-        onChange={async (e) => {
-          const files = e.target.files;
-          if (!files || !selectedProject) return;
+        {/* رفع الصور */}
+        <Input
+          type="file"
+          accept="image/*"
+          multiple
+          disabled={uploading}
+          onChange={async (e) => {
+            const files = e.target.files;
+            if (!files || !selectedProject) return;
 
-          try {
-            setUploading(true);
+            try {
+              setUploading(true);
 
-            // نحول الملفات لأراي
-            const filesArray = Array.from(files);
+              const filesArray = Array.from(files);
 
-            for (const file of filesArray) {
-              // 1️⃣ رفع الصورة على Cloudinary
-              const formData = new FormData();
-              formData.append("file", file);
-              formData.append("upload_preset", "projects");
-              formData.append("folder", "projects");
+              for (const file of filesArray) {
+                const formData = new FormData();
+                formData.append("file", file);
+                formData.append("upload_preset", "projects");
+                formData.append("folder", "projects");
 
-              const cloudinaryResponse = await fetch(
-                "https://api.cloudinary.com/v1_1/dqir7d4jn/image/upload",
-                {
-                  method: "POST",
-                  body: formData,
+                const cloudinaryResponse = await fetch(
+                  "https://api.cloudinary.com/v1_1/dqir7d4jn/image/upload",
+                  {
+                    method: "POST",
+                    body: formData,
+                  }
+                );
+
+                const cloudinaryData = await cloudinaryResponse.json();
+
+                if (!cloudinaryData.secure_url) {
+                  throw new Error("فشل رفع الصورة");
                 }
-              );
 
-              const cloudinaryData = await cloudinaryResponse.json();
-
-              if (!cloudinaryData.secure_url) {
-                throw new Error("فشل رفع الصورة");
+                // حفظ الرابط في الداتابيز
+                await addProjectImageMutation.mutateAsync(
+                  cloudinaryData.secure_url
+                );
               }
-
-              // 2️⃣ حفظ رابط الصورة في الداتا بيز
-              await addProjectImageMutation.mutateAsync(
-                cloudinaryData.secure_url
-              );
+            } catch (error) {
+              console.error("Upload Error:", error);
+            } finally {
+              setUploading(false);
+              refetchProjectImages();
             }
-          } catch (error) {
-            console.error("Upload Error:", error);
-          } finally {
-          setUploading(false);
-          refetchProjectImages();
-
-          setTimeout(() => {
-            setImagesDialogOpen(false);
-            setSelectedProject(null);
-          }, 400);
-        }
-
-        }}
-      />
-
+          }}
+        />
 
         <p className="text-sm text-muted-foreground">
           {uploading
-            ? "جاري رفع الصورة إلى Cloudinary..."
-            : "اختر صورة من جهازك وسيتم رفعها تلقائيًا"}
+            ? "جاري رفع الصور إلى Cloudinary..."
+            : "اختر صور المشروع وسيتم رفعها تلقائيًا"}
         </p>
+
+        {/* 🔥 جاليري صور المشروع + زر الحذف */}
+        <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
+          {projectImages.length === 0 && (
+            <p className="text-sm text-muted-foreground col-span-full text-center">
+              لا توجد صور لهذا المشروع حتى الآن
+            </p>
+          )}
+
+          {projectImages.map((img) => (
+            <div key={img.id} className="relative group">
+              <img
+                src={img.imageUrl}
+                alt="Project"
+                className="w-full h-32 object-cover rounded-lg border"
+                loading="lazy"
+              />
+
+              {/* زر الحذف */}
+              <button
+                onClick={() => deleteImageMutation.mutate(img.id)}
+                className="absolute top-2 right-2 bg-red-600 hover:bg-red-700 text-white text-xs px-2 py-1 rounded opacity-0 group-hover:opacity-100 transition"
+              >
+                حذف
+              </button>
+            </div>
+          ))}
+        </div>
       </div>
 
     </DialogContent>

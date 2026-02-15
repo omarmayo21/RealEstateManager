@@ -186,6 +186,24 @@ app.post("/api/projects/:id/images", async (req, res) => {
   }
 });
 
+
+app.delete("/api/project-images/:id", async (req, res) => {
+  try {
+    const imageId = Number(req.params.id);
+
+    if (!imageId) {
+      return res.status(400).json({ message: "Invalid image id" });
+    }
+
+    await storage.deleteProjectImage(imageId);
+
+    res.json({ success: true });
+  } catch (error) {
+    console.error("Error deleting project image:", error);
+    res.status(500).json({ message: "Failed to delete project image" });
+  }
+});
+
   app.post("/api/test-upload", upload.single("file"), (req, res) => {
     const file = req.file as any;
 

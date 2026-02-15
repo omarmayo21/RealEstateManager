@@ -18,7 +18,6 @@ import type {
 } from "../shared/schema.js";
 import * as schema from "../shared/schema.js";
 
-
 neonConfig.webSocketConstructor = ws;
 
 const pool = new Pool({ connectionString: process.env.DATABASE_URL! });
@@ -175,6 +174,11 @@ export class DatabaseStorage implements IStorage {
     return results[0];
   }
 
+  async deleteProjectImage(imageId: number): Promise<void> {
+  await db
+    .delete(schema.projectImages)
+    .where(eq(schema.projectImages.id, imageId));
+  }
 
   async createUnitImage(unitId: number, imageUrl: string): Promise<UnitImage> {
     const results = await db.insert(schema.unitImages).values({ unitId, imageUrl }).returning();
