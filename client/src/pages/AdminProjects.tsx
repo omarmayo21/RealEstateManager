@@ -212,23 +212,21 @@ export default function AdminProjects() {
     },
   });
 
-const addProjectImageMutation = useMutation({
-  mutationFn: async (imageUrl: string) => {
-    if (!selectedProject) return;
-    return await apiRequest(
-      "POST",
-      `/api/projects/${selectedProject.id}/images`,
-      { imageUrl }
-    );
-  },
-  onSuccess: () => {
-    // refetch مرة واحدة فقط
-    queryClient.invalidateQueries({
-      queryKey: ["api", "project-images", selectedProject?.id ?? null],
-    });
-  },
-});
-
+  const addProjectImageMutation = useMutation({
+    mutationFn: async (imageUrl: string) => {
+      if (!selectedProject) return;
+      return await apiRequest(
+        "POST",
+        `/api/projects/${selectedProject.id}/images`,
+        { imageUrl }
+      );
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({
+        queryKey: ["api", "project-images", selectedProject?.id ?? null],
+      });
+    },
+  });
 
   const handleEdit = (project: Project) => {
     setEditingProject(project);
@@ -527,6 +525,11 @@ const addProjectImageMutation = useMutation({
               const filesArray = Array.from(files);
               const uploadedUrls: string[] = [];
 
+
+
+              // نجمع الروابط أولاً
+
+
               for (const file of filesArray) {
                 const formData = new FormData();
                 formData.append("file", file);
@@ -547,8 +550,16 @@ const addProjectImageMutation = useMutation({
                   throw new Error("فشل رفع الصورة");
                 }
 
-                // نجمع الروابط بدل ما نحفظ مباشرة
                 uploadedUrls.push(cloudinaryData.secure_url);
+              }
+
+              // 🔥 نحفظ في الداتابيز مرة واحدة لكل صورة (بدون mutation loop)
+              for (const url of uploadedUrls) {
+                await apiRequest(
+                  "POST",
+                  `/api/projects/${selectedProject.id}/images`,
+                  { imageUrl: url }
+                );
               }
 
               // 🔥 نحفظ الصور في الداتابيز مرة واحدة فقط

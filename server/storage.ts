@@ -165,8 +165,9 @@ export class DatabaseStorage implements IStorage {
   }
 
   // ➕ إضافة صورة جديدة لمشروع
+
   async createProjectImage(projectId: number, imageUrl: string) {
-    // تحقق هل الصورة موجودة بالفعل
+    // تحقق لو الصورة موجودة بالفعل لنفس المشروع
     const existing = await db
       .select()
       .from(schema.projectImages)
@@ -178,7 +179,7 @@ export class DatabaseStorage implements IStorage {
       );
 
     if (existing.length > 0) {
-      return existing[0]; // لا تضيف تكرار
+      return existing[0]; // يمنع التكرار
     }
 
     const result = await db
