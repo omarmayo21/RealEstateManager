@@ -142,8 +142,8 @@ export class DatabaseStorage implements IStorage {
     .select()
     .from(schema.units)
     .where(eq(schema.units.unitCode, code));
-
   return result[0];
+  
 }
 
 
@@ -157,7 +157,7 @@ export class DatabaseStorage implements IStorage {
   }
 
 
-    // 🖼️ جلب صور المشروع (للسلايدر التلقائي)
+  // 🖼️ جلب صور المشروع (للسلايدر التلقائي)
   async getProjectImages(projectId: number): Promise<ProjectImage[]> {
     return await db
       .select()
@@ -245,6 +245,9 @@ export class DatabaseStorage implements IStorage {
       .returning();
     return results[0];
   }
+
+
+
 }
 
 export const storage = new DatabaseStorage();
