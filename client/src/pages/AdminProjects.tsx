@@ -452,17 +452,22 @@ export default function AdminProjects() {
       </DialogHeader>
 
       <div className="space-y-4">
-        <Input
-          type="file"
-          accept="image/*"
-          disabled={uploading}
-          onChange={async (e) => {
-            const file = e.target.files?.[0];
-            if (!file || !selectedProject) return;
+      <Input
+        type="file"
+        accept="image/*"
+        multiple
+        disabled={uploading}
+        onChange={async (e) => {
+          const files = e.target.files;
+          if (!files || !selectedProject) return;
 
-            try {
-              setUploading(true);
+          try {
+            setUploading(true);
 
+            // نحول الملفات لأراي
+            const filesArray = Array.from(files);
+
+            for (const file of filesArray) {
               // 1️⃣ رفع الصورة على Cloudinary
               const formData = new FormData();
               formData.append("file", file);
@@ -484,14 +489,19 @@ export default function AdminProjects() {
               }
 
               // 2️⃣ حفظ رابط الصورة في الداتا بيز
-              addProjectImageMutation.mutate(cloudinaryData.secure_url);
-            } catch (error) {
-              console.error("Upload Error:", error);
-            } finally {
-              setUploading(false);
+              await addProjectImageMutation.mutateAsync(
+                cloudinaryData.secure_url
+              );
             }
-          }}
-        />
+          } catch (error) {
+            console.error("Upload Error:", error);
+          } finally {
+            setUploading(false);
+            refetchProjectImages(); // تحديث الصور بعد الرفع
+          }
+        }}
+      />
+
 
         <p className="text-sm text-muted-foreground">
           {uploading
