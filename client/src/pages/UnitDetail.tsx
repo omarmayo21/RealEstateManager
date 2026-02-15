@@ -48,15 +48,17 @@ export default function UnitDetail() {
 
   const { unitCode } = useParams<{ unitCode: string }>();
 
-  const { data: unit, isLoading } = useQuery<any>({
+  const { data, isLoading } = useQuery<any>({
     queryKey: ["api", "units", unitCode],
     queryFn: async () => {
       if (!unitCode) return null;
       return await apiRequest("GET", `/api/units/code/${unitCode}`);
-
     },
     enabled: !!unitCode,
   });
+
+  // 👇 أهم سطر في الحل
+  const unit = Array.isArray(data) ? data[0] : data;
 
   
   const [selectedImage, setSelectedImage] = useState<string | null>(null);
@@ -90,17 +92,19 @@ export default function UnitDetail() {
 
 
 
+const unitData = Array.isArray(unit) ? unit[0] : unit;
 
-  const images =
-    (unit?.images && unit.images.length > 0)
-      ? unit.images
-      : (unit?.projectImages || []);
+const images = Array.isArray(unitData?.images)
+  ? unitData.images
+  : [];
 
-  const displayImage =
-    selectedImage ||
-    unit?.mainImageUrl ||
-    images?.[0]?.imageUrl ||
-    "https://images.unsplash.com/photo-1545324418-cc1a3fa10c00?w=800";
+const displayImage =
+  selectedImage ||
+  unitData?.mainImageUrl ||
+  (images.length > 0 ? images[0].imageUrl : null) ||
+  "https://images.unsplash.com/photo-1545324418-cc1a3fa10c00?w=800";
+
+
 
   const similarUnits = allUnits
     .filter((u) => u.id !== unit?.id && u.projectId === unit?.projectId)
@@ -165,7 +169,7 @@ export default function UnitDetail() {
                 <ChevronRight className="w-4 h-4" />
               </>
             )}
-            <span className="text-foreground" data-testid="text-unit-breadcrumb">{unit.title}</span>
+            <span className="text-foreground" data-testid="text-unit-breadcrumb">{unitData.title}</span>
           </div>
 
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 mb-12">
@@ -178,7 +182,7 @@ export default function UnitDetail() {
                 <div className="mb-6">
                   <img
                     src={displayImage}
-                    alt={unit.title}
+                    alt={unitData.title}
                     className="w-full h-[500px] object-cover rounded-2xl shadow-xl"
                     data-testid="img-main-unit"
                   />
@@ -225,7 +229,7 @@ export default function UnitDetail() {
               >
                 <div>
                   <h1 className="text-4xl font-bold mb-2" data-testid="text-unit-title">
-                    {unit.title}
+                    {unitData.title}
                   </h1>
                   {unit.project && (
                     <Link href={`/projects/${unit.project.slug}`}>

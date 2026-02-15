@@ -500,15 +500,15 @@ export default function AdminProjects() {
           } catch (error) {
             console.error("Upload Error:", error);
           } finally {
-            setUploading(false);
+          setUploading(false);
+          refetchProjectImages();
 
-            // تحديث الصور
-            refetchProjectImages();
-
-            // 🔥 اقفل النافذة بعد انتهاء رفع كل الصور
+          setTimeout(() => {
             setImagesDialogOpen(false);
             setSelectedProject(null);
-          }
+          }, 400);
+        }
+
         }}
       />
 
