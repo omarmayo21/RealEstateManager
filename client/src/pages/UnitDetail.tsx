@@ -72,21 +72,27 @@ const unit = Array.isArray(data) ? data[0] : data;
 
 const [selectedImage, setSelectedImage] = useState<string | null>(null);
 
-// الصور
-const images: UnitImage[] = Array.isArray(unit?.images)
-  ? unit.images
-  : [];
 
-// كل الصور المتاحة (بدون null)
-const galleryImages = [
-  ...(unit?.mainImageUrl ? [unit.mainImageUrl] : []),
-  ...images.map((img) => img.imageUrl),
-];
+// استخراج الصور بشكل آمن
+const images =
+  (unit?.images && unit.images.length > 0)
+    ? unit.images
+    : (unit?.projectImages || []);
 
+
+  // كل الصور الجاهزة للعرض
+  const galleryImages: string[] = [
+    ...(unit?.mainImageUrl ? [unit.mainImageUrl] : []),
+    ...images.map((img: any) => img.imageUrl),
+  ];
+
+  // الصورة الرئيسية
 const displayImage =
   selectedImage ||
-  galleryImages[0] ||
+  unit?.mainImageUrl ||
+  images?.[0]?.imageUrl ||
   "https://images.unsplash.com/photo-1545324418-cc1a3fa10c00?w=800";
+
 
 
 
@@ -172,27 +178,25 @@ const displayImage =
                   />
                 </div>
 
-                {galleryImages.length > 0 && (
-                  <div className="grid grid-cols-4 gap-4">
-                    {galleryImages
-                      .slice(0, 8) // بدل 4 عشان كل الصور تظهر
-                      .map((img, index) => (
-                        <button
-                          key={index}
-                          onClick={() => setSelectedImage(img)}
-                          className={`rounded-lg overflow-hidden hover:opacity-80 transition-opacity ${
-                            displayImage === img ? "ring-2 ring-primary" : ""
-                          }`}
-                        >
-                          <img
-                            src={img}
-                            alt={`صورة ${index + 1}`}
-                            className="w-full h-24 object-cover"
-                          />
-                        </button>
-                      ))}
-                  </div>
-                )}
+              {galleryImages.length > 0 && (
+                <div className="grid grid-cols-4 gap-4">
+                  {galleryImages.slice(0, 8).map((img, index) => (
+                    <button
+                      key={index}
+                      onClick={() => setSelectedImage(img)}
+                      className={`rounded-lg overflow-hidden hover:opacity-80 transition-opacity ${
+                        displayImage === img ? "ring-2 ring-primary" : ""
+                      }`}
+                    >
+                      <img
+                        src={img}
+                        alt={`صورة ${index + 1}`}
+                        className="w-full h-24 object-cover"
+                      />
+                    </button>
+                  ))}
+                </div>
+              )}
 
 
               </motion.div>
