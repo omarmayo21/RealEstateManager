@@ -212,7 +212,7 @@ export default function AdminProjects() {
     },
   });
 
-  const addProjectImageMutation = useMutation({
+const addProjectImageMutation = useMutation({
   mutationFn: async (imageUrl: string) => {
     if (!selectedProject) return;
     return await apiRequest(
@@ -222,12 +222,10 @@ export default function AdminProjects() {
     );
   },
   onSuccess: () => {
-    toast({ title: "تم إضافة صورة المشروع" });
-    setNewImageUrl("");
-    refetchProjectImages();
-
-      // 🔥 يقفل النافذة تلقائياً بعد الرفع
-
+    // refetch مرة واحدة فقط
+    queryClient.invalidateQueries({
+      queryKey: ["api", "project-images", selectedProject?.id ?? null],
+    });
   },
 });
 
@@ -527,6 +525,7 @@ export default function AdminProjects() {
               setUploading(true);
 
               const filesArray = Array.from(files);
+              const uploadedUrls: string[] = [];
 
               for (const file of filesArray) {
                 const formData = new FormData();
@@ -548,9 +547,16 @@ export default function AdminProjects() {
                   throw new Error("فشل رفع الصورة");
                 }
 
-                // حفظ الرابط في الداتابيز
-                await addProjectImageMutation.mutateAsync(
-                  cloudinaryData.secure_url
+                // نجمع الروابط بدل ما نحفظ مباشرة
+                uploadedUrls.push(cloudinaryData.secure_url);
+              }
+
+              // 🔥 نحفظ الصور في الداتابيز مرة واحدة فقط
+              for (const url of uploadedUrls) {
+                await apiRequest(
+                  "POST",
+                  `/api/projects/${selectedProject.id}/images`,
+                  { imageUrl: url }
                 );
               }
             } catch (error) {

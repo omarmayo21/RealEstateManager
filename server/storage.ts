@@ -165,13 +165,28 @@ export class DatabaseStorage implements IStorage {
   }
 
   // ➕ إضافة صورة جديدة لمشروع
-  async createProjectImage(projectId: number, imageUrl: string): Promise<ProjectImage> {
-    const results = await db
+  async createProjectImage(projectId: number, imageUrl: string) {
+    // تحقق هل الصورة موجودة بالفعل
+    const existing = await db
+      .select()
+      .from(schema.projectImages)
+      .where(
+        and(
+          eq(schema.projectImages.projectId, projectId),
+          eq(schema.projectImages.imageUrl, imageUrl)
+        )
+      );
+
+    if (existing.length > 0) {
+      return existing[0]; // لا تضيف تكرار
+    }
+
+    const result = await db
       .insert(schema.projectImages)
       .values({ projectId, imageUrl })
       .returning();
 
-    return results[0];
+    return result[0];
   }
 
   async deleteProjectImage(imageId: number): Promise<void> {
@@ -179,7 +194,7 @@ export class DatabaseStorage implements IStorage {
     .delete(schema.projectImages)
     .where(eq(schema.projectImages.id, imageId));
   }
-  
+
   async deleteAllProjectImages(projectId: number): Promise<void> {
     await db
       .delete(schema.projectImages)
