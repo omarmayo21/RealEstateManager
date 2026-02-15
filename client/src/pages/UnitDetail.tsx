@@ -91,18 +91,19 @@ const galleryImages: string[] = [
 ];
 
 // الصورة المعروضة الكبيرة
-// Auto Slider (كل 4 ثواني)
+const [isHovered, setIsHovered] = useState(false);
+
 useEffect(() => {
-  if (!galleryImages.length || selectedImage) return;
+  if (!galleryImages.length || isHovered) return;
 
   const interval = setInterval(() => {
     setCurrentIndex((prev) =>
       prev >= galleryImages.length - 1 ? 0 : prev + 1
     );
-  }, 3500);
+  }, 4000);
 
   return () => clearInterval(interval);
-}, [galleryImages, selectedImage]);
+}, [galleryImages, isHovered]);
 
 
 // الصورة الحالية
@@ -188,22 +189,106 @@ const displayImage =
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.6 }}
               >
-                <div className="mb-6">
-                  <motion.img
-                    key={displayImage}
-                    src={displayImage}
-                    alt={unit.title}
-                    loading="eager"   // دي تتحمل فوراً (مهمة)
-                    decoding="async"
-                    initial={{ opacity: 0.4, scale: 0.98 }}
-                    animate={{ opacity: 1, scale: 1 }}
-                    transition={{ duration: 0.8, ease: [0.4, 0, 0.2, 1] }}
+              <div
+                className="relative mb-6 group select-none"
+                onTouchStart={(e) => setTouchStartX(e.touches[0].clientX)}
+                onTouchEnd={(e) => {
+                  setTouchEndX(e.changedTouches[0].clientX);
 
-                    className="w-full max-h-[80vh] object-contain rounded-2xl shadow-xl "
-                  />
+                  if (!touchStartX) return;
+                  const distance = touchStartX - e.changedTouches[0].clientX;
 
+                  // Swipe Left
+                  if (distance > 50) {
+                    setCurrentIndex((prev) =>
+                      prev >= galleryImages.length - 1 ? 0 : prev + 1
+                    );
+                    setSelectedImage(null);
+                  }
 
-                </div>
+                  // Swipe Right
+                  if (distance < -50) {
+                    setCurrentIndex((prev) =>
+                      prev <= 0 ? galleryImages.length - 1 : prev - 1
+                    );
+                    setSelectedImage(null);
+                  }
+                }}
+              >
+                {/* الصورة الرئيسية */}
+                <motion.img
+                  key={displayImage}
+                  src={displayImage}
+                  alt={unit.title}
+                  loading="eager"
+                  decoding="async"
+                  initial={{ opacity: 0, scale: 1.03 }}
+                  animate={{ opacity: 1, scale: 1 }}
+                  transition={{ duration: 0.6 }}
+                  className="w-full max-h-[75vh] object-cover rounded-2xl shadow-2xl bg-black/5"
+                />
+
+                {/* Overlay Gradient احترافي */}
+                <div className="absolute inset-0 rounded-2xl bg-gradient-to-t from-black/20 via-transparent to-transparent pointer-events-none" />
+
+                {/* Counter */}
+                {galleryImages.length > 1 && (
+                  <div className="absolute top-4 right-4 bg-black/60 text-white text-sm px-3 py-1 rounded-full backdrop-blur">
+                    {currentIndex + 1} / {galleryImages.length}
+                  </div>
+                )}
+
+                {/* زر السابق */}
+                {galleryImages.length > 1 && (
+                  <button
+                    onClick={() => {
+                      setCurrentIndex((prev) =>
+                        prev <= 0 ? galleryImages.length - 1 : prev - 1
+                      );
+                      setSelectedImage(null);
+                    }}
+                    className="absolute left-3 top-1/2 -translate-y-1/2 bg-white/80 hover:bg-white shadow-lg backdrop-blur rounded-full p-3 opacity-0 group-hover:opacity-100 transition"
+                  >
+                    ‹
+                  </button>
+                )}
+
+                {/* زر التالي */}
+                {galleryImages.length > 1 && (
+                  <button
+                    onClick={() => {
+                      setCurrentIndex((prev) =>
+                        prev >= galleryImages.length - 1 ? 0 : prev + 1
+                      );
+                      setSelectedImage(null);
+                    }}
+                    className="absolute right-3 top-1/2 -translate-y-1/2 bg-white/80 hover:bg-white shadow-lg backdrop-blur rounded-full p-3 opacity-0 group-hover:opacity-100 transition"
+                  >
+                    ›
+                  </button>
+                )}
+
+                {/* Dots Indicator */}
+                {galleryImages.length > 1 && (
+                  <div className="absolute bottom-4 left-1/2 -translate-x-1/2 flex gap-2">
+                    {galleryImages.map((_, index) => (
+                      <button
+                        key={index}
+                        onClick={() => {
+                          setCurrentIndex(index);
+                          setSelectedImage(null);
+                        }}
+                        className={`h-2.5 rounded-full transition-all ${
+                          index === currentIndex
+                            ? "w-6 bg-white"
+                            : "w-2.5 bg-white/60 hover:bg-white"
+                        }`}
+                      />
+                    ))}
+                  </div>
+                )}
+</div>
+
 
                 {galleryImages.length > 0 && (
                   <div className="flex gap-3 overflow-x-auto pb-2 scrollbar-hide">
