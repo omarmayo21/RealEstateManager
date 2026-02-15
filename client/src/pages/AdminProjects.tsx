@@ -63,7 +63,7 @@ export default function AdminProjects() {
   const [selectedProject, setSelectedProject] = useState<Project | null>(null);
   const [newImageUrl, setNewImageUrl] = useState("");
   const [uploading, setUploading] = useState(false);
-
+  const [selectedImageIds, setSelectedImageIds] = useState<number[]>([]);
   const { data: projects = [] } = useQuery<Project[]>({
    queryKey: ["api", "projects"]
   });
@@ -86,39 +86,67 @@ export default function AdminProjects() {
       },
     });
 
-const deleteImageMutation = useMutation({
-  mutationFn: async (imageId: number) => {
-    return await apiRequest(
-      "DELETE",
-      `/api/project-images/${imageId}`
-    );
-  },
-  onSuccess: () => {
-    queryClient.invalidateQueries({
-      queryKey: ["api", "project-images", selectedProject?.id],
-    });
-  },
-});
+    const toggleImageSelection = (id: number) => {
+  setSelectedImageIds((prev) =>
+    prev.includes(id)
+      ? prev.filter((imgId) => imgId !== id)
+      : [...prev, id]
+  );
+};
+
+  const deleteImageMutation = useMutation({
+    mutationFn: async (imageId: number) => {
+      return await apiRequest(
+        "DELETE",
+        `/api/project-images/${imageId}`
+      );
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({
+        queryKey: ["api", "project-images", selectedProject?.id],
+      });
+    },
+  });
 
 // 🔥 حط ده هنا مباشرة تحت deleteImageMutation
-const deleteAllImagesMutation = useMutation({
-  mutationFn: async () => {
-    if (!selectedProject) return;
+  const deleteAllImagesMutation = useMutation({
+    mutationFn: async () => {
+      if (!selectedProject) return;
 
-    return await apiRequest(
-      "DELETE",
-      `/api/projects/${selectedProject.id}/images`
+      return await apiRequest(
+        "DELETE",
+        `/api/projects/${selectedProject.id}/images`
+      );
+    },
+    onSuccess: () => {
+      toast({ title: "تم مسح كل صور المشروع بنجاح" });
+
+      queryClient.invalidateQueries({
+        queryKey: ["api", "project-images", selectedProject?.id ?? null],
+      });
+    },
+  });
+
+
+  const bulkDeleteImagesMutation = useMutation({
+  mutationFn: async () => {
+    if (selectedImageIds.length === 0) return;
+
+    await Promise.all(
+      selectedImageIds.map((id) =>
+        apiRequest("DELETE", `/api/project-images/${id}`)
+      )
     );
   },
-  onSuccess: () => {
-    toast({ title: "تم مسح كل صور المشروع بنجاح" });
+    onSuccess: () => {
+      toast({ title: "تم حذف الصور المحددة بنجاح" });
+      setSelectedImageIds([]);
 
-    queryClient.invalidateQueries({
-      queryKey: ["api", "project-images", selectedProject?.id ?? null],
-    });
-  },
-});
-
+      queryClient.invalidateQueries({
+        queryKey: ["api", "project-images", selectedProject?.id ?? null],
+      });
+    },
+  });
 
   const form = useForm<ProjectFormData>({
     resolver: zodResolver(projectSchema),
@@ -540,36 +568,81 @@ const deleteAllImagesMutation = useMutation({
             : "اختر صور المشروع وسيتم رفعها تلقائيًا"}
         </p>
 
-         {projectImages.length > 0 && (
-        <div className="flex items-center justify-between">
-          <p className="text-sm font-medium">
-            عدد الصور: {projectImages.length}
-          </p>
+        {projectImages.length > 0 && (
+          <div className="flex items-center justify-between">
+            <p className="text-sm font-medium">
+              عدد الصور: {projectImages.length} | المحدد: {selectedImageIds.length}
+            </p>
 
-          <Button
-            variant="destructive"
-            size="sm"
-            onClick={() => {
-              if (
-                confirm(
-                  `متأكد إنك عايز تمسح كل ${projectImages.length} صورة من المشروع؟`
-                )
-              ) {
-                deleteAllImagesMutation.mutate();
-              }
-            }}
-          >
-            مسح كل الصور
-          </Button>
-        </div>
-      )}   
+            <div className="flex gap-2">
+              {selectedImageIds.length > 0 && (
+                <Button
+                  variant="destructive"
+                  size="sm"
+                  onClick={() => {
+                    if (confirm("متأكد من حذف الصور المحددة؟")) {
+                      bulkDeleteImagesMutation.mutate();
+                    }
+                  }}
+                >
+                  حذف المحدد ({selectedImageIds.length})
+                </Button>
+              )}
+
+              <Button
+                variant="destructive"
+                size="sm"
+                onClick={() => {
+                  if (confirm("متأكد إنك عايز تمسح كل الصور؟")) {
+                    deleteAllImagesMutation.mutate();
+                  }
+                }}
+              >
+                مسح كل الصور
+              </Button>
+            </div>
+          </div>
+        )}  
         {/* 🔥 جاليري صور المشروع + زر الحذف */}
         <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
-          {projectImages.length === 0 && (
-            <p className="text-sm text-muted-foreground col-span-full text-center">
-              لا توجد صور لهذا المشروع حتى الآن
-            </p>
-          )}
+        {projectImages.map((img) => {
+          const isSelected = selectedImageIds.includes(img.id);
+
+          return (
+            <div
+              key={img.id}
+              onClick={() => toggleImageSelection(img.id)}
+              className={`relative group cursor-pointer border-2 rounded-lg overflow-hidden transition ${
+                isSelected ? "border-blue-500" : "border-transparent"
+              }`}
+            >
+              <img
+                src={img.imageUrl}
+                alt="Project"
+                className="w-full h-32 object-cover"
+                loading="lazy"
+              />
+
+              {/* طبقة التحديد */}
+              {isSelected && (
+                <div className="absolute inset-0 bg-blue-500/30 flex items-center justify-center text-white font-bold text-sm">
+                  محدد ✓
+                </div>
+              )}
+
+              {/* زر حذف فردي (موجود عندك بس بنمنع تعارض الضغط) */}
+              <button
+                onClick={(e) => {
+                  e.stopPropagation(); // مهم جدًا
+                  deleteImageMutation.mutate(img.id);
+                }}
+                className="absolute top-2 right-2 bg-red-600 hover:bg-red-700 text-white text-xs px-2 py-1 rounded opacity-0 group-hover:opacity-100 transition"
+              >
+                حذف
+              </button>
+            </div>
+          );
+        })}
 
           {projectImages.map((img) => (
             <div key={img.id} className="relative group">
