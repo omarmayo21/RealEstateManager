@@ -46,62 +46,46 @@ const formatMoney = (value: unknown) => {
 export default function UnitDetail() {
 
 
-  const { unitCode } = useParams<{ unitCode: string }>();
+const { unitCode } = useParams<{ unitCode: string }>();
 
-  const { data, isLoading } = useQuery<any>({
-    queryKey: ["api", "units", unitCode],
-    queryFn: async () => {
-      if (!unitCode) return null;
-      return await apiRequest("GET", `/api/units/code/${unitCode}`);
-    },
-    enabled: !!unitCode,
-  });
+const { data, isLoading } = useQuery<any>({
+  queryKey: ["api", "units", unitCode],
+  queryFn: async () => {
+    if (!unitCode) return null;
+    return await apiRequest("GET", `/api/units/code/${unitCode}`);
+  },
+  enabled: !!unitCode,
+});
 
-  // 👇 أهم سطر في الحل
-  const unit = Array.isArray(data) ? data[0] : data;
-
-  
-  const [selectedImage, setSelectedImage] = useState<string | null>(null);
-
-  // ⬅️ قائمة الوحدات (للوحدات المشابهة)
-  const { data: allUnits = [] } = useQuery<
-    (Unit & {
-      project?: Project;
-      images?: UnitImage[];
-    })[]
-  >({
-    queryKey: ["/api/units"],
-  });
+const { data: allUnits = [] } = useQuery<
+  (Unit & {
+    project?: Project;
+    images?: UnitImage[];
+  })[]
+>({
+  queryKey: ["/api/units"],
+});
 
 
+// 👈 خليه متغير واحد فقط
+const unit = Array.isArray(data) ? data[0] : data;
 
+const [selectedImage, setSelectedImage] = useState<string | null>(null);
 
-  if (isLoading || !unit) {
-    return (
-      <div className="min-h-screen bg-background">
-        <Navbar />
-        <div className="max-w-7xl mx-auto px-4 py-24 text-center">
-          <h1 className="text-3xl font-bold text-muted-foreground">
-            جاري تحميل الوحدة...
-          </h1>
-        </div>
-        <Footer />
-      </div>
-    );
-  }
-
-
-
-const unitData = Array.isArray(unit) ? unit[0] : unit;
-
-const images = Array.isArray(unitData?.images)
-  ? unitData.images
+// الصور
+const images: UnitImage[] = Array.isArray(unit?.images)
+  ? unit.images
   : [];
+
+// كل الصور المتاحة (بدون null)
+const galleryImages = [
+  ...(unit?.mainImageUrl ? [unit.mainImageUrl] : []),
+  ...images.map((img) => img.imageUrl),
+];
 
 const displayImage =
   selectedImage ||
-  unitData?.mainImageUrl ||
-  (images.length > 0 ? images[0].imageUrl : null) ||
+  galleryImages[0] ||
   "https://images.unsplash.com/photo-1545324418-cc1a3fa10c00?w=800";
 
 
@@ -169,7 +153,7 @@ const displayImage =
                 <ChevronRight className="w-4 h-4" />
               </>
             )}
-            <span className="text-foreground" data-testid="text-unit-breadcrumb">{unitData.title}</span>
+            <span className="text-foreground" data-testid="text-unit-breadcrumb">{unit.title}</span>
           </div>
 
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 mb-12">
@@ -182,28 +166,26 @@ const displayImage =
                 <div className="mb-6">
                   <img
                     src={displayImage}
-                    alt={unitData.title}
+                    alt={unit.title}
                     className="w-full h-[500px] object-cover rounded-2xl shadow-xl"
                     data-testid="img-main-unit"
                   />
                 </div>
 
-                {images.length > 0 && (
+                {galleryImages.length > 0 && (
                   <div className="grid grid-cols-4 gap-4">
-                    {[unit.mainImageUrl, ...images.map((img: any) => img.imageUrl)]
-                      .filter(Boolean)
-                      .slice(0, 4)
+                    {galleryImages
+                      .slice(0, 8) // بدل 4 عشان كل الصور تظهر
                       .map((img, index) => (
                         <button
                           key={index}
-                          onClick={() => setSelectedImage(img!)}
+                          onClick={() => setSelectedImage(img)}
                           className={`rounded-lg overflow-hidden hover:opacity-80 transition-opacity ${
                             displayImage === img ? "ring-2 ring-primary" : ""
                           }`}
-                          data-testid={`button-thumbnail-${index}`}
                         >
                           <img
-                            src={img!}
+                            src={img}
                             alt={`صورة ${index + 1}`}
                             className="w-full h-24 object-cover"
                           />
@@ -211,6 +193,7 @@ const displayImage =
                       ))}
                   </div>
                 )}
+
 
               </motion.div>
             </div>
@@ -229,7 +212,7 @@ const displayImage =
               >
                 <div>
                   <h1 className="text-4xl font-bold mb-2" data-testid="text-unit-title">
-                    {unitData.title}
+                    {unit.title}
                   </h1>
                   {unit.project && (
                     <Link href={`/projects/${unit.project.slug}`}>
