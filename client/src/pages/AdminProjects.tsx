@@ -653,23 +653,7 @@ export default function AdminProjects() {
           );
         })}
 
-          {projectImages.map((img) => (
-            <div key={img.id} className="relative group">
-              <img
-                src={img.imageUrl}
-                alt="Project"
-                className="w-full h-32 object-cover rounded-lg border"
-                loading="lazy"
-              />
 
-              <button
-                onClick={() => deleteImageMutation.mutate(img.id)}
-                className="absolute top-2 right-2 bg-red-600 hover:bg-red-700 text-white text-xs px-2 py-1 rounded opacity-0 group-hover:opacity-100 transition"
-              >
-                حذف
-              </button>
-            </div>
-          ))}
         </div>
       </div>
 
