@@ -197,14 +197,29 @@ export class DatabaseStorage implements IStorage {
     const newUnit = results[0];
 
     // 2️⃣ إضافة الصور
-    if (imageUrls.length > 0) {
+    // 2️⃣ لو مفيش صور مرفوعة → اسحب صور المشروع تلقائياً 🔥
+    let finalImages: string[] = imageUrls;
+
+    // لو الادمن مرفعش صور للوحدة
+    if (finalImages.length === 0) {
+      const projectImages = await db
+        .select()
+        .from(schema.projectImages)
+        .where(eq(schema.projectImages.projectId, unit.projectId));
+
+      finalImages = projectImages.map((img) => img.imageUrl);
+    }
+
+    // إضافة الصور (سواء صور الوحدة أو صور المشروع)
+    if (finalImages.length > 0) {
       await db.insert(schema.unitImages).values(
-        imageUrls.map((url) => ({
+        finalImages.map((url) => ({
           unitId: newUnit.id,
           imageUrl: url,
         }))
       );
     }
+
 
     return newUnit;
 }

@@ -22,6 +22,7 @@ import {
   Calendar,
 } from "lucide-react";
 import { apiRequest } from "@/lib/api";
+import { useEffect } from "react";
 
 
 
@@ -71,6 +72,7 @@ const { data: allUnits = [] } = useQuery<
 const unit = Array.isArray(data) ? data[0] : data;
 
 const [selectedImage, setSelectedImage] = useState<string | null>(null);
+const [currentIndex, setCurrentIndex] = useState(0);
 
 // استخراج الصور بشكل آمن
 // صور الوحدة أو صور المشروع كـ fallback
@@ -86,10 +88,25 @@ const galleryImages: string[] = [
 ];
 
 // الصورة المعروضة الكبيرة
+// Auto Slider (كل 4 ثواني)
+useEffect(() => {
+  if (!galleryImages.length) return;
+
+  const interval = setInterval(() => {
+    setCurrentIndex((prev) =>
+      prev === galleryImages.length - 1 ? 0 : prev + 1
+    );
+  }, 4000);
+
+  return () => clearInterval(interval);
+}, [galleryImages]);
+
+// الصورة الحالية
 const displayImage =
   selectedImage ||
-  galleryImages[0] ||
+  galleryImages[currentIndex] ||
   "https://images.unsplash.com/photo-1545324418-cc1a3fa10c00?w=800";
+
 
 
 
@@ -168,16 +185,19 @@ const displayImage =
                 transition={{ duration: 0.6 }}
               >
                 <div className="mb-6">
-                  <img
-                    src={displayImage}
-                    alt={unit.title}
-                    className="w-full h-[500px] object-cover rounded-2xl shadow-xl"
-                    data-testid="img-main-unit"
-                  />
+                <img
+                  src={displayImage}
+                  alt={unit.title}
+                  loading="eager"   // دي تتحمل فوراً (مهمة)
+                  decoding="async"
+                  onClick={() => window.open(displayImage, "_blank")}
+                  className="w-full h-[520px] object-contain bg-black/5 rounded-2xl shadow-xl cursor-zoom-in transition-transform hover:scale-[1.01]"
+                />
+
                 </div>
 
               {galleryImages.length > 0 && (
-                <div className="grid grid-cols-4 gap-4">
+                <div className="flex gap-3 overflow-x-auto pb-2">
                   {galleryImages.slice(0, 8).map((img, index) => (
                     <button
                       key={index}
@@ -188,8 +208,10 @@ const displayImage =
                     >
                       <img
                         src={img}
+                         loading="lazy"
+                          decoding="async"
                         alt={`صورة ${index + 1}`}
-                        className="w-full h-24 object-cover"
+                          className="w-32 h-24 object-cover rounded-lg flex-shrink-0"
                       />
                     </button>
                   ))}
