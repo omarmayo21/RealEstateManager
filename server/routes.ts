@@ -7,6 +7,7 @@ import type { UnitFilters } from "../shared/schema.js";
 import { insertProjectSchema, updateProjectSchema, insertUnitSchema, updateUnitSchema, insertLeadSchema } from "../shared/schema.js";
 import { upload } from "./middleware/upload";
 import { supabase } from "./utils/supabase";
+import { z } from "zod";
 
 
 
@@ -121,6 +122,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       res.status(500).json({ error: "حدث خطأ في الخادم" });
     }
   });
+  
 
   app.delete("/api/projects/:id",  async (req: Request, res: Response) => {
     try {
@@ -136,6 +138,54 @@ export async function registerRoutes(app: Express): Promise<Server> {
       res.status(500).json({ error: "حدث خطأ في الخادم" });
     }
   });
+  // 🖼️ Get project images
+app.get("/api/projects/:id/images", async (req, res) => {
+  try {
+    const projectId = Number(req.params.id);
+
+    if (isNaN(projectId)) {
+      return res.status(400).json({ message: "Invalid project id" });
+    }
+
+    const images = await storage.getProjectImages(projectId);
+    res.json(images);
+  } catch (error) {
+    console.error("Error fetching project images:", error);
+    res.status(500).json({ message: "Failed to fetch project images" });
+  }
+});
+
+// ➕ Add new image to project
+app.post("/api/projects/:id/images", async (req, res) => {
+  try {
+    const projectId = Number(req.params.id);
+
+    if (isNaN(projectId)) {
+      return res.status(400).json({ message: "Invalid project id" });
+    }
+
+    const schema = z.object({
+      imageUrl: z.string().min(5),
+    });
+
+    const parsed = schema.safeParse(req.body);
+
+    if (!parsed.success) {
+      return res.status(400).json({ message: "Invalid image URL" });
+    }
+
+    const image = await storage.createProjectImage(
+      projectId,
+      parsed.data.imageUrl
+    );
+
+    res.json(image);
+  } catch (error) {
+    console.error("Error creating project image:", error);
+    res.status(500).json({ message: "Failed to create project image" });
+  }
+});
+
   app.post("/api/test-upload", upload.single("file"), (req, res) => {
     const file = req.file as any;
 
@@ -199,7 +249,20 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
       const unitsWithProjects = await Promise.all(
         units.map(async (unit) => {
-          const images = await storage.getUnitImages(unit.id);
+          // 1️⃣ صور الوحدة
+          let images = await storage.getUnitImages(unit.id);
+
+          // 2️⃣ لو مفيش صور للوحدة → نجيب صور المشروع تلقائي
+          if (!images || images.length === 0) {
+            const projectImages = await storage.getProjectImages(unit.projectId);
+
+            images = projectImages.map((img) => ({
+              id: img.id,
+              unitId: unit.id, // fallback mapping
+              imageUrl: img.imageUrl,
+            }));
+          }
+
           return {
             ...unit,
             project: projectsMap.get(unit.projectId),
@@ -207,6 +270,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
           };
         })
       );
+
 
       res.json(unitsWithProjects);
     } catch (error) {
@@ -244,9 +308,23 @@ export async function registerRoutes(app: Express): Promise<Server> {
       }
 
       const project = await storage.getProjectById(unit.projectId);
-      const images = await storage.getUnitImages(unit.id);
+
+      // 1️⃣ صور الوحدة
+      let images = await storage.getUnitImages(unit.id);
+
+      // 2️⃣ لو مفيش صور للوحدة → استخدم صور المشروع تلقائي
+      if (!images || images.length === 0) {
+        const projectImages = await storage.getProjectImages(unit.projectId);
+
+        images = projectImages.map((img) => ({
+          id: img.id,
+          unitId: unit.id,
+          imageUrl: img.imageUrl,
+        }));
+      }
 
       res.json({ ...unit, project, images });
+
     } catch (error) {
       res.status(500).json({ error: "حدث خطأ في الخادم" });
     }

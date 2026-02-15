@@ -59,11 +59,36 @@ export default function AdminProjects() {
   const queryClient = useQueryClient();
   const [dialogOpen, setDialogOpen] = useState(false);
   const [editingProject, setEditingProject] = useState<Project | null>(null);
+  const [imagesDialogOpen, setImagesDialogOpen] = useState(false);
+  const [selectedProject, setSelectedProject] = useState<Project | null>(null);
+  const [newImageUrl, setNewImageUrl] = useState("");
+  const [uploading, setUploading] = useState(false);
 
   const { data: projects = [] } = useQuery<Project[]>({
    queryKey: ["api", "projects"]
-
   });
+
+
+  const { data: projectImages = [], refetch: refetchProjectImages } =
+    useQuery<{ id: number; imageUrl: string }[]>({
+      queryKey: ["api", "project-images", selectedProject?.id ?? null],
+      enabled: !!selectedProject,
+      queryFn: async () => {
+        if (!selectedProject) return [];
+
+        const res = await apiRequest(
+          "GET",
+          `/api/projects/${selectedProject.id}/images`
+        );
+
+        const data = await res.json();
+        return data as { id: number; imageUrl: string }[];
+      },
+    });
+
+
+
+
 
   const form = useForm<ProjectFormData>({
     resolver: zodResolver(projectSchema),
@@ -128,6 +153,23 @@ export default function AdminProjects() {
       queryClient.invalidateQueries({queryKey: ["api", "projects"]});
     },
   });
+
+  const addProjectImageMutation = useMutation({
+  mutationFn: async (imageUrl: string) => {
+    if (!selectedProject) return;
+    return await apiRequest(
+      "POST",
+      `/api/projects/${selectedProject.id}/images`,
+      { imageUrl }
+    );
+  },
+  onSuccess: () => {
+    toast({ title: "تم إضافة صورة المشروع" });
+    setNewImageUrl("");
+    refetchProjectImages();
+  },
+});
+
 
   const handleEdit = (project: Project) => {
     setEditingProject(project);
@@ -357,6 +399,17 @@ export default function AdminProjects() {
                     <TableCell className="text-left">
                       <div className="flex gap-2">
                         <Button
+                          size="sm"
+                          variant="outline"
+                          onClick={() => {
+                            setSelectedProject(project);
+                            setImagesDialogOpen(true);
+                          }}
+                        >
+                          صور المشروع
+                        </Button>
+
+                        <Button
                           size="icon"
                           variant="ghost"
                           onClick={() => handleEdit(project)}
@@ -364,6 +417,7 @@ export default function AdminProjects() {
                         >
                           <Pencil className="w-4 h-4" />
                         </Button>
+
                         <Button
                           size="icon"
                           variant="ghost"
@@ -373,6 +427,7 @@ export default function AdminProjects() {
                           <Trash2 className="w-4 h-4 text-destructive" />
                         </Button>
                       </div>
+
                     </TableCell>
                   </TableRow>
                 ))}
@@ -384,6 +439,71 @@ export default function AdminProjects() {
           </CardContent>
         </Card>
       </div>
+
+        <Dialog open={imagesDialogOpen} onOpenChange={setImagesDialogOpen}>
+    <DialogContent className="max-w-xl">
+      <DialogHeader>
+        <DialogTitle>
+          صور المشروع: {selectedProject?.name}
+        </DialogTitle>
+        <DialogDescription>
+          أضف صور المشروع مرة واحدة وسيتم استخدامها تلقائيًا لكل الوحدات
+        </DialogDescription>
+      </DialogHeader>
+
+      <div className="space-y-4">
+        <Input
+          type="file"
+          accept="image/*"
+          disabled={uploading}
+          onChange={async (e) => {
+            const file = e.target.files?.[0];
+            if (!file || !selectedProject) return;
+
+            try {
+              setUploading(true);
+
+              // 1️⃣ رفع الصورة على Cloudinary
+              const formData = new FormData();
+              formData.append("file", file);
+              formData.append("upload_preset", "projects");
+              formData.append("folder", "projects");
+
+              const cloudinaryResponse = await fetch(
+                "https://api.cloudinary.com/v1_1/dqir7d4jn/image/upload",
+                {
+                  method: "POST",
+                  body: formData,
+                }
+              );
+
+              const cloudinaryData = await cloudinaryResponse.json();
+
+              if (!cloudinaryData.secure_url) {
+                throw new Error("فشل رفع الصورة");
+              }
+
+              // 2️⃣ حفظ رابط الصورة في الداتا بيز
+              addProjectImageMutation.mutate(cloudinaryData.secure_url);
+            } catch (error) {
+              console.error("Upload Error:", error);
+            } finally {
+              setUploading(false);
+            }
+          }}
+        />
+
+        <p className="text-sm text-muted-foreground">
+          {uploading
+            ? "جاري رفع الصورة إلى Cloudinary..."
+            : "اختر صورة من جهازك وسيتم رفعها تلقائيًا"}
+        </p>
+      </div>
+
+    </DialogContent>
+  </Dialog>
+
     </AdminLayout>
+    
   );
 }

@@ -3,6 +3,7 @@ import { pgTable, text, integer, boolean, timestamp, serial } from "drizzle-orm/
 import { createInsertSchema } from "drizzle-zod";
 import { z } from "zod";
 
+
 // Database Tables
 export const projects = pgTable("projects", {
   id: serial("id").primaryKey(),
@@ -20,6 +21,21 @@ export const projects = pgTable("projects", {
   createdAt: timestamp("created_at").defaultNow().notNull(),
   updatedAt: timestamp("updated_at").defaultNow().notNull(),
 });
+
+
+
+export const projectImages = pgTable("project_images", {
+  id: serial("id").primaryKey(),
+
+  projectId: integer("project_id")
+    .notNull()
+    .references(() => projects.id, { onDelete: "cascade" }),
+
+  imageUrl: text("image_url").notNull(), // صور المشروع (السلايدر)
+
+  createdAt: timestamp("created_at").defaultNow().notNull(),
+});
+
 
 export const units = pgTable("units", {
   id: serial("id").primaryKey(),
@@ -112,6 +128,11 @@ export type InsertUnit = z.infer<typeof insertUnitSchema>;
 
 export type UnitImage = typeof unitImages.$inferSelect;
 export type InsertUnitImage = z.infer<typeof insertUnitImageSchema>;
+export type ProjectImage = typeof projectImages.$inferSelect;
+export type InsertProjectImage = {
+  projectId: number;
+  imageUrl: string;
+};
 
 export type Lead = typeof leads.$inferSelect;
 export type InsertLead = z.infer<typeof insertLeadSchema>;

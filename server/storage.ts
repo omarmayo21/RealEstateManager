@@ -3,7 +3,19 @@ import { Pool, neonConfig } from "@neondatabase/serverless";
 import ws from "ws";
 import { eq, and, gte, lte, sql } from "drizzle-orm";
 import bcrypt from "bcryptjs";
-import type { Project, Unit, UnitImage, Lead, AdminUser, Settings, InsertProject, InsertUnit, InsertLead, UnitFilters } from "../shared/schema.js";
+import type { 
+  Project, 
+  Unit, 
+  UnitImage, 
+  Lead, 
+  AdminUser, 
+  Settings, 
+  InsertProject, 
+  InsertUnit, 
+  InsertLead, 
+  UnitFilters,
+  ProjectImage
+} from "../shared/schema.js";
 import * as schema from "../shared/schema.js";
 
 
@@ -27,6 +39,10 @@ export interface IStorage {
   deleteUnit(id: number): Promise<boolean>;
 
   getUnitImages(unitId: number): Promise<UnitImage[]>;
+    // 🔥 Project Images (NEW)
+  getProjectImages(projectId: number): Promise<ProjectImage[]>;
+  createProjectImage(projectId: number, imageUrl: string): Promise<ProjectImage>;
+
   createUnitImage(unitId: number, imageUrl: string): Promise<UnitImage>;
   createUnitWithAssets(
     unit: InsertUnit,
@@ -139,6 +155,26 @@ export class DatabaseStorage implements IStorage {
   async getUnitImages(unitId: number): Promise<UnitImage[]> {
     return await db.select().from(schema.unitImages).where(eq(schema.unitImages.unitId, unitId));
   }
+
+
+    // 🖼️ جلب صور المشروع (للسلايدر التلقائي)
+  async getProjectImages(projectId: number): Promise<ProjectImage[]> {
+    return await db
+      .select()
+      .from(schema.projectImages)
+      .where(eq(schema.projectImages.projectId, projectId));
+  }
+
+  // ➕ إضافة صورة جديدة لمشروع
+  async createProjectImage(projectId: number, imageUrl: string): Promise<ProjectImage> {
+    const results = await db
+      .insert(schema.projectImages)
+      .values({ projectId, imageUrl })
+      .returning();
+
+    return results[0];
+  }
+
 
   async createUnitImage(unitId: number, imageUrl: string): Promise<UnitImage> {
     const results = await db.insert(schema.unitImages).values({ unitId, imageUrl }).returning();
