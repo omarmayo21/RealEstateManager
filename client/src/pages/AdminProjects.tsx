@@ -167,6 +167,10 @@ export default function AdminProjects() {
     toast({ title: "تم إضافة صورة المشروع" });
     setNewImageUrl("");
     refetchProjectImages();
+
+      // 🔥 يقفل النافذة تلقائياً بعد الرفع
+    setImagesDialogOpen(false);
+    setSelectedProject(null);
   },
 });
 
@@ -497,7 +501,13 @@ export default function AdminProjects() {
             console.error("Upload Error:", error);
           } finally {
             setUploading(false);
-            refetchProjectImages(); // تحديث الصور بعد الرفع
+
+            // تحديث الصور
+            refetchProjectImages();
+
+            // 🔥 اقفل النافذة بعد انتهاء رفع كل الصور
+            setImagesDialogOpen(false);
+            setSelectedProject(null);
           }
         }}
       />

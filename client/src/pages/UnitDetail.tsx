@@ -91,8 +91,16 @@ export default function UnitDetail() {
 
 
 
-  const images = unit?.images || [];
-  const displayImage = selectedImage || unit?.mainImageUrl || "https://images.unsplash.com/photo-1545324418-cc1a3fa10c00?w=800";
+  const images =
+    (unit?.images && unit.images.length > 0)
+      ? unit.images
+      : (unit?.projectImages || []);
+
+  const displayImage =
+    selectedImage ||
+    unit?.mainImageUrl ||
+    images?.[0]?.imageUrl ||
+    "https://images.unsplash.com/photo-1545324418-cc1a3fa10c00?w=800";
 
   const similarUnits = allUnits
     .filter((u) => u.id !== unit?.id && u.projectId === unit?.projectId)

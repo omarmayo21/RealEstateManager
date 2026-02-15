@@ -298,37 +298,44 @@ app.post("/api/projects/:id/images", async (req, res) => {
   }
 });
 
-  app.get("/api/units/:id",  async (req: Request, res: Response) => {
-    try {
-      const id = parseInt(req.params.id);
-      const unit = await storage.getUnitById(id);
-      
-      if (!unit) {
-        return res.status(404).json({ error: "الوحدة غير موجودة" });
-      }
+app.get("/api/units/:id", async (req, res) => {
+  try {
+    const id = Number(req.params.id);
 
-      const project = await storage.getProjectById(unit.projectId);
-
-      // 1️⃣ صور الوحدة
-      let images = await storage.getUnitImages(unit.id);
-
-      // 2️⃣ لو مفيش صور للوحدة → استخدم صور المشروع تلقائي
-      if (!images || images.length === 0) {
-        const projectImages = await storage.getProjectImages(unit.projectId);
-
-        images = projectImages.map((img) => ({
-          id: img.id,
-          unitId: unit.id,
-          imageUrl: img.imageUrl,
-        }));
-      }
-
-      res.json({ ...unit, project, images });
-
-    } catch (error) {
-      res.status(500).json({ error: "حدث خطأ في الخادم" });
+    // 1️⃣ هات الوحدة
+    const unit = await storage.getUnitById(id);
+    if (!unit) {
+      return res.status(404).json({ message: "Unit not found" });
     }
-  });
+
+    // 2️⃣ هات صور الوحدة
+    const unitImages = await storage.getUnitImages(id);
+
+    let images = unitImages;
+
+    // 3️⃣ لو مفيش صور للوحدة → هات صور المشروع تلقائي
+    if (!unitImages || unitImages.length === 0) {
+      const projectImages = await storage.getProjectImages(unit.projectId);
+
+      // نحولها لنفس شكل unit images
+      images = projectImages.map((img) => ({
+        id: img.id,
+        unitId: id,
+        imageUrl: img.imageUrl,
+      }));
+    }
+
+    // 4️⃣ رجّع الوحدة + الصور (المهم!)
+    res.json({
+      ...unit,
+      images, // 👈 ده اللي السلايدر محتاجه
+    });
+  } catch (error) {
+    console.error("Error fetching unit:", error);
+    res.status(500).json({ message: "Failed to fetch unit" });
+  }
+});
+
 
   app.post(
     "/api/units",
