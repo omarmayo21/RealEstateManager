@@ -185,14 +185,18 @@ const displayImage =
                 transition={{ duration: 0.6 }}
               >
                 <div className="mb-6">
-                <img
-                  src={displayImage}
-                  alt={unit.title}
-                  loading="eager"   // دي تتحمل فوراً (مهمة)
-                  decoding="async"
-                  onClick={() => window.open(displayImage, "_blank")}
-                  className="w-full h-[520px] object-contain bg-black/5 rounded-2xl shadow-xl cursor-zoom-in transition-transform hover:scale-[1.01]"
-                />
+                  <motion.img
+                    key={displayImage}
+                    src={displayImage}
+                    alt={unit.title}
+                    loading="eager"   // دي تتحمل فوراً (مهمة)
+                    decoding="async"
+                    initial={{ opacity: 0.4, scale: 0.98 }}
+                    animate={{ opacity: 1, scale: 1 }}
+                    transition={{ duration: 0.5, ease: "easeInOut" }}
+                    className="w-full max-h-[80vh] object-contain rounded-2xl shadow-xl bg-black"
+                  />
+
 
                 </div>
 
@@ -211,7 +215,8 @@ const displayImage =
                          loading="lazy"
                           decoding="async"
                         alt={`صورة ${index + 1}`}
-                          className="w-32 h-24 object-cover rounded-lg flex-shrink-0"
+                            className="w-32 h-24 object-cover rounded-lg"
+
                       />
                     </button>
                   ))}

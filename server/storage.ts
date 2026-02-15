@@ -185,6 +185,7 @@ export class DatabaseStorage implements IStorage {
     imageUrls: string[],
     paymentPlanPdf?: string | null
   ): Promise<Unit> {
+
     // 1️⃣ إنشاء الوحدة
     const results = await db
       .insert(schema.units)
@@ -196,21 +197,19 @@ export class DatabaseStorage implements IStorage {
 
     const newUnit = results[0];
 
-    // 2️⃣ إضافة الصور
-    // 2️⃣ لو مفيش صور مرفوعة → اسحب صور المشروع تلقائياً 🔥
-    let finalImages: string[] = imageUrls;
+    // 2️⃣ لو مفيش صور للوحدة → اسحب صور المشروع تلقائي
+    let finalImages = imageUrls;
 
-    // لو الادمن مرفعش صور للوحدة
-    if (finalImages.length === 0) {
-      const projectImages = await db
+    if (finalImages.length === 0 && newUnit.projectId) {
+      const projectImgs = await db
         .select()
         .from(schema.projectImages)
-        .where(eq(schema.projectImages.projectId, unit.projectId));
+        .where(eq(schema.projectImages.projectId, newUnit.projectId));
 
-      finalImages = projectImages.map((img) => img.imageUrl);
+      finalImages = projectImgs.map((img) => img.imageUrl);
     }
 
-    // إضافة الصور (سواء صور الوحدة أو صور المشروع)
+    // 3️⃣ إدخال الصور (سواء وحدة أو مشروع)
     if (finalImages.length > 0) {
       await db.insert(schema.unitImages).values(
         finalImages.map((url) => ({
@@ -220,9 +219,9 @@ export class DatabaseStorage implements IStorage {
       );
     }
 
-
     return newUnit;
-}
+  }
+
 
   async getLeads(): Promise<Lead[]> {
     return await db.select().from(schema.leads);
