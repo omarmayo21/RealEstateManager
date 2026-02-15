@@ -562,14 +562,6 @@ export default function AdminProjects() {
                 );
               }
 
-              // 🔥 نحفظ الصور في الداتابيز مرة واحدة فقط
-              for (const url of uploadedUrls) {
-                await apiRequest(
-                  "POST",
-                  `/api/projects/${selectedProject.id}/images`,
-                  { imageUrl: url }
-                );
-              }
             } catch (error) {
               console.error("Upload Error:", error);
             } finally {
@@ -670,7 +662,6 @@ export default function AdminProjects() {
                 loading="lazy"
               />
 
-              {/* زر الحذف */}
               <button
                 onClick={() => deleteImageMutation.mutate(img.id)}
                 className="absolute top-2 right-2 bg-red-600 hover:bg-red-700 text-white text-xs px-2 py-1 rounded opacity-0 group-hover:opacity-100 transition"
