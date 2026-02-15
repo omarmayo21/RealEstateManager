@@ -73,6 +73,9 @@ const unit = Array.isArray(data) ? data[0] : data;
 
 const [selectedImage, setSelectedImage] = useState<string | null>(null);
 const [currentIndex, setCurrentIndex] = useState(0);
+const [isFullscreen, setIsFullscreen] = useState(false);
+const [touchStartX, setTouchStartX] = useState<number | null>(null);
+const [touchEndX, setTouchEndX] = useState<number | null>(null);
 
 // استخراج الصور بشكل آمن
 // صور الوحدة أو صور المشروع كـ fallback
@@ -90,16 +93,17 @@ const galleryImages: string[] = [
 // الصورة المعروضة الكبيرة
 // Auto Slider (كل 4 ثواني)
 useEffect(() => {
-  if (!galleryImages.length) return;
+  if (!galleryImages.length || selectedImage) return;
 
   const interval = setInterval(() => {
     setCurrentIndex((prev) =>
-      prev === galleryImages.length - 1 ? 0 : prev + 1
+      prev >= galleryImages.length - 1 ? 0 : prev + 1
     );
-  }, 4000);
+  }, 3500);
 
   return () => clearInterval(interval);
-}, [galleryImages]);
+}, [galleryImages, selectedImage]);
+
 
 // الصورة الحالية
 const displayImage =
@@ -193,35 +197,53 @@ const displayImage =
                     decoding="async"
                     initial={{ opacity: 0.4, scale: 0.98 }}
                     animate={{ opacity: 1, scale: 1 }}
-                    transition={{ duration: 0.5, ease: "easeInOut" }}
-                    className="w-full max-h-[80vh] object-contain rounded-2xl shadow-xl bg-black"
+                    transition={{ duration: 0.8, ease: [0.4, 0, 0.2, 1] }}
+
+                    className="w-full max-h-[80vh] object-contain rounded-2xl shadow-xl "
                   />
 
 
                 </div>
 
-              {galleryImages.length > 0 && (
-                <div className="flex gap-3 overflow-x-auto pb-2">
-                  {galleryImages.slice(0, 8).map((img, index) => (
-                    <button
-                      key={index}
-                      onClick={() => setSelectedImage(img)}
-                      className={`rounded-lg overflow-hidden hover:opacity-80 transition-opacity ${
-                        displayImage === img ? "ring-2 ring-primary" : ""
-                      }`}
-                    >
-                      <img
-                        src={img}
-                         loading="lazy"
-                          decoding="async"
-                        alt={`صورة ${index + 1}`}
-                            className="w-32 h-24 object-cover rounded-lg"
+                {galleryImages.length > 0 && (
+                  <div className="flex gap-3 overflow-x-auto pb-2 scrollbar-hide">
+                    {galleryImages.map((img, index) => {
+                      // 👇 نتحكم بعدد الصور حسب حجم الشاشة
+                      // موبايل: أول 3 صور فقط
+                      if (typeof window !== "undefined") {
+                        const isMobile = window.innerWidth < 640;
+                        if (isMobile && index >= 3) return null;
+                      }
 
-                      />
-                    </button>
-                  ))}
-                </div>
-              )}
+                      return (
+                        <button
+                          key={index}
+                          onClick={() => {
+                            setSelectedImage(img);
+                            setCurrentIndex(index); // يخلي السلايدر متزامن
+                          }}
+                          className={`flex-shrink-0 rounded-xl overflow-hidden transition-all duration-300 ${
+                            displayImage === img
+                              ? "ring-2 ring-primary scale-105"
+                              : "hover:opacity-80"
+                          }`}
+                        >
+                          <img
+                            src={img}
+                            loading="lazy"
+                            decoding="async"
+                            alt={`صورة ${index + 1}`}
+                            className="
+                              w-24 h-20 object-cover rounded-xl
+                              sm:w-28 sm:h-20
+                              md:w-32 md:h-24
+                            "
+                          />
+                        </button>
+                      );
+                    })}
+                  </div>
+                )}
 
 
               </motion.div>
