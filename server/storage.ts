@@ -179,7 +179,12 @@ export class DatabaseStorage implements IStorage {
     .delete(schema.projectImages)
     .where(eq(schema.projectImages.id, imageId));
   }
-
+  
+  async deleteAllProjectImages(projectId: number): Promise<void> {
+    await db
+      .delete(schema.projectImages)
+      .where(eq(schema.projectImages.projectId, projectId));
+  }
   async createUnitImage(unitId: number, imageUrl: string): Promise<UnitImage> {
     const results = await db.insert(schema.unitImages).values({ unitId, imageUrl }).returning();
     return results[0];

@@ -204,6 +204,24 @@ app.delete("/api/project-images/:id", async (req, res) => {
   }
 });
 
+app.delete("/api/projects/:id/images", async (req, res) => {
+  try {
+    const projectId = Number(req.params.id);
+
+    if (!projectId) {
+      return res.status(400).json({ message: "Invalid project id" });
+    }
+
+    // استخدام الـ Storage Layer حسب Architecture المشروع
+    await storage.deleteAllProjectImages(projectId);
+
+    res.json({ success: true });
+  } catch (error) {
+    console.error("Error deleting all project images:", error);
+    res.status(500).json({ message: "Failed to delete project images" });
+  }
+});
+
   app.post("/api/test-upload", upload.single("file"), (req, res) => {
     const file = req.file as any;
 

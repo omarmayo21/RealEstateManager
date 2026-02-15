@@ -86,21 +86,38 @@ export default function AdminProjects() {
       },
     });
 
-    const deleteImageMutation = useMutation({
-      mutationFn: async (imageId: number) => {
-        return await apiRequest(
-          "DELETE",
-          `/api/project-images/${imageId}`
-        );
-      },
-      onSuccess: () => {
-        // إعادة تحميل صور المشروع بعد الحذف
-        queryClient.invalidateQueries({
-          queryKey: ["api", "project-images", selectedProject?.id],
-        });
-      },
+const deleteImageMutation = useMutation({
+  mutationFn: async (imageId: number) => {
+    return await apiRequest(
+      "DELETE",
+      `/api/project-images/${imageId}`
+    );
+  },
+  onSuccess: () => {
+    queryClient.invalidateQueries({
+      queryKey: ["api", "project-images", selectedProject?.id],
     });
+  },
+});
 
+// 🔥 حط ده هنا مباشرة تحت deleteImageMutation
+const deleteAllImagesMutation = useMutation({
+  mutationFn: async () => {
+    if (!selectedProject) return;
+
+    return await apiRequest(
+      "DELETE",
+      `/api/projects/${selectedProject.id}/images`
+    );
+  },
+  onSuccess: () => {
+    toast({ title: "تم مسح كل صور المشروع بنجاح" });
+
+    queryClient.invalidateQueries({
+      queryKey: ["api", "project-images", selectedProject?.id ?? null],
+    });
+  },
+});
 
 
   const form = useForm<ProjectFormData>({
@@ -466,7 +483,7 @@ export default function AdminProjects() {
           أضف صور المشروع مرة واحدة وسيتم استخدامها تلقائيًا لكل الوحدات
         </DialogDescription>
       </DialogHeader>
-
+          
       <div className="space-y-4">
         {/* رفع الصور */}
         <Input
@@ -523,6 +540,29 @@ export default function AdminProjects() {
             : "اختر صور المشروع وسيتم رفعها تلقائيًا"}
         </p>
 
+         {projectImages.length > 0 && (
+        <div className="flex items-center justify-between">
+          <p className="text-sm font-medium">
+            عدد الصور: {projectImages.length}
+          </p>
+
+          <Button
+            variant="destructive"
+            size="sm"
+            onClick={() => {
+              if (
+                confirm(
+                  `متأكد إنك عايز تمسح كل ${projectImages.length} صورة من المشروع؟`
+                )
+              ) {
+                deleteAllImagesMutation.mutate();
+              }
+            }}
+          >
+            مسح كل الصور
+          </Button>
+        </div>
+      )}   
         {/* 🔥 جاليري صور المشروع + زر الحذف */}
         <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
           {projectImages.length === 0 && (
