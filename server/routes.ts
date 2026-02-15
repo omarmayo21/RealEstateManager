@@ -282,21 +282,35 @@ app.post("/api/projects/:id/images", async (req, res) => {
 
 
   app.get("/api/units/code/:unitCode", async (req, res) => {
-  try {
-    const { unitCode } = req.params;
+    try {
+      const { unitCode } = req.params;
 
-    const unit = await storage.getUnitByCode(unitCode);
+      // 1️⃣ جيب الوحدة
+      const unit = await storage.getUnitByCode(unitCode);
 
-    if (!unit) {
-      return res.status(404).json({ message: "Unit not found" });
+      if (!unit) {
+        return res.status(404).json({ message: "Unit not found" });
+      }
+
+      // 2️⃣ جيب صور الوحدة
+      const unitImages = await storage.getUnitImages(unit.id);
+
+      // 3️⃣ جيب صور المشروع (المهم جداً 🔥)
+      const projectImages = await storage.getProjectImages(unit.projectId);
+
+      // 4️⃣ رجّع كل حاجة مع بعض
+      res.json({
+        ...unit,
+        images: unitImages,          // صور الوحدة
+        projectImages: projectImages // صور المشروع (fallback)
+      });
+
+    } catch (error) {
+      console.error("❌ Error fetching unit with images:", error);
+      res.status(500).json({ message: "Server error" });
     }
+  });
 
-    res.json(unit);
-  } catch (error) {
-    console.error(error);
-    res.status(500).json({ message: "Server error" });
-  }
-});
 
 app.get("/api/units/:id", async (req, res) => {
   try {

@@ -72,25 +72,23 @@ const unit = Array.isArray(data) ? data[0] : data;
 
 const [selectedImage, setSelectedImage] = useState<string | null>(null);
 
-
 // استخراج الصور بشكل آمن
+// صور الوحدة أو صور المشروع كـ fallback
 const images =
-  (unit?.images && unit.images.length > 0)
+  unit?.images && unit.images.length > 0
     ? unit.images
     : (unit?.projectImages || []);
 
+// جاليري الصور النهائي (المهم 🔥)
+const galleryImages: string[] = [
+  ...(unit?.mainImageUrl ? [unit.mainImageUrl] : []),
+  ...images.map((img: any) => img.imageUrl),
+];
 
-  // كل الصور الجاهزة للعرض
-  const galleryImages: string[] = [
-    ...(unit?.mainImageUrl ? [unit.mainImageUrl] : []),
-    ...images.map((img: any) => img.imageUrl),
-  ];
-
-  // الصورة الرئيسية
+// الصورة المعروضة الكبيرة
 const displayImage =
   selectedImage ||
-  unit?.mainImageUrl ||
-  images?.[0]?.imageUrl ||
+  galleryImages[0] ||
   "https://images.unsplash.com/photo-1545324418-cc1a3fa10c00?w=800";
 
 
