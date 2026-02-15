@@ -222,7 +222,7 @@ const displayImage =
                   alt={unit.title}
                   loading="eager"
                   decoding="async"
-                  initial={{ opacity: 0, scale: 1.03 }}
+                  initial={{ opacity: 0, scale: 1.08 }}
                   animate={{ opacity: 1, scale: 1 }}
                   transition={{ duration: 0.6 }}
                   className="w-full max-h-[75vh] object-cover rounded-2xl shadow-2xl bg-black/5"
@@ -249,7 +249,7 @@ const displayImage =
                     }}
                     className="absolute left-3 top-1/2 -translate-y-1/2 bg-white/80 hover:bg-white shadow-lg backdrop-blur rounded-full p-3 opacity-0 group-hover:opacity-100 transition"
                   >
-                    ‹
+                    ›
                   </button>
                 )}
 
@@ -264,7 +264,7 @@ const displayImage =
                     }}
                     className="absolute right-3 top-1/2 -translate-y-1/2 bg-white/80 hover:bg-white shadow-lg backdrop-blur rounded-full p-3 opacity-0 group-hover:opacity-100 transition"
                   >
-                    ›
+                    ‹
                   </button>
                 )}
 
@@ -287,10 +287,10 @@ const displayImage =
                     ))}
                   </div>
                 )}
-</div>
+                  </div>
 
 
-                {galleryImages.length > 0 && (
+                {/* {galleryImages.length > 0 && (
                   <div className="flex gap-3 overflow-x-auto pb-2 scrollbar-hide">
                     {galleryImages.map((img, index) => {
                       // 👇 نتحكم بعدد الصور حسب حجم الشاشة
@@ -313,22 +313,12 @@ const displayImage =
                               : "hover:opacity-80"
                           }`}
                         >
-                          <img
-                            src={img}
-                            loading="lazy"
-                            decoding="async"
-                            alt={`صورة ${index + 1}`}
-                            className="
-                              w-24 h-20 object-cover rounded-xl
-                              sm:w-28 sm:h-20
-                              md:w-32 md:h-24
-                            "
-                          />
+
                         </button>
                       );
                     })}
                   </div>
-                )}
+                )} */}
 
 
               </motion.div>
