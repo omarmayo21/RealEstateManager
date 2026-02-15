@@ -224,7 +224,7 @@ const displayImage =
                   decoding="async"
                   initial={{ opacity: 0, scale: 1.08 }}
                   animate={{ opacity: 1, scale: 1 }}
-                  transition={{ duration: 0.6 }}
+                  transition={{ duration: 0.8 }}
                   className="w-full max-h-[75vh] object-cover rounded-2xl shadow-2xl bg-black/5"
                 />
 
