@@ -298,6 +298,6 @@ input[type="number"] {
   -moz-appearance: textfield;
 }
 
-html, body, #root {
+html, body {
   overflow-x: hidden;
 }
