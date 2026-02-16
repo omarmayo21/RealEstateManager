@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { Link, useLocation } from "wouter";
-import { Settings, ChevronDown } from "lucide-react";
+import { Settings, ChevronDown, Menu, X } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import { Button } from "@/components/ui/button";
 import {
@@ -15,6 +15,7 @@ import type { Project } from "@shared/schema";
 export default function Navbar() {
   const [location] = useLocation();
   const [isScrolled, setIsScrolled] = useState(false);
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const isHomePage = location === "/";
 
   const { data: projects = [] } = useQuery<Project[]>({
@@ -99,9 +100,12 @@ export default function Navbar() {
                     href={`/projects/${parent.slug}`}
                     data-testid={`link-project-${parent.slug}`}
                   >
-                    <span className="w-full font-semibold">
-                      {parent.name}
-                    </span>
+                  <div className="w-full flex items-center justify-between font-semibold text-gray-800 hover:text-primary transition-colors">
+                    {parent.name}
+                    {children.length > 0 && (
+                      <ChevronDown className="w-3 h-3 opacity-60" />
+                    )}
+                  </div>
                   </Link>
                 </DropdownMenuItem>
 
@@ -114,9 +118,9 @@ export default function Navbar() {
                           href={`/projects/${child.slug}`}
                           data-testid={`link-project-${child.slug}`}
                         >
-                          <span className="w-full text-sm text-muted-foreground">
-                            └ {child.name}
-                          </span>
+                        <span className="w-full text-sm text-gray-500 hover:text-primary transition-colors pl-4">
+                          {child.name}
+                        </span>
                         </Link>
                       </DropdownMenuItem>
                     ))}
@@ -171,19 +175,32 @@ export default function Navbar() {
           </div>
 
           <div className="flex items-center gap-4">
+            {/* زر المينيو للموبايل */}
+            <button
+              className="md:hidden text-white"
+              onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
+            >
+              {mobileMenuOpen ? (
+                <X className="w-6 h-6" />
+              ) : (
+                <Menu className="w-6 h-6" />
+              )}
+            </button>
+
+            {/* رقم الهاتف (يظهر فقط من sm وفوق) */}
             <a
               href={`tel:${settings?.companyPhone || '+20 1234567890'}`}
               className={`${textColor} hover:text-primary transition-colors hidden sm:block text-sm font-medium`}
-              data-testid="text-phone"
             >
               {settings?.companyPhone || '+20 1234567890'}
             </a>
+
+            {/* 🔥 إخفاء زر الأدمن في الموبايل */}
             <Link href="/admin/login">
               <Button
                 size="icon"
                 variant="ghost"
-                className={`${textColor} hover:text-primary hover:bg-white/10`}
-                data-testid="button-admin"
+                className={`${textColor} hover:text-primary hover:bg-white/10 hidden md:flex`}
               >
                 <Settings className="w-5 h-5" />
               </Button>
@@ -191,6 +208,58 @@ export default function Navbar() {
           </div>
         </div>
       </div>
+
+            {/* 📱 Mobile Menu */}
+      <AnimatePresence>
+        {mobileMenuOpen && (
+          <motion.div
+            initial={{ opacity: 0, y: -20 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: -20 }}
+            className="md:hidden bg-black/95 backdrop-blur-lg border-t border-white/10"
+          >
+            <div className="px-4 py-4 space-y-4">
+
+              {/* ريسيل مشروعات */}
+              <div>
+                <p className="text-white font-semibold mb-2">ريسيل مشروعات</p>
+                {resaleProjects.map((p) => (
+                  <Link key={p.id} href={`/projects/${p.slug}`}>
+                    <div className="text-gray-300 py-2 border-b border-white/10">
+                      {p.name}
+                    </div>
+                  </Link>
+                ))}
+              </div>
+
+              {/* مشروعات */}
+              <div>
+                <p className="text-white font-semibold mb-2">مشروعات</p>
+                {newProjects.map((p) => (
+                  <Link key={p.id} href={`/projects/${p.slug}`}>
+                    <div className="text-gray-300 py-2 border-b border-white/10">
+                      {p.name}
+                    </div>
+                  </Link>
+                ))}
+              </div>
+
+              {/* مشروعات اسكندرية */}
+              <div>
+                <p className="text-white font-semibold mb-2">مشروعات الإسكندرية</p>
+                {alexandriaProjects.map((p) => (
+                  <Link key={p.id} href={`/projects/${p.slug}`}>
+                    <div className="text-gray-300 py-2 border-b border-white/10">
+                      {p.name}
+                    </div>
+                  </Link>
+                ))}
+              </div>
+
+            </div>
+          </motion.div>
+        )}
+      </AnimatePresence>
     </motion.nav>
   );
 }
