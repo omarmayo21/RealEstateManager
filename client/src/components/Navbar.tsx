@@ -11,6 +11,7 @@ export default function Navbar() {
   const [location] = useLocation();
   const [isScrolled, setIsScrolled] = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const [mobileOpenParent, setMobileOpenParent] = useState<string | null>(null);
   const isHomePage = location === "/";
 
   const { data: projects = [] } = useQuery<Project[]>({
@@ -284,9 +285,9 @@ export default function Navbar() {
             initial={{ opacity: 0, y: -20 }}
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: -20 }}
-            className="md:hidden bg-black/95 backdrop-blur-lg border-t border-white/10"
+           className="md:hidden bg-gradient-to-b from-[#0f0f0f] via-[#111] to-black border-t border-white/5 shadow-2xl"
           >
-            <div className="px-4 py-4 space-y-6 max-h-[80vh] overflow-y-auto">
+            <div className="px-4 py-5 space-y-6 max-h-[calc(100vh-70px)] overflow-y-auto">
 
               {/* 🔥 Helper Renderer */}
               {[
@@ -330,55 +331,87 @@ export default function Navbar() {
                     const hasChildren = children.length > 0;
 
                     return (
-                      <div
-                        key={parent.id}
-                        className="border-b border-white/10 last:border-b-0"
-                      >
+                    <div
+                      key={parent.id}
+                      className="rounded-xl bg-white/5 border border-white/10 backdrop-blur-sm overflow-hidden"
+                    >
                         {/* المشروع الرئيسي */}
                         <div
-                          className="flex items-center justify-between py-3 text-white font-semibold cursor-pointer"
-                          onClick={() => {
-                            if (!hasChildren) {
-                              setMobileMenuOpen(false);
-                              window.location.href = `/projects/${parent.slug}`;
-                            } else {
-                              const el = document.getElementById(
-                                `mobile-${section.title}-${parent.id}`
-                              );
-                              if (el) {
-                                el.classList.toggle("hidden");
-                              }
-                            }
-                          }}
-                        >
+                          className="
+                              flex items-center justify-between 
+                              px-4 py-3 
+                              text-white font-bold text-base 
+                              cursor-pointer 
+                              transition-all duration-200 
+                              hover:bg-white/10 
+                              active:scale-[0.98]
+                            "
+                              onClick={() => {
+                                if (!hasChildren) {
+                                  setMobileMenuOpen(false);
+                                  window.location.href = `/projects/${parent.slug}`;
+                                } else {
+                                  const key = `${section.title}-${parent.id}`;
+                                  setMobileOpenParent(
+                                    mobileOpenParent === key ? null : key
+                                  );
+                                }
+                              }}
+                            >
                           {parent.name}
 
                           {hasChildren && (
-                            <span className="text-xs text-gray-400">
-                              ▼
-                            </span>
+                            <ChevronDown
+                              className={`
+                                w-4 h-4 text-primary transition-transform duration-300
+                                ${mobileOpenParent === `${section.title}-${parent.id}`
+                                  ? "rotate-180"
+                                  : "rotate-0"}
+                              `}
+                            />
                           )}
                         </div>
 
                         {/* المشاريع الفرعية */}
-                        {hasChildren && (
-                          <div
-                            id={`mobile-${section.title}-${parent.id}`}
-                            className="hidden pb-3"
-                          >
-                            {children.map((child) => (
-                              <Link
-                                key={child.id}
-                                href={`/projects/${child.slug}`}
-                                onClick={() => setMobileMenuOpen(false)}
-                              >
-                                <div className="text-gray-300 py-2 text-sm pl-4 hover:text-primary transition">
-                                  {child.name}
-                                </div>
-                              </Link>
-                            ))}
-                          </div>
-                        )}
+                          <AnimatePresence initial={false}>
+                            {hasChildren &&
+                              mobileOpenParent === `${section.title}-${parent.id}` && (
+                                <motion.div
+                                  initial={{ height: 0, opacity: 0 }}
+                                  animate={{ height: "auto", opacity: 1 }}
+                                  exit={{ height: 0, opacity: 0 }}
+                                  transition={{
+                                    height: { duration: 0.35, ease: "easeInOut" },
+                                    opacity: { duration: 0.25 }
+                                  }}
+                                  style={{ overflow: "hidden" }}
+                                  className="pb-3 bg-black/30 border-t border-white/10"
+                                >
+                                  {children.map((child) => (
+                                    <Link
+                                      key={child.id}
+                                      href={`/projects/${child.slug}`}
+                                      onClick={() => setMobileMenuOpen(false)}
+                                    >
+                                      <div
+                                        className="
+                                          px-6 py-3 
+                                          text-sm 
+                                          text-gray-300 
+                                          hover:text-primary 
+                                          hover:bg-white/5 
+                                          transition-all duration-200 
+                                          border-r-2 border-transparent 
+                                          hover:border-primary
+                                        "
+                                      >
+                                        {child.name}
+                                      </div>
+                                    </Link>
+                                  ))}
+                                </motion.div>
+                              )}
+                          </AnimatePresence>
                       </div>
                     );
                   })}
