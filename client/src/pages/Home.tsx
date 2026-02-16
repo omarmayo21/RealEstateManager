@@ -14,7 +14,12 @@ import heroImage from "@assets/generated_images/luxury_real_estate_hero_backgrou
 import teamImage from "@assets/generated_images/mars_realestates_team_photo.png";
 
 export default function Home() {
-  const [filters, setFilters] = useState<UnitFilters>({});
+  const [filters, setFilters] = useState<UnitFilters>({
+  projectId: undefined,
+  minArea: undefined,
+  maxArea: undefined,
+  bedrooms: undefined,
+    });
 
   const { data: settings } = useQuery<Settings>({
     queryKey: ["/api/settings"],
@@ -27,10 +32,37 @@ export default function Home() {
   });
 
   const { data: allUnits = [] } = useQuery<(Unit & { project?: Project })[]>({
-    queryKey: ["/api/units"],
-  });
+    queryKey: ["/api/units", filters], // 🔥 مهم
+    queryFn: async () => {
+      const params = new URLSearchParams();
 
-  const featuredUnits = allUnits.filter((unit) => unit.isFeaturedOnHomepage);
+      if (filters.projectId) {
+        params.append("projectId", filters.projectId.toString());
+      }
+      if (filters.minArea) {
+        params.append("minArea", filters.minArea.toString());
+      }
+      if (filters.maxArea) {
+        params.append("maxArea", filters.maxArea.toString());
+      }
+      if (filters.bedrooms) {
+        params.append("bedrooms", filters.bedrooms.toString());
+      }
+
+      const query = params.toString();
+      const url = query ? `/api/units?${query}` : `/api/units`;
+
+      const res = await fetch(url);
+      if (!res.ok) throw new Error("Failed to fetch units");
+      return res.json();
+    },
+  });
+  console.log("ALL UNITS:", allUnits);
+  console.log("FEATURED:", allUnits.filter(u => u.isFeaturedOnHomepage));
+  const featuredUnits =
+    allUnits.some((unit) => unit.isFeaturedOnHomepage)
+      ? allUnits.filter((unit) => unit.isFeaturedOnHomepage)
+      : allUnits;;
 
   const filteredUnits = featuredUnits.filter((unit) => {
     if (filters.projectId && unit.projectId !== filters.projectId) return false;

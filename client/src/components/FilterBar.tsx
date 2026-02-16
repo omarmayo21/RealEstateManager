@@ -28,7 +28,7 @@ export default function FilterBar({
   resultsCount,
 }: FilterBarProps) {
   const [filters, setFilters] = useState<UnitFilters>({
-    projectId: initialProjectId,
+    projectId: undefined,
     minArea: undefined,
     maxArea: undefined,
     bedrooms: undefined,

@@ -401,10 +401,11 @@ app.get("/api/units/:id", async (req, res) => {
         maintenanceDeposit: req.body.maintenanceDeposit ? Number(req.body.maintenanceDeposit) : null,
         totalPaid: req.body.totalPaid ? Number(req.body.totalPaid) : null,
         repaymentYears: req.body.repaymentYears ? Number(req.body.repaymentYears) : null,
-
+        
         isFeaturedOnHomepage:
+          req.body.isFeaturedOnHomepage === true ||
           req.body.isFeaturedOnHomepage === "true" ||
-          req.body.isFeaturedOnHomepage === true,
+          req.body.isFeaturedOnHomepage === 1,
       });
 
 
