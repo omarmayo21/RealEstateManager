@@ -116,15 +116,13 @@ export default function ProjectDetail() {
                   <div
                     className="flex transition-transform duration-700 ease-in-out"
                     style={{
-                      transform: `translateX(-${currentSlide * (100 / (imagesCount || 1))}%)`,
-                      width: `${imagesCount * 100}%`,
+                      transform: `translateX(-${currentSlide * 100}%)`,
                     }}
                   >
                   {galleryImages.map((img, index) => (
                     <div
                       key={index}
                       className="w-full flex-shrink-0"
-                      style={{ width: `${100 / (imagesCount || 1)}%` }}
                     >
                     <img
                       src={
