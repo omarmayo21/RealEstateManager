@@ -48,10 +48,16 @@ export default function ProjectDetail() {
   const galleryImages = projectImages.map((img) => img.imageUrl);
 
 
-
   // 🎬 Slider State (لازم قبل أي useEffect)
   const [currentSlide, setCurrentSlide] = useState(0);
   const imagesCount = galleryImages.length;
+
+  // 🔥 حماية: لو السلايد خرج برا عدد الصور (زي -400%)
+  useEffect(() => {
+    if (currentSlide >= imagesCount && imagesCount > 0) {
+      setCurrentSlide(0);
+    }
+  }, [currentSlide, imagesCount]);
 
   // 🔥 Auto Play مستقر ومتوافق مع React Query
   useEffect(() => {
@@ -63,7 +69,6 @@ export default function ProjectDetail() {
 
     return () => clearInterval(interval);
   }, [imagesCount]);
-
 
 
   const filteredUnits = projectUnits.filter((unit) => {
@@ -109,14 +114,18 @@ export default function ProjectDetail() {
                 
                 {/* Slides Container */}
                   <div
-                    className="flex transition-transform duration-700 ease-in-out will-change-transform"
+                    className="flex transition-transform duration-700 ease-in-out"
                     style={{
-                      transform: `translateX(-${currentSlide * 100}%)`,
+                      transform: `translateX(-${currentSlide * (100 / (imagesCount || 1))}%)`,
                       width: `${imagesCount * 100}%`,
                     }}
-                  > 
+                  >
                   {galleryImages.map((img, index) => (
-                    <div key={index} className="min-w-full ">
+                    <div
+                      key={index}
+                      className="w-full flex-shrink-0"
+                      style={{ width: `${100 / (imagesCount || 1)}%` }}
+                    >
                     <img
                       src={
                         img.includes("cloudinary")
