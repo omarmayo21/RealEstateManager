@@ -206,7 +206,7 @@ export default function Navbar() {
       animate={{ y: 0 }}
       transition={{ duration: 0.5 }}
     >
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 overflow-x-hidden">
         <div className="flex items-center justify-between h-16">
           <Link href="/" data-testid="link-home">
             <div className="flex items-center gap-2 cursor-pointer">
@@ -285,9 +285,23 @@ export default function Navbar() {
             initial={{ opacity: 0, y: -20 }}
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: -20 }}
-           className="md:hidden bg-gradient-to-b from-[#0f0f0f] via-[#111] to-black border-t border-white/5 shadow-2xl"
+             className="
+                  md:hidden
+                  bg-black/40
+                  backdrop-blur-2xl
+                  border-t border-white/10
+                  shadow-2xl
+                "
+
           >
-            <div className="px-4 py-5 space-y-6 max-h-[calc(100vh-70px)] overflow-y-auto">
+            <div className="
+                px-4 py-6 
+                space-y-6 
+                max-h-[calc(100vh-70px)] 
+                overflow-y-auto
+                scrollbar-thin
+                scrollbar-thumb-white/10
+              ">
 
               {/* 🔥 Helper Renderer */}
               {[
