@@ -32,6 +32,7 @@ export const projectImages = pgTable("project_images", {
     .references(() => projects.id, { onDelete: "cascade" }),
 
   imageUrl: text("image_url").notNull(), // صور المشروع (السلايدر)
+  publicId: text("public_id"), // 🔥 أضف هذا السطر
 
   createdAt: timestamp("created_at").defaultNow().notNull(),
 });

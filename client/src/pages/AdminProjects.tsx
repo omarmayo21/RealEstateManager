@@ -550,6 +550,19 @@ export default function AdminProjects() {
                   throw new Error("فشل رفع الصورة");
                 }
 
+                const imageUrl = cloudinaryData.secure_url;
+                const publicId = cloudinaryData.public_id; // 🔥 مهم
+
+                await apiRequest(
+                  "POST",
+                  `/api/projects/${selectedProject.id}/images`,
+                  { imageUrl, publicId } // بدل imageUrl فقط
+                );
+
+                if (!cloudinaryData.secure_url) {
+                  throw new Error("فشل رفع الصورة");
+                }
+
                 uploadedUrls.push(cloudinaryData.secure_url);
               }
 

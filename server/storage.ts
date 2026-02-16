@@ -17,7 +17,13 @@ import type {
   ProjectImage
 } from "../shared/schema.js";
 import * as schema from "../shared/schema.js";
+import { v2 as cloudinary } from "cloudinary";
 
+cloudinary.config({
+  cloud_name: process.env.CLOUDINARY_CLOUD_NAME!,
+  api_key: process.env.CLOUDINARY_API_KEY!,
+  api_secret: process.env.CLOUDINARY_API_SECRET!,
+});
 neonConfig.webSocketConstructor = ws;
 
 const pool = new Pool({ connectionString: process.env.DATABASE_URL! });
@@ -166,31 +172,36 @@ export class DatabaseStorage implements IStorage {
 
   // ➕ إضافة صورة جديدة لمشروع
 
-  async createProjectImage(projectId: number, imageUrl: string) {
-    // تحقق لو الصورة موجودة بالفعل لنفس المشروع
-    const existing = await db
-      .select()
-      .from(schema.projectImages)
-      .where(
-        and(
-          eq(schema.projectImages.projectId, projectId),
-          eq(schema.projectImages.imageUrl, imageUrl)
-        )
-      );
+async createProjectImage(
+  projectId: number,
+  imageUrl: string,
+  publicId?: string
+) {
+  const result = await db
+    .insert(schema.projectImages)
+    .values({ projectId, imageUrl, publicId })
+    .returning();
 
-    if (existing.length > 0) {
-      return existing[0]; // يمنع التكرار
-    }
+  return result[0];
+}
 
-    const result = await db
-      .insert(schema.projectImages)
-      .values({ projectId, imageUrl })
-      .returning();
+async deleteProjectImage(imageId: number): Promise<void> {
+  const image = await db
+    .select()
+    .from(schema.projectImages)
+    .where(eq(schema.projectImages.id, imageId))
+    .limit(1);
 
-    return result[0];
+  if (!image.length) return;
+
+  const img = image[0];
+
+  // 🔥 حذف من Cloudinary أولاً
+  if (img.publicId) {
+    await cloudinary.uploader.destroy(img.publicId);
   }
 
-  async deleteProjectImage(imageId: number): Promise<void> {
+  // ثم حذف من الداتابيز
   await db
     .delete(schema.projectImages)
     .where(eq(schema.projectImages.id, imageId));
