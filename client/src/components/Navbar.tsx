@@ -44,12 +44,33 @@ export default function Navbar() {
     ? "text-white"
     : "text-white";
 
-  const resaleProjects = projects.filter((p) => p.appearsInResaleProjects);
-  const newProjects = projects.filter((p) => p.appearsInProjects);
-  const alexandriaProjects = projects.filter((p) => p.appearsInAlexandriaProjects);
-  const alexandriaResale = projects.filter((p) => p.appearsInAlexandriaResale);
+  // 🧠 Helper: تقسيم Parent / Children
+  const getParentProjects = (list: Project[]) =>
+    list.filter((p) => !p.parentProjectId);
 
-  const NavDropdown = ({ title, items }: { title: string; items: Project[] }) => (
+  const getChildProjects = (parentId: number, list: Project[]) =>
+    list.filter((p) => p.parentProjectId === parentId);
+
+  // القوائم الأصلية (كما هي حسب الفلاج)
+  const resaleProjectsRaw = projects.filter((p) => p.appearsInResaleProjects);
+  const newProjectsRaw = projects.filter((p) => p.appearsInProjects);
+  const alexandriaProjectsRaw = projects.filter((p) => p.appearsInAlexandriaProjects);
+  const alexandriaResaleRaw = projects.filter((p) => p.appearsInAlexandriaResale);
+
+  // ✨ المشاريع الرئيسية فقط لكل قائمة
+  const resaleProjects = getParentProjects(resaleProjectsRaw);
+  const newProjects = getParentProjects(newProjectsRaw);
+  const alexandriaProjects = getParentProjects(alexandriaProjectsRaw);
+  const alexandriaResale = getParentProjects(alexandriaResaleRaw);
+
+
+
+
+  const NavDropdown = ({ title, items, rawList }: { 
+    title: string; 
+    items: Project[]; 
+    rawList: Project[];
+  }) => (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
         <button
@@ -60,17 +81,50 @@ export default function Navbar() {
           <ChevronDown className="w-4 h-4" />
         </button>
       </DropdownMenuTrigger>
-      <DropdownMenuContent align="start" className="min-w-[200px]">
+
+      <DropdownMenuContent align="start" className="min-w-[240px]">
         {items.length === 0 ? (
           <DropdownMenuItem disabled>لا توجد مشروعات</DropdownMenuItem>
         ) : (
-          items.map((project) => (
-            <DropdownMenuItem key={project.id} asChild>
-              <Link href={`/projects/${project.slug}`} data-testid={`link-project-${project.slug}`}>
-                <span className="w-full">{project.name}</span>
-              </Link>
-            </DropdownMenuItem>
-          ))
+          items.map((parent) => {
+            const children = rawList.filter(
+              (p) => p.parentProjectId === parent.id
+            );
+
+            return (
+              <div key={parent.id} className="w-full">
+                {/* المشروع الرئيسي */}
+                <DropdownMenuItem asChild>
+                  <Link
+                    href={`/projects/${parent.slug}`}
+                    data-testid={`link-project-${parent.slug}`}
+                  >
+                    <span className="w-full font-semibold">
+                      {parent.name}
+                    </span>
+                  </Link>
+                </DropdownMenuItem>
+
+                {/* المشاريع الفرعية (لو موجودة) */}
+                {children.length > 0 && (
+                  <div className="mr-3 border-r pr-3">
+                    {children.map((child) => (
+                      <DropdownMenuItem key={child.id} asChild>
+                        <Link
+                          href={`/projects/${child.slug}`}
+                          data-testid={`link-project-${child.slug}`}
+                        >
+                          <span className="w-full text-sm text-muted-foreground">
+                            └ {child.name}
+                          </span>
+                        </Link>
+                      </DropdownMenuItem>
+                    ))}
+                  </div>
+                )}
+              </div>
+            );
+          })
         )}
       </DropdownMenuContent>
     </DropdownMenu>
@@ -94,10 +148,26 @@ export default function Navbar() {
           </Link>
 
           <div className="hidden md:flex items-center gap-1">
-            <NavDropdown title="ريسيل مشروعات" items={resaleProjects} />
-            <NavDropdown title="مشروعات" items={newProjects} />
-            <NavDropdown title="مشروعات الإسكندرية" items={alexandriaProjects} />
-            <NavDropdown title="ريسيل الإسكندرية" items={alexandriaResale} />
+            <NavDropdown 
+              title="ريسيل مشروعات" 
+              items={resaleProjects} 
+              rawList={resaleProjectsRaw} 
+            />
+            <NavDropdown 
+              title="مشروعات" 
+              items={newProjects} 
+              rawList={newProjectsRaw} 
+            />
+            <NavDropdown 
+              title="مشروعات الإسكندرية" 
+              items={alexandriaProjects} 
+              rawList={alexandriaProjectsRaw} 
+            />
+            <NavDropdown 
+              title="ريسيل الإسكندرية" 
+              items={alexandriaResale} 
+              rawList={alexandriaResaleRaw} 
+            />
           </div>
 
           <div className="flex items-center gap-4">
