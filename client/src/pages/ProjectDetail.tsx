@@ -118,6 +118,7 @@ export default function ProjectDetail() {
                     className="flex transition-transform duration-700 ease-in-out"
                     style={{
                       transform: `translateX(-${currentSlide * 100}%)`,
+                      direction: "ltr",
                     }}
                   >
                     {galleryImages.map((img, index) => (
