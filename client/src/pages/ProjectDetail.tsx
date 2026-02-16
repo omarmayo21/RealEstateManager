@@ -114,20 +114,18 @@ export default function ProjectDetail() {
                 
                 {/* Slides Container */}
                  {/* Slides Container */}
-                  <div
-                    className="flex transition-transform duration-700 ease-in-out"
-                    style={{
-                      transform: `translateX(-${currentSlide * 100}%)`,
-                      direction: "ltr",
-                      width: `${galleryImages.length * 100}%`,
-                    }}
-                  >
-                    {galleryImages.map((img, index) => (
-                        <div
-                          key={index}
-                          className="flex-shrink-0"
-                          style={{ width: `${100 / galleryImages.length}%` }}
-                        >
+                      <div
+                        className="flex transition-transform duration-700 ease-in-out"
+                        style={{
+                          transform: `translateX(-${currentSlide * 100}%)`,
+                          direction: "ltr",
+                        }}
+                      >
+                        {galleryImages.map((img, index) => (
+                          <div
+                            key={index}
+                            className="min-w-full flex-shrink-0"
+                          >
                         <img
                           src={
                             img.includes("cloudinary")
