@@ -81,7 +81,15 @@ export class DatabaseStorage implements IStorage {
   }
 
   async createProject(project: InsertProject): Promise<Project> {
-    const results = await db.insert(schema.projects).values(project).returning();
+    const results = await db
+      .insert(schema.projects)
+      .values({
+        ...project,
+        // دعم المشروع الأب (Hierarchy System)
+        parentProjectId: project.parentProjectId ?? null,
+      })
+      .returning();
+
     return results[0];
   }
 

@@ -50,6 +50,7 @@ const projectSchema = z.object({
   logoUrl: z.string().optional(),
   shortDescription: z.string().optional(),
   amenities: z.string().optional(),
+  parentProjectId: z.number().nullable().optional(),
 });
 
 type ProjectFormData = z.infer<typeof projectSchema>;
@@ -154,6 +155,7 @@ export default function AdminProjects() {
       name: "",
       slug: "",
       city: "",
+      parentProjectId: null, // 🔥 مهم جدًا
       appearsInResaleProjects: false,
       appearsInProjects: false,
       appearsInAlexandriaProjects: false,
@@ -168,6 +170,7 @@ export default function AdminProjects() {
     mutationFn: async (data: ProjectFormData) => {
       const projectData: InsertProject = {
         ...data,
+        parentProjectId: data.parentProjectId ?? null, // 🔥 مهم
         logoUrl: data.logoUrl || null,
         shortDescription: data.shortDescription || null,
         amenities: data.amenities || null,
@@ -187,6 +190,7 @@ export default function AdminProjects() {
     mutationFn: async ({ id, data }: { id: number; data: ProjectFormData }) => {
       const projectData: InsertProject = {
         ...data,
+        parentProjectId: data.parentProjectId ?? null, // 🔥 أضف دي
         logoUrl: data.logoUrl || null,
         shortDescription: data.shortDescription || null,
         amenities: data.amenities || null,
@@ -234,6 +238,7 @@ export default function AdminProjects() {
       name: project.name,
       slug: project.slug,
       city: project.city,
+      parentProjectId: project.parentProjectId ?? null, // 🔥 جديد
       appearsInResaleProjects: project.appearsInResaleProjects,
       appearsInProjects: project.appearsInProjects,
       appearsInAlexandriaProjects: project.appearsInAlexandriaProjects,
@@ -319,20 +324,40 @@ export default function AdminProjects() {
                       </FormItem>
                     )}
                   />
-{/* 
                   <FormField
                     control={form.control}
-                    name="logoUrl"
+                    name="parentProjectId"
                     render={({ field }) => (
                       <FormItem>
-                        <FormLabel>رابط الشعار (اختياري)</FormLabel>
+                        <FormLabel>المشروع الرئيسي (اختياري)</FormLabel>
                         <FormControl>
-                          <Input {...field} data-testid="input-project-logo" />
+                          <select
+                            className="w-full border rounded-md p-2 bg-background"
+                            value={field.value ?? ""}
+                            onChange={(e) =>
+                              field.onChange(
+                                e.target.value ? Number(e.target.value) : null
+                              )
+                            }
+                          >
+                            <option value="">بدون (مشروع رئيسي)</option>
+
+                            {projects
+                              ?.filter((p) => !p.parentProjectId) // يعرض المشاريع الرئيسية فقط
+                              .map((project) => (
+                                <option key={project.id} value={project.id}>
+                                  {project.name}
+                                </option>
+                              ))}
+                          </select>
                         </FormControl>
+                        <FormDescription>
+                          لو اخترت مشروع هنا سيصبح مشروع فرعي تحته
+                        </FormDescription>
                         <FormMessage />
                       </FormItem>
                     )}
-                  /> */}
+                  />
 
                   <FormField
                     control={form.control}
