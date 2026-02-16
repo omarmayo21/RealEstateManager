@@ -110,7 +110,7 @@ export default function ProjectDetail() {
           {/* 🔥 Auto Play Project Images Slider (Centralized Gallery) */}
           {galleryImages.length > 0 && (
             <div className="w-full max-w-6xl mx-auto mb-10">
-              <div className="relative overflow-hidden rounded-3xl shadow-2xl">
+             <div className="relative overflow-hidden rounded-3xl shadow-2xl w-full">
                 
                 {/* Slides Container */}
                  {/* Slides Container */}
@@ -119,13 +119,15 @@ export default function ProjectDetail() {
                     style={{
                       transform: `translateX(-${currentSlide * 100}%)`,
                       direction: "ltr",
+                      width: `${galleryImages.length * 100}%`,
                     }}
                   >
                     {galleryImages.map((img, index) => (
-                      <div
-                        key={index}
-                        className="min-w-full flex-shrink-0"
-                      >
+                        <div
+                          key={index}
+                          className="flex-shrink-0"
+                          style={{ width: `${100 / galleryImages.length}%` }}
+                        >
                         <img
                           src={
                             img.includes("cloudinary")
