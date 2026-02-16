@@ -179,10 +179,22 @@ export default function AdminProjects() {
     },
     onSuccess: () => {
       toast({ title: "تم إضافة المشروع بنجاح" });
-      queryClient.invalidateQueries({queryKey: ["api", "projects"]
- });
+      queryClient.invalidateQueries({ queryKey: ["api", "projects"] });
       setDialogOpen(false);
-      form.reset();
+
+      form.reset({
+        name: "",
+        slug: "",
+        city: "",
+        parentProjectId: null,
+        appearsInResaleProjects: false,
+        appearsInProjects: false,
+        appearsInAlexandriaProjects: false,
+        appearsInAlexandriaResale: false,
+        logoUrl: "",
+        shortDescription: "",
+        amenities: "",
+      });
     },
   });
 
@@ -266,9 +278,47 @@ export default function AdminProjects() {
             <h1 className="text-3xl font-bold text-primary">المشروعات</h1>
             <p className="text-muted-foreground">إدارة المشروعات العقارية</p>
           </div>
-          <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
+                      <Dialog
+                open={dialogOpen}
+                onOpenChange={(open) => {
+                  setDialogOpen(open);
+
+                  // 🔥 Reset إجباري عند الغلق
+                  if (!open) {
+                    setEditingProject(null);
+                    form.reset({
+                      name: "",
+                      slug: "",
+                      city: "", // 🔥 كان ناقص
+                      parentProjectId: null,
+                      appearsInResaleProjects: false,
+                      appearsInProjects: false,
+                      appearsInAlexandriaProjects: false,
+                      appearsInAlexandriaResale: false,
+                      logoUrl: "",
+                      shortDescription: "",
+                      amenities: "",
+                    });
+                  }
+                }}
+              >
             <DialogTrigger asChild>
-              <Button className="bg-primary" onClick={() => { setEditingProject(null); form.reset(); }} data-testid="button-add-project">
+              <Button className="bg-primary" onClick={() => {
+                      setEditingProject(null);
+                      form.reset({
+                        name: "",
+                        slug: "",
+                        city: "",
+                        parentProjectId: null, // 🔥 كان ناقص
+                        appearsInResaleProjects: false,
+                        appearsInProjects: false,
+                        appearsInAlexandriaProjects: false,
+                        appearsInAlexandriaResale: false,
+                        logoUrl: "",
+                        shortDescription: "",
+                        amenities: "",
+                      });
+                    }} data-testid="button-add-project">
                 <Plus className="w-4 h-4 ml-2" />
                 إضافة مشروع
               </Button>
@@ -467,15 +517,43 @@ export default function AdminProjects() {
                     <TableCell>{project.city}</TableCell>
                     <TableCell>
                       <div className="flex flex-wrap gap-1">
-                        {project.appearsInResaleProjects && (
-                          <span className="text-xs bg-primary/10 text-primary px-2 py-1 rounded">ريسيل</span>
-                        )}
+                        {/* 1️⃣ مشروعات (Primary) */}
                         {project.appearsInProjects && (
-                          <span className="text-xs bg-primary/10 text-primary px-2 py-1 rounded">مشروعات</span>
+                          <span className="text-xs bg-emerald-500/10 text-emerald-600 px-2.5 py-1 rounded-full font-medium">
+                            مشروعات
+                          </span>
                         )}
+
+                        {/* 2️⃣ ريسيل مشروعات */}
+                        {project.appearsInResaleProjects && (
+                          <span className="text-xs bg-blue-500/10 text-blue-600 px-2.5 py-1 rounded-full font-medium">
+                            ريسيل مشروعات
+                          </span>
+                        )}
+
+                        {/* 3️⃣ مشروعات الإسكندرية */}
                         {project.appearsInAlexandriaProjects && (
-                          <span className="text-xs bg-primary/10 text-primary px-2 py-1 rounded">إسكندرية</span>
+                          <span className="text-xs bg-purple-500/10 text-purple-600 px-2.5 py-1 rounded-full font-medium">
+                            مشروعات الإسكندرية
+                          </span>
                         )}
+
+                        {/* 4️⃣ ريسيل الإسكندرية (كان ناقص عندك) */}
+                        {project.appearsInAlexandriaResale && (
+                          <span className="text-xs bg-orange-500/10 text-orange-600 px-2.5 py-1 rounded-full font-medium">
+                            ريسيل الإسكندرية
+                          </span>
+                        )}
+
+                        {/* حالة احتياطية لو مفيش أي فلاج متفعل */}
+                        {!project.appearsInProjects &&
+                          !project.appearsInResaleProjects &&
+                          !project.appearsInAlexandriaProjects &&
+                          !project.appearsInAlexandriaResale && (
+                            <span className="text-xs bg-gray-500/10 text-gray-500 px-2.5 py-1 rounded-full">
+                              غير مصنف
+                            </span>
+                          )}
                       </div>
                     </TableCell>
                     <TableCell className="text-left">
