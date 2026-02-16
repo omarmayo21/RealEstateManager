@@ -6,7 +6,7 @@ import { Button } from "@/components/ui/button";
 
 import { useQuery } from "@tanstack/react-query";
 import type { Project } from "@shared/schema";
-import { useRef } from "react";
+
 export default function Navbar() {
   const [location] = useLocation();
   const [isScrolled, setIsScrolled] = useState(false);
@@ -75,41 +75,19 @@ export default function Navbar() {
     }) => {
       const [open, setOpen] = useState(false);
       const [activeParent, setActiveParent] = useState<number | null>(null);
-      const menuRef = useRef<HTMLDivElement>(null);
 
-      useEffect(() => {
-        const handleClickOutside = (event: MouseEvent) => {
-          if (menuRef.current && !menuRef.current.contains(event.target as Node)) {
-            setOpen(false);
-            setActiveParent(null);
-          }
-        };
-
-        document.addEventListener("mousedown", handleClickOutside);
-        return () => {
-          document.removeEventListener("mousedown", handleClickOutside);
-        };
-      }, []);
           return (
-          <div ref={menuRef} className="relative">
+            <div
+              className="relative"
+              onMouseEnter={() => setOpen(true)}
+              onMouseLeave={() => {
+                setOpen(false);
+                setActiveParent(null);
+              }}
+            >
           {/* زر القائمة */}
               <button
-                onClick={(e) => {
-                  e.stopPropagation();
-                  setOpen((prev) => !prev);
-                  setActiveParent(null);
-                }}
-                className={`
-                  ${textColor}
-                  hover:text-primary
-                  transition-all duration-200
-                  flex items-center gap-1
-                  px-4 py-2
-                  text-base font-medium
-                  rounded-lg
-                  hover:bg-white/10
-                  ${open ? "bg-white/10 text-primary" : ""}
-                `}
+                className={`${textColor} hover:text-primary transition-colors flex items-center gap-1 px-3 py-2 text-base font-medium`}
               >
             {title}
             <ChevronDown className="w-4 h-4" />
