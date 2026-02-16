@@ -113,34 +113,35 @@ export default function ProjectDetail() {
               <div className="relative overflow-hidden rounded-3xl shadow-2xl">
                 
                 {/* Slides Container */}
+                 {/* Slides Container */}
                   <div
                     className="flex transition-transform duration-700 ease-in-out"
                     style={{
                       transform: `translateX(-${currentSlide * 100}%)`,
                     }}
                   >
-                  {galleryImages.map((img, index) => (
-                    <div
-                      key={index}
-                      className="w-full flex-shrink-0"
-                    >
-                    <img
-                      src={
-                        img.includes("cloudinary")
-                          ? img.replace(
-                              "/upload/",
-                              "/upload/f_auto,q_auto,w_1600/"
-                            )
-                          : img
-                      }
-                      alt={`project-image-${index}`}
-                      className="w-full h-[420px] md:h-[520px] object-cover"
-                      loading="lazy"
-                      data-testid={`img-project-slider-${index}`}
-                    />
-                    </div>
-                  ))}
-                </div>
+                    {galleryImages.map((img, index) => (
+                      <div
+                        key={index}
+                        className="min-w-full flex-shrink-0"
+                      >
+                        <img
+                          src={
+                            img.includes("cloudinary")
+                              ? img.replace(
+                                  "/upload/",
+                                  "/upload/f_auto,q_auto,w_1600/"
+                                )
+                              : img
+                          }
+                          alt={`project-image-${index}`}
+                          className="w-full h-[420px] md:h-[520px] object-cover"
+                          loading="lazy"
+                          data-testid={`img-project-slider-${index}`}
+                        />
+                      </div>
+                    ))}
+                  </div>
 
                 {/* Dots Indicators */}
                 <div className="absolute bottom-4 left-0 right-0 flex justify-center gap-2">
@@ -157,29 +158,9 @@ export default function ProjectDetail() {
                   ))}
                 </div>
 
-                {/* Left Arrow */}
-                <button
-                  onClick={() =>
-                    setCurrentSlide((prev) =>
-                      prev === 0 ? galleryImages.length - 1 : prev - 1
-                    )
-                  }
-                  className="absolute left-4 top-1/2 -translate-y-1/2 bg-black/40 hover:bg-black/60 text-white p-3 rounded-full"
-                >
-                  ‹
-                </button>
 
-                {/* Right Arrow */}
-                <button
-                  onClick={() =>
-                    setCurrentSlide((prev) =>
-                      prev === galleryImages.length - 1 ? 0 : prev + 1
-                    )
-                  }
-                  className="absolute right-4 top-1/2 -translate-y-1/2 bg-black/40 hover:bg-black/60 text-white p-3 rounded-full"
-                >
-                  ›
-                </button>
+
+
               </div>
             </div>
           )}
