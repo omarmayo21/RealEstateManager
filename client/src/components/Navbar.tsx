@@ -63,6 +63,7 @@ export default function Navbar() {
 
   // 🔥 Mega Menu احترافي (Parent + Children)
   // 🔥 Nested Dropdown احترافي (Vertical + Sub Projects)
+
     const NestedMenu = ({
       title,
       parentItems,
@@ -75,14 +76,19 @@ export default function Navbar() {
       const [open, setOpen] = useState(false);
       const [activeParent, setActiveParent] = useState<number | null>(null);
 
-      return (
-        <div className="relative">
+          return (
+            <div
+              className="relative"
+              onMouseEnter={() => setOpen(true)}
+              onMouseLeave={() => {
+                setOpen(false);
+                setActiveParent(null);
+              }}
+            >
           {/* زر القائمة */}
-          <button
-            onMouseEnter={() => setOpen(true)}
-            onMouseLeave={() => setOpen(false)}
-            className={`${textColor} hover:text-primary transition-colors flex items-center gap-1 px-3 py-2 text-base font-medium`}
-          >
+              <button
+                className={`${textColor} hover:text-primary transition-colors flex items-center gap-1 px-3 py-2 text-base font-medium`}
+              >
             {title}
             <ChevronDown className="w-4 h-4" />
           </button>
@@ -90,18 +96,13 @@ export default function Navbar() {
           {/* القائمة */}
           <AnimatePresence>
             {open && parentItems.length > 0 && (
-              <motion.div
-                  onMouseEnter={() => setOpen(true)}
-                  onMouseLeave={() => {
-                    setOpen(false);
-                    setActiveParent(null);
-                  }}
-                  initial={{ opacity: 0, y: 8 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  exit={{ opacity: 0, y: 8 }}
-                  transition={{ duration: 0.18 }}
-                  className="absolute right-0 top-full mt-3 w-80 bg-white rounded-2xl shadow-2xl border border-gray-100 z-[9999]"
-                >
+                    <motion.div
+                      initial={{ opacity: 0, y: 8 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      exit={{ opacity: 0, y: 8 }}
+                      transition={{ duration: 0.18 }}
+                      className="absolute right-0 top-full mt-3 w-80 bg-white rounded-2xl shadow-2xl border border-gray-100 z-[9999]"
+                    >
                   <div className="py-2">
                   {parentItems.map((parent) => {
                     const children = rawList.filter(
