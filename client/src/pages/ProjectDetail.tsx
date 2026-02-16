@@ -102,41 +102,7 @@ export default function ProjectDetail() {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
 
 
-                  {/* 🔥 السلايدر خارج Framer Motion (حل نهائي لمشكلة ظهور ربع الصورة) */}
-        {galleryImages.length > 0 && (
-          <div className="w-full max-w-6xl mx-auto mb-10">
-            <div className="relative overflow-hidden rounded-3xl shadow-2xl">
-              <div
-                className="flex transition-transform duration-700 ease-in-out"
-                style={{
-                  transform: `translate3d(-${currentSlide * 100}%, 0, 0)`,
-                  direction: "ltr",
-                }}
-              >
-                {galleryImages.map((img, index) => (
-                  <div
-                    key={index}
-                    className="min-w-full flex-shrink-0"
-                  >
-                    <img
-                      src={
-                        img.includes("cloudinary")
-                          ? img.replace(
-                              "/upload/",
-                              "/upload/f_auto,q_auto,w_1600/"
-                            )
-                          : img
-                      }
-                      alt={`project-image-${index}`}
-                     className="w-full h-[420px] md:h-[520px] object-cover pointer-events-none"
-                      draggable={false}
-                    />
-                  </div>
-                ))}
-              </div>
-            </div>
-          </div>
-        )}
+
 
           <motion.div
             initial={{ opacity: 0, y: 20 }}
@@ -144,6 +110,67 @@ export default function ProjectDetail() {
             transition={{ duration: 0.6 }}
             className="text-center"
           >
+
+          {/* 🔥 Auto Play Project Images Slider (Centralized Gallery) */}
+          {galleryImages.length > 0 && (
+            <div className="w-full max-w-6xl mx-auto mb-10">
+             <div className="relative overflow-hidden rounded-3xl shadow-2xl w-full">
+                
+                {/* Slides Container */}
+                 {/* Slides Container */}
+                        <div
+                          className="flex transition-transform duration-700 ease-in-out"
+                          style={{
+                            transform: `translate3d(-${currentSlide * 100}%, 0, 0)`,
+                            direction: "ltr",
+                            backfaceVisibility: "hidden",
+                          }}
+                        >
+                        {galleryImages.map((img, index) => (
+                          <div
+                            key={index}
+                            className="min-w-full flex-shrink-0 overflow-hidden"
+                          >
+                        <img
+                          src={
+                            img.includes("cloudinary")
+                              ? img.replace(
+                                  "/upload/",
+                                  "/upload/f_auto,q_auto,w_1600/"
+                                )
+                              : img
+                          }
+                          alt={`project-image-${index}`}
+                          className="w-full h-[420px] md:h-[520px] object-cover block"
+                          style={{ imageRendering: "auto" }}
+                          loading="lazy"
+                          data-testid={`img-project-slider-${index}`}
+                        />
+                      </div>
+                    ))}
+                  </div>
+
+                {/* Dots Indicators */}
+                <div className="absolute bottom-4 left-0 right-0 flex justify-center gap-2">
+                  {galleryImages.map((_, index) => (
+                    <button
+                      key={index}
+                      onClick={() => setCurrentSlide(index)}
+                      className={`w-3 h-3 rounded-full transition ${
+                        currentSlide === index
+                          ? "bg-white scale-110"
+                          : "bg-white/50"
+                      }`}
+                    />
+                  ))}
+                </div>
+
+
+
+
+              </div>
+            </div>
+          )}
 
 
             
