@@ -136,16 +136,16 @@ export default function ProjectDetail() {
                             img.includes("cloudinary")
                               ? img.replace(
                                   "/upload/",
-                                  "/upload/f_auto,q_auto,w_1600/"
+                                  "/upload/f_auto,q_auto,c_fill,w_1600,h_900/"
                                 )
                               : img
                           }
-                          alt={`project-image-${index}`}
-                          className="w-full h-[420px] md:h-[520px] object-cover block"
-                          style={{ imageRendering: "auto" }}
-                          loading="lazy"
-                          data-testid={`img-project-slider-${index}`}
-                        />
+
+                              alt={`project-image-${index}`}
+                              className="w-full h-[420px] md:h-[520px] object-cover block"
+                              loading="lazy"
+                              draggable={false}
+                            />
                       </div>
                     ))}
                   </div>
