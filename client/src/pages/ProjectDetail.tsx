@@ -116,7 +116,7 @@ export default function ProjectDetail() {
                     }}
                   > 
                   {galleryImages.map((img, index) => (
-                    <div key={index} className="min-w-full flex-shrink-0">
+                    <div key={index} className="min-w-full ">
                     <img
                       src={
                         img.includes("cloudinary")
