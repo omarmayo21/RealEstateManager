@@ -61,83 +61,112 @@ export default function Navbar() {
 
 
   // 🔥 Mega Menu احترافي (Parent + Children)
-  const MegaMenu = ({
-    title,
-    parentItems,
-    rawList,
-  }: {
-    title: string;
-    parentItems: Project[];
-    rawList: Project[];
-  }) => {
-    const [open, setOpen] = useState(false);
+  // 🔥 Nested Dropdown احترافي (Vertical + Sub Projects)
+    const NestedMenu = ({
+      title,
+      parentItems,
+      rawList,
+    }: {
+      title: string;
+      parentItems: Project[];
+      rawList: Project[];
+    }) => {
+      const [open, setOpen] = useState(false);
+      const [activeParent, setActiveParent] = useState<number | null>(null);
 
-    return (
-      <div
-        className="relative"
-        onMouseEnter={() => setOpen(true)}
-        onMouseLeave={() => setOpen(false)}
-      >
-        {/* زر القائمة */}
-        <button
-          className={`${textColor} hover:text-primary transition-colors flex items-center gap-1 px-3 py-2 text-base font-medium`}
-        >
-          {title}
-          <ChevronDown className="w-4 h-4" />
-        </button>
+      return (
+        <div className="relative">
+          {/* زر القائمة */}
+          <button
+            onMouseEnter={() => setOpen(true)}
+            onMouseLeave={() => setOpen(false)}
+            className={`${textColor} hover:text-primary transition-colors flex items-center gap-1 px-3 py-2 text-base font-medium`}
+          >
+            {title}
+            <ChevronDown className="w-4 h-4" />
+          </button>
 
-        {/* Mega Menu Panel */}
-        <AnimatePresence>
-          {open && parentItems.length > 0 && (
-            <motion.div
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              exit={{ opacity: 0, y: 20 }}
-              transition={{ duration: 0.2 }}
-              className="absolute right-0 top-full mt-3 w-[500px] bg-white rounded-2xl shadow-2xl border border-gray-100 p-6 z-50"
-            >
-              <div className="grid grid-cols-2 gap-8">
-                {parentItems.map((parent) => {
-                  const children = rawList.filter(
-                    (p) => p.parentProjectId === parent.id
-                  );
+          {/* القائمة */}
+          <AnimatePresence>
+            {open && parentItems.length > 0 && (
+              <motion.div
+                onMouseEnter={() => setOpen(true)}
+                onMouseLeave={() => {
+                  setOpen(false);
+                  setActiveParent(null);
+                }}
+                initial={{ opacity: 0, y: 10 }}
+                animate={{ opacity: 1, y: 0 }}
+                exit={{ opacity: 0, y: 10 }}
+                className="absolute right-0 top-full mt-2 w-72 bg-white rounded-xl shadow-2xl border border-gray-100 z-50 overflow-hidden"
+              >
+                <div className="max-h-[400px] overflow-y-auto">
+                  {parentItems.map((parent) => {
+                    const children = rawList.filter(
+                      (p) => p.parentProjectId === parent.id
+                    );
+                    const hasChildren = children.length > 0;
 
-                  return (
-                    <div key={parent.id} className="space-y-3">
-                      {/* المشروع الرئيسي */}
-                      <Link href={`/projects/${parent.slug}`}>
-                        <div className="text-lg font-bold text-gray-900 hover:text-primary transition cursor-pointer">
-                          {parent.name}
+                    return (
+                      <div key={parent.id} className="border-b last:border-b-0">
+                        {/* المشروع الرئيسي */}
+                        <div
+                          className="flex items-center justify-between px-4 py-3 hover:bg-gray-50 cursor-pointer transition"
+                          onClick={() => {
+                            if (hasChildren) {
+                              setActiveParent(
+                                activeParent === parent.id ? null : parent.id
+                              );
+                            } else {
+                              window.location.href = `/projects/${parent.slug}`;
+                            }
+                          }}
+                        >
+                          <span className="font-semibold text-gray-900">
+                            {parent.name}
+                          </span>
+
+                          {hasChildren && (
+                            <ChevronDown
+                              className={`w-4 h-4 transition-transform ${
+                                activeParent === parent.id ? "rotate-180" : ""
+                              }`}
+                            />
+                          )}
                         </div>
-                      </Link>
 
-                      {/* المشاريع الفرعية */}
-                      {children.length > 0 && (
-                        <div className="space-y-2 border-r pr-4">
-                          {children.map((child) => (
-                            <Link
-                              key={child.id}
-                              href={`/projects/${child.slug}`}
+                        {/* المشاريع الفرعية */}
+                        <AnimatePresence>
+                          {hasChildren && activeParent === parent.id && (
+                            <motion.div
+                              initial={{ height: 0, opacity: 0 }}
+                              animate={{ height: "auto", opacity: 1 }}
+                              exit={{ height: 0, opacity: 0 }}
+                              className="bg-gray-50"
                             >
-                              <div className="text-sm text-gray-500 hover:text-primary transition cursor-pointer">
-                                {child.name}
-                              </div>
-                            </Link>
-                          ))}
-                        </div>
-                      )}
-                    </div>
-                  );
-                })}
-              </div>
-            </motion.div>
-          )}
-        </AnimatePresence>
-      </div>
-    );
-  };
-
-
+                              {children.map((child) => (
+                                <Link
+                                  key={child.id}
+                                  href={`/projects/${child.slug}`}
+                                >
+                                  <div className="px-6 py-2 text-sm text-gray-600 hover:text-primary hover:bg-gray-100 transition cursor-pointer">
+                                    {child.name}
+                                  </div>
+                                </Link>
+                              ))}
+                            </motion.div>
+                          )}
+                        </AnimatePresence>
+                      </div>
+                    );
+                  })}
+                </div>
+              </motion.div>
+            )}
+          </AnimatePresence>
+        </div>
+      );
+    };
 
   return (
     <motion.nav
@@ -157,25 +186,25 @@ export default function Navbar() {
           </Link>
 
           <div className="hidden md:flex items-center gap-2">
-            <MegaMenu
+            <NestedMenu
               title="ريسيل مشروعات"
               parentItems={resaleProjects}
               rawList={resaleProjectsRaw}
             />
 
-            <MegaMenu
+            <NestedMenu
               title="مشروعات"
               parentItems={newProjects}
               rawList={newProjectsRaw}
             />
 
-            <MegaMenu
+            <NestedMenu
               title="مشروعات الإسكندرية"
               parentItems={alexandriaProjects}
               rawList={alexandriaProjectsRaw}
             />
 
-            <MegaMenu
+            <NestedMenu
               title="ريسيل الإسكندرية"
               parentItems={alexandriaResale}
               rawList={alexandriaResaleRaw}
@@ -218,6 +247,7 @@ export default function Navbar() {
       </div>
 
             {/* 📱 Mobile Menu */}
+          {/* 📱 Mobile Menu - Nested Professional */}
       <AnimatePresence>
         {mobileMenuOpen && (
           <motion.div
@@ -226,43 +256,104 @@ export default function Navbar() {
             exit={{ opacity: 0, y: -20 }}
             className="md:hidden bg-black/95 backdrop-blur-lg border-t border-white/10"
           >
-            <div className="px-4 py-4 space-y-4">
+            <div className="px-4 py-4 space-y-6 max-h-[80vh] overflow-y-auto">
 
-              {/* ريسيل مشروعات */}
-              <div>
-                <p className="text-white font-semibold mb-2">ريسيل مشروعات</p>
-                {resaleProjects.map((p) => (
-                  <Link key={p.id} href={`/projects/${p.slug}`}>
-                    <div className="text-gray-300 py-2 border-b border-white/10">
-                      {p.name}
-                    </div>
-                  </Link>
-                ))}
-              </div>
+              {/* 🔥 Helper Renderer */}
+              {[
+                {
+                  title: "ريسيل مشروعات",
+                  parents: resaleProjects,
+                  raw: resaleProjectsRaw,
+                },
+                {
+                  title: "مشروعات",
+                  parents: newProjects,
+                  raw: newProjectsRaw,
+                },
+                {
+                  title: "مشروعات الإسكندرية",
+                  parents: alexandriaProjects,
+                  raw: alexandriaProjectsRaw,
+                },
+                {
+                  title: "ريسيل الإسكندرية",
+                  parents: alexandriaResale,
+                  raw: alexandriaResaleRaw,
+                },
+              ].map((section) => (
+                <div key={section.title}>
+                  {/* عنوان القسم */}
+                  <p className="text-white font-bold mb-3 text-base">
+                    {section.title}
+                  </p>
 
-              {/* مشروعات */}
-              <div>
-                <p className="text-white font-semibold mb-2">مشروعات</p>
-                {newProjects.map((p) => (
-                  <Link key={p.id} href={`/projects/${p.slug}`}>
-                    <div className="text-gray-300 py-2 border-b border-white/10">
-                      {p.name}
+                  {section.parents.length === 0 && (
+                    <div className="text-gray-400 text-sm py-2">
+                      لا توجد مشروعات
                     </div>
-                  </Link>
-                ))}
-              </div>
+                  )}
 
-              {/* مشروعات اسكندرية */}
-              <div>
-                <p className="text-white font-semibold mb-2">مشروعات الإسكندرية</p>
-                {alexandriaProjects.map((p) => (
-                  <Link key={p.id} href={`/projects/${p.slug}`}>
-                    <div className="text-gray-300 py-2 border-b border-white/10">
-                      {p.name}
-                    </div>
-                  </Link>
-                ))}
-              </div>
+                  {section.parents.map((parent) => {
+                    const children = section.raw.filter(
+                      (c) => c.parentProjectId === parent.id
+                    );
+                    const hasChildren = children.length > 0;
+
+                    return (
+                      <div
+                        key={parent.id}
+                        className="border-b border-white/10 last:border-b-0"
+                      >
+                        {/* المشروع الرئيسي */}
+                        <div
+                          className="flex items-center justify-between py-3 text-white font-semibold cursor-pointer"
+                          onClick={() => {
+                            if (!hasChildren) {
+                              setMobileMenuOpen(false);
+                              window.location.href = `/projects/${parent.slug}`;
+                            } else {
+                              const el = document.getElementById(
+                                `mobile-${section.title}-${parent.id}`
+                              );
+                              if (el) {
+                                el.classList.toggle("hidden");
+                              }
+                            }
+                          }}
+                        >
+                          {parent.name}
+
+                          {hasChildren && (
+                            <span className="text-xs text-gray-400">
+                              ▼
+                            </span>
+                          )}
+                        </div>
+
+                        {/* المشاريع الفرعية */}
+                        {hasChildren && (
+                          <div
+                            id={`mobile-${section.title}-${parent.id}`}
+                            className="hidden pb-3"
+                          >
+                            {children.map((child) => (
+                              <Link
+                                key={child.id}
+                                href={`/projects/${child.slug}`}
+                                onClick={() => setMobileMenuOpen(false)}
+                              >
+                                <div className="text-gray-300 py-2 text-sm pl-4 hover:text-primary transition">
+                                  {child.name}
+                                </div>
+                              </Link>
+                            ))}
+                          </div>
+                        )}
+                      </div>
+                    );
+                  })}
+                </div>
+              ))}
 
             </div>
           </motion.div>
