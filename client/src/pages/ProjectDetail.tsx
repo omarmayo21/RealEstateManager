@@ -49,19 +49,22 @@ export default function ProjectDetail() {
 
   // 🎬 Auto Play Slider State
   const [currentSlide, setCurrentSlide] = useState(0);
-
+  // 🔥 إعادة ضبط السلايدر لما الصور تتحمل من الـ API
+  useEffect(() => {
+    setCurrentSlide(0);
+  }, [galleryImages.length]);
   // Auto Play (كل 4 ثواني)
   useEffect(() => {
-    if (!galleryImages.length) return;
+    if (!galleryImages || galleryImages.length === 0) return;
 
     const interval = setInterval(() => {
       setCurrentSlide((prev) =>
-        prev === galleryImages.length - 1 ? 0 : prev + 1
+        prev >= galleryImages.length - 1 ? 0 : prev + 1
       );
-    }, 4000); // تقدر تغير السرعة من هنا
+    }, 4000);
 
     return () => clearInterval(interval);
-  }, [galleryImages.length]);
+  }, [galleryImages]);
 
   const filteredUnits = projectUnits.filter((unit) => {
     if (filters.minArea && unit.area < filters.minArea) return false;
@@ -98,7 +101,7 @@ export default function ProjectDetail() {
             transition={{ duration: 0.6 }}
             className="text-center"
           >
-            
+
           {/* 🔥 Auto Play Project Images Slider (Centralized Gallery) */}
           {galleryImages.length > 0 && (
             <div className="w-full max-w-6xl mx-auto mb-10">
@@ -113,12 +116,20 @@ export default function ProjectDetail() {
                 >
                   {galleryImages.map((img, index) => (
                     <div key={index} className="min-w-full">
-                      <img
-                        src={img}
-                        alt={`project-image-${index}`}
-                        className="w-full h-[350px] md:h-[500px] object-cover"
-                        data-testid={`img-project-slider-${index}`}
-                      />
+                    <img
+                      src={
+                        img.includes("cloudinary")
+                          ? img.replace(
+                              "/upload/",
+                              "/upload/f_auto,q_auto,w_1600/"
+                            )
+                          : img
+                      }
+                      alt={`project-image-${index}`}
+                      className="w-full h-[420px] md:h-[520px] object-cover"
+                      loading="lazy"
+                      data-testid={`img-project-slider-${index}`}
+                    />
                     </div>
                   ))}
                 </div>
