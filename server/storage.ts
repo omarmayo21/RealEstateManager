@@ -185,33 +185,54 @@ async createProjectImage(
   return result[0];
 }
 
-async deleteProjectImage(imageId: number): Promise<void> {
-  const image = await db
-    .select()
-    .from(schema.projectImages)
-    .where(eq(schema.projectImages.id, imageId))
-    .limit(1);
+  async deleteProjectImage(imageId: number): Promise<void> {
+    const image = await db
+      .select()
+      .from(schema.projectImages)
+      .where(eq(schema.projectImages.id, imageId))
+      .limit(1);
 
-  if (!image.length) return;
+    if (!image.length) return;
 
-  const img = image[0];
+    const img = image[0];
 
-  // 🔥 حذف من Cloudinary أولاً
-  if (img.publicId) {
-    await cloudinary.uploader.destroy(img.publicId);
-  }
+    // حذف من Cloudinary
+    if (img.publicId) {
+      try {
+        await cloudinary.uploader.destroy(img.publicId);
+      } catch (error) {
+        console.error("Cloudinary delete error:", error);
+      }
+    }
 
-  // ثم حذف من الداتابيز
-  await db
-    .delete(schema.projectImages)
-    .where(eq(schema.projectImages.id, imageId));
+    // حذف من الداتابيز
+    await db
+      .delete(schema.projectImages)
+      .where(eq(schema.projectImages.id, imageId));
   }
 
   async deleteAllProjectImages(projectId: number): Promise<void> {
+    const images = await db
+      .select()
+      .from(schema.projectImages)
+      .where(eq(schema.projectImages.projectId, projectId));
+
+    for (const img of images) {
+      if (img.publicId) {
+        try {
+          await cloudinary.uploader.destroy(img.publicId);
+        } catch (error) {
+          console.error("Cloudinary delete error:", error);
+        }
+      }
+    }
+
     await db
       .delete(schema.projectImages)
       .where(eq(schema.projectImages.projectId, projectId));
   }
+
+  
   async createUnitImage(unitId: number, imageUrl: string): Promise<UnitImage> {
     const results = await db.insert(schema.unitImages).values({ unitId, imageUrl }).returning();
     return results[0];

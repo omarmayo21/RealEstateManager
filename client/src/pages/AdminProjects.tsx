@@ -517,20 +517,15 @@ export default function AdminProjects() {
           disabled={uploading}
           onChange={async (e) => {
             const files = e.target.files;
-            if (!files || !selectedProject) return;
+            if (!files || !selectedProject || uploading) return;
 
             try {
               setUploading(true);
 
               const filesArray = Array.from(files);
-              const uploadedUrls: string[] = [];
-
-
-
-              // نجمع الروابط أولاً
-
 
               for (const file of filesArray) {
+                // 1️⃣ رفع الصورة على Cloudinary
                 const formData = new FormData();
                 formData.append("file", file);
                 formData.append("upload_preset", "projects");
@@ -550,36 +545,26 @@ export default function AdminProjects() {
                   throw new Error("فشل رفع الصورة");
                 }
 
-                const imageUrl = cloudinaryData.secure_url;
-                const publicId = cloudinaryData.public_id; // 🔥 مهم
-
+                // 2️⃣ حفظ في الداتابيز مرة واحدة فقط (بدون أي loop إضافي)
                 await apiRequest(
                   "POST",
                   `/api/projects/${selectedProject.id}/images`,
-                  { imageUrl, publicId } // بدل imageUrl فقط
-                );
-
-                if (!cloudinaryData.secure_url) {
-                  throw new Error("فشل رفع الصورة");
-                }
-
-                uploadedUrls.push(cloudinaryData.secure_url);
-              }
-
-              // 🔥 نحفظ في الداتابيز مرة واحدة لكل صورة (بدون mutation loop)
-              for (const url of uploadedUrls) {
-                await apiRequest(
-                  "POST",
-                  `/api/projects/${selectedProject.id}/images`,
-                  { imageUrl: url }
+                  {
+                    imageUrl: cloudinaryData.secure_url,
+                    publicId: cloudinaryData.public_id, // مهم للحذف من Cloudinary
+                  }
                 );
               }
 
+              // 3️⃣ إعادة تحميل الصور مرة واحدة
+              refetchProjectImages();
+
+              // 4️⃣ مهم: تصفير input عشان ما يكرر الحدث
+              e.target.value = "";
             } catch (error) {
               console.error("Upload Error:", error);
             } finally {
               setUploading(false);
-              refetchProjectImages();
             }
           }}
         />
