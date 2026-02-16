@@ -3,12 +3,7 @@ import { Link, useLocation } from "wouter";
 import { Settings, ChevronDown, Menu, X } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import { Button } from "@/components/ui/button";
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
+
 import { useQuery } from "@tanstack/react-query";
 import type { Project } from "@shared/schema";
 
@@ -65,74 +60,84 @@ export default function Navbar() {
   const alexandriaResale = getParentProjects(alexandriaResaleRaw);
 
 
-
-
-  const NavDropdown = ({ title, items, rawList }: { 
-    title: string; 
-    items: Project[]; 
+  // 🔥 Mega Menu احترافي (Parent + Children)
+  const MegaMenu = ({
+    title,
+    parentItems,
+    rawList,
+  }: {
+    title: string;
+    parentItems: Project[];
     rawList: Project[];
-  }) => (
-    <DropdownMenu>
-      <DropdownMenuTrigger asChild>
+  }) => {
+    const [open, setOpen] = useState(false);
+
+    return (
+      <div
+        className="relative"
+        onMouseEnter={() => setOpen(true)}
+        onMouseLeave={() => setOpen(false)}
+      >
+        {/* زر القائمة */}
         <button
-          className={`${textColor} hover:text-primary transition-colors flex items-center gap-1 px-3 py-2 text-base font-medium hover-elevate rounded-md`}
-          data-testid={`dropdown-${title}`}
+          className={`${textColor} hover:text-primary transition-colors flex items-center gap-1 px-3 py-2 text-base font-medium`}
         >
           {title}
           <ChevronDown className="w-4 h-4" />
         </button>
-      </DropdownMenuTrigger>
 
-      <DropdownMenuContent align="start" className="min-w-[240px]">
-        {items.length === 0 ? (
-          <DropdownMenuItem disabled>لا توجد مشروعات</DropdownMenuItem>
-        ) : (
-          items.map((parent) => {
-            const children = rawList.filter(
-              (p) => p.parentProjectId === parent.id
-            );
+        {/* Mega Menu Panel */}
+        <AnimatePresence>
+          {open && parentItems.length > 0 && (
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: 20 }}
+              transition={{ duration: 0.2 }}
+              className="absolute right-0 top-full mt-3 w-[500px] bg-white rounded-2xl shadow-2xl border border-gray-100 p-6 z-50"
+            >
+              <div className="grid grid-cols-2 gap-8">
+                {parentItems.map((parent) => {
+                  const children = rawList.filter(
+                    (p) => p.parentProjectId === parent.id
+                  );
 
-            return (
-              <div key={parent.id} className="w-full">
-                {/* المشروع الرئيسي */}
-                <DropdownMenuItem asChild>
-                  <Link
-                    href={`/projects/${parent.slug}`}
-                    data-testid={`link-project-${parent.slug}`}
-                  >
-                  <div className="w-full flex items-center justify-between font-semibold text-gray-800 hover:text-primary transition-colors">
-                    {parent.name}
-                    {children.length > 0 && (
-                      <ChevronDown className="w-3 h-3 opacity-60" />
-                    )}
-                  </div>
-                  </Link>
-                </DropdownMenuItem>
+                  return (
+                    <div key={parent.id} className="space-y-3">
+                      {/* المشروع الرئيسي */}
+                      <Link href={`/projects/${parent.slug}`}>
+                        <div className="text-lg font-bold text-gray-900 hover:text-primary transition cursor-pointer">
+                          {parent.name}
+                        </div>
+                      </Link>
 
-                {/* المشاريع الفرعية (لو موجودة) */}
-                {children.length > 0 && (
-                  <div className="mr-3 border-r pr-3">
-                    {children.map((child) => (
-                      <DropdownMenuItem key={child.id} asChild>
-                        <Link
-                          href={`/projects/${child.slug}`}
-                          data-testid={`link-project-${child.slug}`}
-                        >
-                        <span className="w-full text-sm text-gray-500 hover:text-primary transition-colors pl-4">
-                          {child.name}
-                        </span>
-                        </Link>
-                      </DropdownMenuItem>
-                    ))}
-                  </div>
-                )}
+                      {/* المشاريع الفرعية */}
+                      {children.length > 0 && (
+                        <div className="space-y-2 border-r pr-4">
+                          {children.map((child) => (
+                            <Link
+                              key={child.id}
+                              href={`/projects/${child.slug}`}
+                            >
+                              <div className="text-sm text-gray-500 hover:text-primary transition cursor-pointer">
+                                {child.name}
+                              </div>
+                            </Link>
+                          ))}
+                        </div>
+                      )}
+                    </div>
+                  );
+                })}
               </div>
-            );
-          })
-        )}
-      </DropdownMenuContent>
-    </DropdownMenu>
-  );
+            </motion.div>
+          )}
+        </AnimatePresence>
+      </div>
+    );
+  };
+
+
 
   return (
     <motion.nav
@@ -151,26 +156,29 @@ export default function Navbar() {
             </div>
           </Link>
 
-          <div className="hidden md:flex items-center gap-1">
-            <NavDropdown 
-              title="ريسيل مشروعات" 
-              items={resaleProjects} 
-              rawList={resaleProjectsRaw} 
+          <div className="hidden md:flex items-center gap-2">
+            <MegaMenu
+              title="ريسيل مشروعات"
+              parentItems={resaleProjects}
+              rawList={resaleProjectsRaw}
             />
-            <NavDropdown 
-              title="مشروعات" 
-              items={newProjects} 
-              rawList={newProjectsRaw} 
+
+            <MegaMenu
+              title="مشروعات"
+              parentItems={newProjects}
+              rawList={newProjectsRaw}
             />
-            <NavDropdown 
-              title="مشروعات الإسكندرية" 
-              items={alexandriaProjects} 
-              rawList={alexandriaProjectsRaw} 
+
+            <MegaMenu
+              title="مشروعات الإسكندرية"
+              parentItems={alexandriaProjects}
+              rawList={alexandriaProjectsRaw}
             />
-            <NavDropdown 
-              title="ريسيل الإسكندرية" 
-              items={alexandriaResale} 
-              rawList={alexandriaResaleRaw} 
+
+            <MegaMenu
+              title="ريسيل الإسكندرية"
+              parentItems={alexandriaResale}
+              rawList={alexandriaResaleRaw}
             />
           </div>
 
