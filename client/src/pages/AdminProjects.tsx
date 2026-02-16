@@ -319,7 +319,7 @@ export default function AdminProjects() {
                       </FormItem>
                     )}
                   />
-
+{/* 
                   <FormField
                     control={form.control}
                     name="logoUrl"
@@ -332,7 +332,7 @@ export default function AdminProjects() {
                         <FormMessage />
                       </FormItem>
                     )}
-                  />
+                  /> */}
 
                   <FormField
                     control={form.control}

@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useParams } from "wouter";
 import { motion } from "framer-motion";
 import { MapPin, CheckCircle } from "lucide-react";
@@ -9,6 +9,10 @@ import FilterBar from "@/components/FilterBar";
 import LeadForm from "@/components/LeadForm";
 import { useQuery } from "@tanstack/react-query";
 import type { Project, Unit, UnitFilters } from "@shared/schema";
+
+
+
+
 
 export default function ProjectDetail() {
   const { slug } = useParams<{ slug: string }>();
@@ -27,6 +31,37 @@ export default function ProjectDetail() {
   });
 
   const projectUnits = allUnits.filter((unit) => unit.projectId === project?.id);
+
+
+  // 🔥 Project Images (Centralized Gallery - حسب الدوكمنيشن)
+  const { data: projectImages = [] } = useQuery<{ imageUrl: string }[]>({
+    queryKey: ["api", "project-images", project?.id],
+    queryFn: async () => {
+      const res = await fetch(`/api/projects/${project?.id}/images`);
+      if (!res.ok) throw new Error("Failed to fetch project images");
+      return res.json();
+    },
+    enabled: !!project?.id, // مهم عشان مايضربش قبل تحميل المشروع
+  });
+
+  // نحول الصور لمصفوفة روابط
+  const galleryImages = projectImages.map((img) => img.imageUrl);
+
+  // 🎬 Auto Play Slider State
+  const [currentSlide, setCurrentSlide] = useState(0);
+
+  // Auto Play (كل 4 ثواني)
+  useEffect(() => {
+    if (!galleryImages.length) return;
+
+    const interval = setInterval(() => {
+      setCurrentSlide((prev) =>
+        prev === galleryImages.length - 1 ? 0 : prev + 1
+      );
+    }, 4000); // تقدر تغير السرعة من هنا
+
+    return () => clearInterval(interval);
+  }, [galleryImages.length]);
 
   const filteredUnits = projectUnits.filter((unit) => {
     if (filters.minArea && unit.area < filters.minArea) return false;
@@ -63,14 +98,75 @@ export default function ProjectDetail() {
             transition={{ duration: 0.6 }}
             className="text-center"
           >
-            {project.logoUrl && (
-              <img
-                src={project.logoUrl}
-                alt={project.name}
-                className="h-24 mx-auto mb-6"
-                data-testid="img-project-logo"
-              />
-            )}
+            
+          {/* 🔥 Auto Play Project Images Slider (Centralized Gallery) */}
+          {galleryImages.length > 0 && (
+            <div className="w-full max-w-6xl mx-auto mb-10">
+              <div className="relative overflow-hidden rounded-3xl shadow-2xl">
+                
+                {/* Slides Container */}
+                <div
+                  className="flex transition-transform duration-700 ease-in-out"
+                  style={{
+                    transform: `translateX(-${currentSlide * 100}%)`,
+                  }}
+                >
+                  {galleryImages.map((img, index) => (
+                    <div key={index} className="min-w-full">
+                      <img
+                        src={img}
+                        alt={`project-image-${index}`}
+                        className="w-full h-[350px] md:h-[500px] object-cover"
+                        data-testid={`img-project-slider-${index}`}
+                      />
+                    </div>
+                  ))}
+                </div>
+
+                {/* Dots Indicators */}
+                <div className="absolute bottom-4 left-0 right-0 flex justify-center gap-2">
+                  {galleryImages.map((_, index) => (
+                    <button
+                      key={index}
+                      onClick={() => setCurrentSlide(index)}
+                      className={`w-3 h-3 rounded-full transition ${
+                        currentSlide === index
+                          ? "bg-white scale-110"
+                          : "bg-white/50"
+                      }`}
+                    />
+                  ))}
+                </div>
+
+                {/* Left Arrow */}
+                <button
+                  onClick={() =>
+                    setCurrentSlide((prev) =>
+                      prev === 0 ? galleryImages.length - 1 : prev - 1
+                    )
+                  }
+                  className="absolute left-4 top-1/2 -translate-y-1/2 bg-black/40 hover:bg-black/60 text-white p-3 rounded-full"
+                >
+                  ‹
+                </button>
+
+                {/* Right Arrow */}
+                <button
+                  onClick={() =>
+                    setCurrentSlide((prev) =>
+                      prev === galleryImages.length - 1 ? 0 : prev + 1
+                    )
+                  }
+                  className="absolute right-4 top-1/2 -translate-y-1/2 bg-black/40 hover:bg-black/60 text-white p-3 rounded-full"
+                >
+                  ›
+                </button>
+              </div>
+            </div>
+          )}
+
+
+            
             <h1 className="text-5xl font-bold mb-4 text-primary" data-testid="text-project-name">
               {project.name}
             </h1>
