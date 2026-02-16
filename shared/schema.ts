@@ -10,6 +10,8 @@ export const projects = pgTable("projects", {
   name: text("name").notNull(),
   slug: text("slug").notNull().unique(),
   city: text("city").notNull(),
+  parentProjectId: integer("parent_project_id"),
+
   appearsInResaleProjects: boolean("appears_in_resale_projects").default(false).notNull(),
   appearsInProjects: boolean("appears_in_projects").default(false).notNull(),
   appearsInAlexandriaProjects: boolean("appears_in_alexandria_projects").default(false).notNull(),
@@ -20,6 +22,7 @@ export const projects = pgTable("projects", {
   
   createdAt: timestamp("created_at").defaultNow().notNull(),
   updatedAt: timestamp("updated_at").defaultNow().notNull(),
+
 });
 
 
