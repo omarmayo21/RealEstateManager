@@ -90,17 +90,18 @@ export default function Navbar() {
           <AnimatePresence>
             {open && parentItems.length > 0 && (
               <motion.div
-                onMouseEnter={() => setOpen(true)}
-                onMouseLeave={() => {
-                  setOpen(false);
-                  setActiveParent(null);
-                }}
-                initial={{ opacity: 0, y: 10 }}
-                animate={{ opacity: 1, y: 0 }}
-                exit={{ opacity: 0, y: 10 }}
-                className="absolute right-0 top-full mt-2 w-72 bg-white rounded-xl shadow-2xl border border-gray-100 z-50 overflow-hidden"
-              >
-                <div className="max-h-[400px] overflow-y-auto">
+                  onMouseEnter={() => setOpen(true)}
+                  onMouseLeave={() => {
+                    setOpen(false);
+                    setActiveParent(null);
+                  }}
+                  initial={{ opacity: 0, y: 8 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  exit={{ opacity: 0, y: 8 }}
+                  transition={{ duration: 0.18 }}
+                  className="absolute right-0 top-full mt-3 w-80 bg-white rounded-2xl shadow-2xl border border-gray-100 z-[9999]"
+                >
+                  <div className="py-2">
                   {parentItems.map((parent) => {
                     const children = rawList.filter(
                       (p) => p.parentProjectId === parent.id
@@ -108,10 +109,19 @@ export default function Navbar() {
                     const hasChildren = children.length > 0;
 
                     return (
-                      <div key={parent.id} className="border-b last:border-b-0">
+                      <div key={parent.id} className="border-b bg-white hover:bg-gray-50 last:border-b-0">
                         {/* المشروع الرئيسي */}
                         <div
-                          className="flex items-center justify-between px-4 py-3 hover:bg-gray-50 cursor-pointer transition"
+                          className="
+                            flex items-center justify-between 
+                            px-4 py-3 
+                            hover:bg-gray-50 
+                            cursor-pointer 
+                            transition-all 
+                            duration-200 
+                            ease-out
+                            active:scale-[0.98]
+                          "
                           onClick={() => {
                             if (hasChildren) {
                               setActiveParent(
@@ -122,38 +132,58 @@ export default function Navbar() {
                             }
                           }}
                         >
-                          <span className="font-semibold text-gray-900">
+                          <span className="font-semibold text-gray-900 tracking-wide">
                             {parent.name}
                           </span>
 
                           {hasChildren && (
-                            <ChevronDown
-                              className={`w-4 h-4 transition-transform ${
-                                activeParent === parent.id ? "rotate-180" : ""
-                              }`}
-                            />
+                          <ChevronDown
+                            className={`w-4 h-4 text-primary transition-all duration-300 ease-out ${
+                              activeParent === parent.id ? "rotate-180 scale-110" : "rotate-0"
+                            }`}
+                          />
                           )}
                         </div>
 
-                        {/* المشاريع الفرعية */}
-                        <AnimatePresence>
+                        {/* المشاريع الفرعية - Smooth Accordion */}
+                        <AnimatePresence initial={false}>
                           {hasChildren && activeParent === parent.id && (
                             <motion.div
+                              key="submenu"
                               initial={{ height: 0, opacity: 0 }}
                               animate={{ height: "auto", opacity: 1 }}
                               exit={{ height: 0, opacity: 0 }}
-                              className="bg-gray-50"
+                              transition={{
+                                height: { duration: 0.35, ease: "easeInOut" },
+                                opacity: { duration: 0.25 }
+                              }}
+                              style={{ overflow: "hidden" }}
+                              className="bg-gradient-to-b from-gray-50 to-white"
                             >
-                              {children.map((child) => (
-                                <Link
-                                  key={child.id}
-                                  href={`/projects/${child.slug}`}
-                                >
-                                  <div className="px-6 py-2 text-sm text-gray-600 hover:text-primary hover:bg-gray-100 transition cursor-pointer">
-                                    {child.name}
-                                  </div>
-                                </Link>
-                              ))}
+                              <div className="py-1">
+                                {children.map((child) => (
+                                  <Link
+                                    key={child.id}
+                                    href={`/projects/${child.slug}`}
+                                  >
+                                    <div className="
+                                      px-6 py-2.5 
+                                      text-sm 
+                                      text-gray-600 
+                                      hover:text-primary 
+                                      hover:bg-primary/5 
+                                      transition-all 
+                                      duration-200 
+                                      cursor-pointer
+                                      border-r-2 
+                                      border-transparent 
+                                      hover:border-primary
+                                    ">
+                                      {child.name}
+                                    </div>
+                                  </Link>
+                                ))}
+                              </div>
                             </motion.div>
                           )}
                         </AnimatePresence>
