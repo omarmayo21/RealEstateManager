@@ -7,11 +7,15 @@ import { MapPin, Maximize, Bed, Bath } from "lucide-react";
 import type { Unit, Project } from "@shared/schema";
 
 interface UnitCardProps {
-  unit: Unit & { project?: Project };
+  unit: Unit & { 
+    project?: Project;
+    projectImages?: { imageUrl: string }[]; // 🔥 أضف هذا
+  };
   index?: number;
 }
 
 export default function UnitCard({ unit, index = 0 }: UnitCardProps) {
+
   const formatPrice = (price: number) => {
     return new Intl.NumberFormat('ar-EG', {
       style: 'currency',
@@ -19,6 +23,16 @@ export default function UnitCard({ unit, index = 0 }: UnitCardProps) {
       maximumFractionDigits: 0,
     }).format(price);
   };
+
+  // 🔥 ياخد أول صورة من صور المشروع تلقائيًا
+  const displayImage =
+    (unit.mainImageUrl && unit.mainImageUrl.trim() !== "")
+      ? unit.mainImageUrl
+      : (unit.projectImages && unit.projectImages.length > 0)
+        ? unit.projectImages[0].imageUrl
+        : "/placeholder-property.jpg";
+
+
 
   return (
     <motion.div
@@ -30,7 +44,7 @@ export default function UnitCard({ unit, index = 0 }: UnitCardProps) {
       <Card className="overflow-hidden hover:shadow-xl transition-all duration-300 h-full" data-testid={`card-unit-${unit.unitCode}`}>
         <div className="relative h-48 overflow-hidden">
           <img
-            src={unit.mainImageUrl || "https://images.unsplash.com/photo-1545324418-cc1a3fa10c00?w=600"}
+            src={displayImage}
             alt={unit.title}
             className="w-full h-full object-cover transition-transform duration-300 hover:scale-110"
             data-testid={`img-unit-${unit.unitCode}`}

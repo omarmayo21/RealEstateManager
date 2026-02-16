@@ -222,40 +222,6 @@ app.delete("/api/projects/:id/images", async (req, res) => {
   });
 
 
-//   app.post(
-//   "/api/units",
-//   authMiddleware,
-//   async (req: Request, res: Response) => {
-//     try {
-//       const validatedData = insertUnitSchema.parse({
-//         ...req.body,
-//         projectId: Number(req.body.projectId),
-//         price: Number(req.body.price),
-//         area: Number(req.body.area),
-//         bedrooms: Number(req.body.bedrooms),
-//         bathrooms: Number(req.body.bathrooms),
-//       });
-
-//       const unit = await storage.createUnitWithAssets(
-//         validatedData,
-//         req.body.images || [],
-//         req.body.paymentPlanPdf || null
-//       );
-
-//       res.json(unit);
-//     } catch (error: any) {
-//       if (error.name === "ZodError") {
-//         return res.status(400).json({
-//           error: "بيانات غير صالحة",
-//           details: error.errors,
-//         });
-//       }
-
-//       res.status(500).json({ error: "حدث خطأ في الخادم" });
-//     }
-//   }
-// );
-
 
   app.get("/api/units",  async (req: Request, res: Response) =>{
     try {
@@ -401,7 +367,7 @@ app.get("/api/units/:id", async (req, res) => {
         maintenanceDeposit: req.body.maintenanceDeposit ? Number(req.body.maintenanceDeposit) : null,
         totalPaid: req.body.totalPaid ? Number(req.body.totalPaid) : null,
         repaymentYears: req.body.repaymentYears ? Number(req.body.repaymentYears) : null,
-        
+
         isFeaturedOnHomepage:
           req.body.isFeaturedOnHomepage === true ||
           req.body.isFeaturedOnHomepage === "true" ||

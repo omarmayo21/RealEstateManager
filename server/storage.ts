@@ -106,7 +106,7 @@ export class DatabaseStorage implements IStorage {
     return results.length > 0;
   }
 
-  async getUnits(filters?: UnitFilters): Promise<Unit[]> {
+  async getUnits(filters?: UnitFilters): Promise<any[]> {
     const conditions = [];
     
     if (filters?.projectId) {
@@ -122,11 +122,33 @@ export class DatabaseStorage implements IStorage {
       conditions.push(gte(schema.units.bedrooms, filters.bedrooms));
     }
 
-    if (conditions.length > 0) {
-      return await db.select().from(schema.units).where(and(...conditions));
-    }
-    
-    return await db.select().from(schema.units);
+    // 1️⃣ نجيب الوحدات بالفلتر (زي ما هو)
+    const units = conditions.length > 0
+      ? await db.select().from(schema.units).where(and(...conditions))
+      : await db.select().from(schema.units);
+
+    if (units.length === 0) return units;
+
+    // 2️⃣ نجيب كل صور المشاريع مرة واحدة (أداء احترافي)
+    const projectImages = await db
+      .select()
+      .from(schema.projectImages);
+
+    // 3️⃣ نعمل Map للصور حسب projectId
+    const imagesMap = new Map<number, typeof projectImages>();
+
+    projectImages.forEach((img) => {
+      if (!imagesMap.has(img.projectId)) {
+        imagesMap.set(img.projectId, []);
+      }
+      imagesMap.get(img.projectId)!.push(img);
+    });
+
+    // 4️⃣ نلحق صور المشروع بكل وحدة (Centralized Fallback)
+    return units.map((unit) => ({
+      ...unit,
+      projectImages: imagesMap.get(unit.projectId) || [],
+    }));
   }
 
   async getUnitById(id: number): Promise<Unit | undefined> {
