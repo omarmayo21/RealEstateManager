@@ -47,24 +47,32 @@ export default function ProjectDetail() {
   // نحول الصور لمصفوفة روابط
   const galleryImages = projectImages.map((img) => img.imageUrl);
 
-  // 🎬 Auto Play Slider State
-  const [currentSlide, setCurrentSlide] = useState(0);
-  // 🔥 إعادة ضبط السلايدر لما الصور تتحمل من الـ API
-  useEffect(() => {
-    setCurrentSlide(0);
-  }, [galleryImages.length]);
-  // Auto Play (كل 4 ثواني)
-  useEffect(() => {
-    if (!galleryImages || galleryImages.length === 0) return;
 
-    const interval = setInterval(() => {
-      setCurrentSlide((prev) =>
-        prev >= galleryImages.length - 1 ? 0 : prev + 1
-      );
+// 🎬 Slider State (لازم ييجي قبل أي useEffect)
+  const [currentSlide, setCurrentSlide] = useState(0);
+
+  // عدد الصور
+  const imagesCount = galleryImages.length;
+
+  // 🔥 إعادة ضبط السلايدر فقط عند أول تحميل الصور
+  useEffect(() => {
+    if (imagesCount > 0) {
+      setCurrentSlide(0);
+    }
+  }, [imagesCount]);
+
+  // 🎬 Auto Play ثابت (متوافق مع React Query)
+  useEffect(() => {
+    if (imagesCount <= 1) return;
+
+    const autoPlay = setInterval(() => {
+      setCurrentSlide((prev) => (prev + 1) % imagesCount);
     }, 4000);
 
-    return () => clearInterval(interval);
-  }, [galleryImages]);
+    return () => clearInterval(autoPlay);
+  }, [imagesCount]);
+
+
 
   const filteredUnits = projectUnits.filter((unit) => {
     if (filters.minArea && unit.area < filters.minArea) return false;
@@ -109,9 +117,9 @@ export default function ProjectDetail() {
                 
                 {/* Slides Container */}
                 <div
-                  className="flex transition-transform duration-700 ease-in-out"
+                  className="flex transition-transform duration-700 ease-in-out will-change-transform"
                   style={{
-                    transform: `translateX(-${currentSlide * 100}%)`,
+                    transform: `translate3d(-${currentSlide * 100}%, 0, 0)`,
                   }}
                 >
                   {galleryImages.map((img, index) => (
