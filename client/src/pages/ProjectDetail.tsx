@@ -48,28 +48,20 @@ export default function ProjectDetail() {
   const galleryImages = projectImages.map((img) => img.imageUrl);
 
 
-// 🎬 Slider State (لازم ييجي قبل أي useEffect)
-  const [currentSlide, setCurrentSlide] = useState(0);
 
-  // عدد الصور
+  // 🎬 Slider State (لازم قبل أي useEffect)
+  const [currentSlide, setCurrentSlide] = useState(0);
   const imagesCount = galleryImages.length;
 
-  // 🔥 إعادة ضبط السلايدر فقط عند أول تحميل الصور
-  useEffect(() => {
-    if (imagesCount > 0) {
-      setCurrentSlide(0);
-    }
-  }, [imagesCount]);
-
-  // 🎬 Auto Play ثابت (متوافق مع React Query)
+  // 🔥 Auto Play مستقر ومتوافق مع React Query
   useEffect(() => {
     if (imagesCount <= 1) return;
 
-    const autoPlay = setInterval(() => {
+    const interval = setInterval(() => {
       setCurrentSlide((prev) => (prev + 1) % imagesCount);
     }, 4000);
 
-    return () => clearInterval(autoPlay);
+    return () => clearInterval(interval);
   }, [imagesCount]);
 
 
@@ -116,14 +108,15 @@ export default function ProjectDetail() {
               <div className="relative overflow-hidden rounded-3xl shadow-2xl">
                 
                 {/* Slides Container */}
-                <div
-                  className="flex transition-transform duration-700 ease-in-out will-change-transform"
-                  style={{
-                    transform: `translate3d(-${currentSlide * 100}%, 0, 0)`,
-                  }}
-                >
+                  <div
+                    className="flex transition-transform duration-700 ease-in-out will-change-transform"
+                    style={{
+                      transform: `translateX(-${currentSlide * 100}%)`,
+                      width: `${imagesCount * 100}%`,
+                    }}
+                  > 
                   {galleryImages.map((img, index) => (
-                    <div key={index} className="min-w-full">
+                    <div key={index} className="min-w-full flex-shrink-0">
                     <img
                       src={
                         img.includes("cloudinary")
