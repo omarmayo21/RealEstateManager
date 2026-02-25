@@ -144,42 +144,27 @@ export default function ProjectDetail() {
               }}
             >
               {/* Slides Container */}
-              <div
-                className="flex transition-transform duration-700 ease-in-out"
-                style={{
-                  transform: `translate3d(-${currentSlide * 100}%, 0, 0)`,
-                  direction: "ltr",
-                  backfaceVisibility: "hidden",
-                }}
-              >
+                <div
+                  className="flex transition-transform duration-700 ease-in-out will-change-transform"
+                  style={{
+                    width: `${galleryImages.length * 100}%`,
+                    transform: `translateX(-${100 / galleryImages.length * currentSlide}%)`,
+                  }}
+                >
                 {galleryImages.map((img, index) => (
                   <div
                     key={index}
                     className="min-w-full flex-shrink-0 overflow-hidden"
                   >
-                      <img
-                        src={
-                          img.includes("cloudinary")
-                            ? img.replace(
-                                "/upload/",
-                                "/upload/f_auto,q_auto,c_fit,w_1600,h_1000/"
-                              )
-                            : img
-                        }
-                        alt={`project-image-${index}`}
-                        className="
-                          w-full
-                          h-[240px]      /* موبايل */
-                          sm:h-[340px]   /* تابلت */
-                          md:h-[460px]   /* لابتوب */
-                          lg:h-[520px]   /* ديسكتوب */
-                          object-contain
-                          bg-black
-                          block
-                        "
-                        loading="lazy"
-                        draggable={false}
-                      />
+                  <div className="w-full aspect-[16/9] bg-black">
+                    <img
+                      src={img}
+                      alt={`project-image-${index}`}
+                      className="w-full h-full object-cover"
+                      loading="lazy"
+                      draggable={false}
+                    />
+                  </div>
                   </div>
                 ))}
               </div>
