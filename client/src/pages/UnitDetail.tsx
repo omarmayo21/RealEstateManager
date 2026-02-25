@@ -225,7 +225,16 @@ const displayImage =
                   initial={{ opacity: 0, scale: 1.01 }}
                   animate={{ opacity: 1, scale: 1 }}
                   transition={{ duration: 1 }}
-                  className="w-full max-h-[75vh] object-cover rounded-2xl shadow-2xl bg-black/5"
+                  className="
+                    w-full
+                    h-[60vh]
+                    lg:h-[85vh]
+                    object-cover
+                    scale-[1.05]
+                    rounded-2xl
+                    shadow-2xl
+                    bg-black
+                  "
                 />
 
                 {/* Overlay Gradient احترافي */}
