@@ -151,11 +151,13 @@ export default function ProjectDetail() {
                   transition={{ duration: 0.6 }}
                   draggable={false}
                   className="
-                    w-full 
-                    max-h-[70vh] 
-                    object-contain 
-                    rounded-2xl md:rounded-3xl 
-                    shadow-2xl 
+                    w-full
+                    h-[70vh]
+                    sm:h-[75vh]
+                    lg:h-[85vh]
+                    object-cover
+                    rounded-2xl
+                    shadow-2xl
                     bg-black
                   "
                 />
