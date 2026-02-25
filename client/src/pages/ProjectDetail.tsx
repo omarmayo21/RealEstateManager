@@ -113,119 +113,113 @@ export default function ProjectDetail() {
             className="text-center"
           >
 
-        {/* 🔥 Professional Project Images Slider (Mobile Swipe + Responsive) */}
-        {galleryImages.length > 0 && (
-          <div className="w-full max-w-6xl mx-auto mb-10">
-            <div
-              className="relative overflow-hidden rounded-2xl md:rounded-3xl shadow-2xl w-full select-none bg-black"
-              onTouchStart={(e) => setTouchStartX(e.touches[0].clientX)}
-              onTouchEnd={(e) => {
-                if (touchStartX === null) return;
 
-                const distance = touchStartX - e.changedTouches[0].clientX;
+            {/* 🔥 FINAL Professional Project Slider (Same as UnitDetail + No Crop Mobile) */}
+          {galleryImages.length > 0 && (
+            <div className="w-full max-w-6xl mx-auto mb-10">
+              <div
+                className="relative group select-none"
+                onTouchStart={(e) => setTouchStartX(e.touches[0].clientX)}
+                onTouchEnd={(e) => {
+                  if (!touchStartX) return;
+                  const distance = touchStartX - e.changedTouches[0].clientX;
 
-                // Swipe Left (الصورة اللي بعدها)
-                if (distance > 50) {
-                  setCurrentSlide((prev) =>
-                    galleryImages.length === 0
-                      ? 0
-                      : (prev + 1) % galleryImages.length
-                  );
-                }
+                  // Swipe Left
+                  if (distance > 50) {
+                    setCurrentSlide((prev) =>
+                      prev >= galleryImages.length - 1 ? 0 : prev + 1
+                    );
+                  }
 
-                // Swipe Right (الصورة اللي قبلها)
-                if (distance < -50) {
-                  setCurrentSlide((prev) =>
-                    prev === 0
-                      ? galleryImages.length - 1
-                      : prev - 1
-                  );
-                }
-              }}
-            >
-              {/* Slides Container */}
-                <div
-                  className="flex transition-transform duration-700 ease-in-out will-change-transform"
-                  style={{
-                    width: `${galleryImages.length * 100}%`,
-                    transform: `translateX(-${100 / galleryImages.length * currentSlide}%)`,
-                  }}
-                >
-                {galleryImages.map((img, index) => (
-                  <div
-                    key={index}
-                    className="min-w-full flex-shrink-0 overflow-hidden"
-                  >
-                  <div className="w-full aspect-[16/9] bg-black">
-                    <img
-                      src={img}
-                      alt={`project-image-${index}`}
-                      className="w-full h-full object-cover"
-                      loading="lazy"
-                      draggable={false}
-                    />
-                  </div>
-                  </div>
-                ))}
-              </div>
-
-              {/* Gradient Overlay (زي سلايدر الوحدات) */}
-              <div className="absolute inset-0 bg-gradient-to-t from-black/25 via-transparent to-transparent pointer-events-none" />
-
-              {/* Counter */}
-              {galleryImages.length > 1 && (
-                <div className="absolute top-4 right-4 bg-black/60 text-white text-sm px-3 py-1 rounded-full backdrop-blur">
-                  {currentSlide + 1} / {galleryImages.length}
-                </div>
-              )}
-
-            {/* Prev Button */}
-            {galleryImages.length > 1 && (
-              <button
-                onClick={() =>
-                  setCurrentSlide((prev) =>
-                    prev === 0 ? galleryImages.length - 1 : prev - 1
-                  )
-                }
-                className="absolute left-3 top-1/2 -translate-y-1/2 bg-white/80 hover:bg-white shadow-lg backdrop-blur rounded-full p-3 opacity-0 md:opacity-100 md:hover:scale-105 transition"
+                  // Swipe Right
+                  if (distance < -50) {
+                    setCurrentSlide((prev) =>
+                      prev <= 0 ? galleryImages.length - 1 : prev - 1
+                    );
+                  }
+                }}
               >
-                ‹
-              </button>
-            )}
+                {/* Main Image (زي UnitDetail بالظبط) */}
+                <motion.img
+                  key={galleryImages[currentSlide]}
+                  src={galleryImages[currentSlide]}
+                  alt={`project-image-${currentSlide}`}
+                  loading="eager"
+                  decoding="async"
+                  initial={{ opacity: 0, scale: 1.01 }}
+                  animate={{ opacity: 1, scale: 1 }}
+                  transition={{ duration: 0.6 }}
+                  draggable={false}
+                  className="
+                    w-full 
+                    max-h-[70vh] 
+                    object-contain 
+                    rounded-2xl md:rounded-3xl 
+                    shadow-2xl 
+                    bg-black
+                  "
+                />
 
-            {/* Next Button */}
-            {galleryImages.length > 1 && (
-              <button
-                onClick={() =>
-                  setCurrentSlide((prev) =>
-                    (prev + 1) % galleryImages.length
-                  )
-                }
-                className="absolute right-3 top-1/2 -translate-y-1/2 bg-white/80 hover:bg-white shadow-lg backdrop-blur rounded-full p-3 opacity-0 md:opacity-100 md:hover:scale-105 transition"
-              >
-                ›
-              </button>
-            )}
+                {/* Gradient Overlay احترافي */}
+                <div className="absolute inset-0 rounded-2xl md:rounded-3xl bg-gradient-to-t from-black/25 via-transparent to-transparent pointer-events-none" />
 
-            {/* Dots Indicators */}
-            {galleryImages.length > 1 && (
-              <div className="absolute bottom-4 left-0 right-0 flex justify-center gap-2">
-                {galleryImages.map((_, index) => (
+                {/* Counter */}
+                {galleryImages.length > 1 && (
+                  <div className="absolute top-4 right-4 bg-black/60 text-white text-sm px-3 py-1 rounded-full backdrop-blur">
+                    {currentSlide + 1} / {galleryImages.length}
+                  </div>
+                )}
+
+                {/* Prev Button */}
+                {galleryImages.length > 1 && (
                   <button
-                    key={index}
-                    onClick={() => setCurrentSlide(index)}
-                    className={`h-2.5 rounded-full transition-all ${
-                      currentSlide === index
-                        ? "w-6 bg-white"
-                        : "w-2.5 bg-white/60 hover:bg-white"
-                    }`}
-                  />
-                ))}
+                    onClick={() =>
+                      setCurrentSlide((prev) =>
+                        prev <= 0 ? galleryImages.length - 1 : prev - 1
+                      )
+                    }
+                    className="absolute left-3 top-1/2 -translate-y-1/2 bg-white/80 hover:bg-white shadow-lg backdrop-blur rounded-full p-3 opacity-0 group-hover:opacity-100 transition"
+                  >
+                    ‹
+                  </button>
+                )}
+
+                {/* Next Button */}
+                {galleryImages.length > 1 && (
+                  <button
+                    onClick={() =>
+                      setCurrentSlide((prev) =>
+                        prev >= galleryImages.length - 1 ? 0 : prev + 1
+                      )
+                    }
+                    className="absolute right-3 top-1/2 -translate-y-1/2 bg-white/80 hover:bg-white shadow-lg backdrop-blur rounded-full p-3 opacity-0 group-hover:opacity-100 transition"
+                  >
+                    ›
+                  </button>
+                )}
+
+                {/* Dots Indicator */}
+                {galleryImages.length > 1 && (
+                  <div className="absolute bottom-4 left-1/2 -translate-x-1/2 flex gap-2">
+                    {galleryImages.map((_, index) => (
+                      <button
+                        key={index}
+                        onClick={() => setCurrentSlide(index)}
+                        className={`h-2.5 rounded-full transition-all ${
+                          index === currentSlide
+                            ? "w-6 bg-white"
+                            : "w-2.5 bg-white/60 hover:bg-white"
+                        }`}
+                      />
+                    ))}
+                  </div>
+                )}
               </div>
-            )}
-          </div>
-        </div>
-      )}
+            </div>
+          )}
+
+
+
             <h1 className="text-5xl font-bold mb-4 text-primary" data-testid="text-project-name">
               {project.name}
             </h1>
