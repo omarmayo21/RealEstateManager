@@ -117,7 +117,7 @@ export default function ProjectDetail() {
         {galleryImages.length > 0 && (
           <div className="w-full max-w-6xl mx-auto mb-10">
             <div
-              className="relative overflow-hidden rounded-2xl md:rounded-3xl shadow-2xl w-full select-none"
+              className="relative overflow-hidden rounded-2xl md:rounded-3xl shadow-2xl w-full select-none bg-black"
               onTouchStart={(e) => setTouchStartX(e.touches[0].clientX)}
               onTouchEnd={(e) => {
                 if (touchStartX === null) return;
@@ -157,20 +157,29 @@ export default function ProjectDetail() {
                     key={index}
                     className="min-w-full flex-shrink-0 overflow-hidden"
                   >
-                    <img
-                      src={
-                        img.includes("cloudinary")
-                          ? img.replace(
-                              "/upload/",
-                              "/upload/f_auto,q_auto,c_fill,w_1600,h_900/"
-                            )
-                          : img
-                      }
-                      alt={`project-image-${index}`}
-                      className="w-full h-[260px] sm:h-[360px] md:h-[460px] lg:h-[520px] object-cover block"
-                      loading="lazy"
-                      draggable={false}
-                    />
+                      <img
+                        src={
+                          img.includes("cloudinary")
+                            ? img.replace(
+                                "/upload/",
+                                "/upload/f_auto,q_auto,c_fit,w_1600,h_1000/"
+                              )
+                            : img
+                        }
+                        alt={`project-image-${index}`}
+                        className="
+                          w-full
+                          h-[240px]      /* موبايل */
+                          sm:h-[340px]   /* تابلت */
+                          md:h-[460px]   /* لابتوب */
+                          lg:h-[520px]   /* ديسكتوب */
+                          object-contain
+                          bg-black
+                          block
+                        "
+                        loading="lazy"
+                        draggable={false}
+                      />
                   </div>
                 ))}
               </div>
