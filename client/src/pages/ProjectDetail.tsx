@@ -50,6 +50,8 @@ export default function ProjectDetail() {
 
   // 🎬 Slider State (لازم قبل أي useEffect)
   const [currentSlide, setCurrentSlide] = useState(0);
+  const [touchStartX, setTouchStartX] = useState<number | null>(null);
+  const [touchEndX, setTouchEndX] = useState<number | null>(null);
   const imagesCount = galleryImages.length;
 
   // 🔥 حماية: لو السلايد خرج برا عدد الصور (زي -400%)
@@ -111,69 +113,125 @@ export default function ProjectDetail() {
             className="text-center"
           >
 
-          {/* 🔥 Auto Play Project Images Slider (Centralized Gallery) */}
-          {galleryImages.length > 0 && (
-            <div className="w-full max-w-6xl mx-auto mb-10">
-             <div className="relative overflow-hidden rounded-3xl shadow-2xl w-full">
-                
-                {/* Slides Container */}
-                 {/* Slides Container */}
-                        <div
-                          className="flex transition-transform duration-700 ease-in-out"
-                          style={{
-                            transform: `translate3d(-${currentSlide * 100}%, 0, 0)`,
-                            direction: "ltr",
-                            backfaceVisibility: "hidden",
-                          }}
-                        >
-                        {galleryImages.map((img, index) => (
-                          <div
-                            key={index}
-                            className="min-w-full flex-shrink-0 overflow-hidden"
-                          >
-                        <img
-                          src={
-                            img.includes("cloudinary")
-                              ? img.replace(
-                                  "/upload/",
-                                  "/upload/f_auto,q_auto,c_fill,w_1600,h_900/"
-                                )
-                              : img
-                          }
+        {/* 🔥 Professional Project Images Slider (Mobile Swipe + Responsive) */}
+        {galleryImages.length > 0 && (
+          <div className="w-full max-w-6xl mx-auto mb-10">
+            <div
+              className="relative overflow-hidden rounded-2xl md:rounded-3xl shadow-2xl w-full select-none"
+              onTouchStart={(e) => setTouchStartX(e.touches[0].clientX)}
+              onTouchEnd={(e) => {
+                if (touchStartX === null) return;
 
-                              alt={`project-image-${index}`}
-                              className="w-full h-[420px] md:h-[520px] object-cover block"
-                              loading="lazy"
-                              draggable={false}
-                            />
-                      </div>
-                    ))}
-                  </div>
+                const distance = touchStartX - e.changedTouches[0].clientX;
 
-                {/* Dots Indicators */}
-                <div className="absolute bottom-4 left-0 right-0 flex justify-center gap-2">
-                  {galleryImages.map((_, index) => (
-                    <button
-                      key={index}
-                      onClick={() => setCurrentSlide(index)}
-                      className={`w-3 h-3 rounded-full transition ${
-                        currentSlide === index
-                          ? "bg-white scale-110"
-                          : "bg-white/50"
-                      }`}
+                // Swipe Left (الصورة اللي بعدها)
+                if (distance > 50) {
+                  setCurrentSlide((prev) =>
+                    galleryImages.length === 0
+                      ? 0
+                      : (prev + 1) % galleryImages.length
+                  );
+                }
+
+                // Swipe Right (الصورة اللي قبلها)
+                if (distance < -50) {
+                  setCurrentSlide((prev) =>
+                    prev === 0
+                      ? galleryImages.length - 1
+                      : prev - 1
+                  );
+                }
+              }}
+            >
+              {/* Slides Container */}
+              <div
+                className="flex transition-transform duration-700 ease-in-out"
+                style={{
+                  transform: `translate3d(-${currentSlide * 100}%, 0, 0)`,
+                  direction: "ltr",
+                  backfaceVisibility: "hidden",
+                }}
+              >
+                {galleryImages.map((img, index) => (
+                  <div
+                    key={index}
+                    className="min-w-full flex-shrink-0 overflow-hidden"
+                  >
+                    <img
+                      src={
+                        img.includes("cloudinary")
+                          ? img.replace(
+                              "/upload/",
+                              "/upload/f_auto,q_auto,c_fill,w_1600,h_900/"
+                            )
+                          : img
+                      }
+                      alt={`project-image-${index}`}
+                      className="w-full h-[260px] sm:h-[360px] md:h-[460px] lg:h-[520px] object-cover block"
+                      loading="lazy"
+                      draggable={false}
                     />
-                  ))}
-                </div>
-
-
-
-
+                  </div>
+                ))}
               </div>
-            </div>
-          )}
 
+              {/* Gradient Overlay (زي سلايدر الوحدات) */}
+              <div className="absolute inset-0 bg-gradient-to-t from-black/25 via-transparent to-transparent pointer-events-none" />
 
-            
+              {/* Counter */}
+              {galleryImages.length > 1 && (
+                <div className="absolute top-4 right-4 bg-black/60 text-white text-sm px-3 py-1 rounded-full backdrop-blur">
+                  {currentSlide + 1} / {galleryImages.length}
+                </div>
+              )}
+
+            {/* Prev Button */}
+            {galleryImages.length > 1 && (
+              <button
+                onClick={() =>
+                  setCurrentSlide((prev) =>
+                    prev === 0 ? galleryImages.length - 1 : prev - 1
+                  )
+                }
+                className="absolute left-3 top-1/2 -translate-y-1/2 bg-white/80 hover:bg-white shadow-lg backdrop-blur rounded-full p-3 opacity-0 md:opacity-100 md:hover:scale-105 transition"
+              >
+                ‹
+              </button>
+            )}
+
+            {/* Next Button */}
+            {galleryImages.length > 1 && (
+              <button
+                onClick={() =>
+                  setCurrentSlide((prev) =>
+                    (prev + 1) % galleryImages.length
+                  )
+                }
+                className="absolute right-3 top-1/2 -translate-y-1/2 bg-white/80 hover:bg-white shadow-lg backdrop-blur rounded-full p-3 opacity-0 md:opacity-100 md:hover:scale-105 transition"
+              >
+                ›
+              </button>
+            )}
+
+            {/* Dots Indicators */}
+            {galleryImages.length > 1 && (
+              <div className="absolute bottom-4 left-0 right-0 flex justify-center gap-2">
+                {galleryImages.map((_, index) => (
+                  <button
+                    key={index}
+                    onClick={() => setCurrentSlide(index)}
+                    className={`h-2.5 rounded-full transition-all ${
+                      currentSlide === index
+                        ? "w-6 bg-white"
+                        : "w-2.5 bg-white/60 hover:bg-white"
+                    }`}
+                  />
+                ))}
+              </div>
+            )}
+          </div>
+        </div>
+      )}
             <h1 className="text-5xl font-bold mb-4 text-primary" data-testid="text-project-name">
               {project.name}
             </h1>
@@ -185,7 +243,7 @@ export default function ProjectDetail() {
               <p className="text-lg text-card-foreground max-w-3xl mx-auto" data-testid="text-project-description">
                 {project.shortDescription}
               </p>
-            )}
+              )}
           </motion.div>
         </div>
       </section>
