@@ -150,16 +150,16 @@ export default function ProjectDetail() {
                   animate={{ opacity: 1, scale: 1 }}
                   transition={{ duration: 0.6 }}
                   draggable={false}
-                  className="
-                    w-full
-                    h-[70vh]
-                    sm:h-[75vh]
-                    lg:h-[85vh]
-                    object-cover
-                    rounded-2xl
-                    shadow-2xl
-                    bg-black
-                  "
+                className="
+                  w-full
+                  h-[40vh]
+                  sm:h-[75vh]
+                  lg:h-[85vh]
+                  object-cover
+                  rounded-2xl
+                  shadow-2xl
+                  bg-black
+                "
                 />
 
                 {/* Gradient Overlay احترافي */}
