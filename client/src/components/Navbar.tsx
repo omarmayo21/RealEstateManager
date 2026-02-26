@@ -138,7 +138,13 @@ export default function Navbar() {
                             }
                           }}
                         >
-                          <span className="font-semibold text-gray-900 tracking-wide">
+                          <span className="
+                              font-semibold 
+                              text-gray-900 
+                              tracking-wide 
+                              transition-colors duration-200
+                              group-hover:text-orange-500
+                            ">
                             {parent.name}
                           </span>
 
@@ -183,6 +189,7 @@ export default function Navbar() {
                                       cursor-pointer
                                       border-r-2 
                                       border-transparent 
+                                      hover:text-primary 
                                       hover:border-primary
                                     ">
                                       {child.name}
@@ -386,8 +393,20 @@ export default function Navbar() {
                     </div>
                   )}
 
-                  {mobileOpenSection === section.title &&
-                    section.parents.map((parent) => {
+                  <AnimatePresence initial={false}>
+                  {mobileOpenSection === section.title && (
+                    <motion.div
+                      initial={{ height: 0, opacity: 0 }}
+                      animate={{ height: "auto", opacity: 1 }}
+                      exit={{ height: 0, opacity: 0 }}
+                      transition={{
+                        height: { duration: 0.35, ease: "easeInOut" },
+                        opacity: { duration: 0.25 }
+                      }}
+                      style={{ overflow: "hidden" }}
+                      className="mt-3 space-y-3"
+                    >
+                      {section.parents.map((parent) => {
                     const children = section.raw.filter(
                       (c) => c.parentProjectId === parent.id
                     );
@@ -396,7 +415,15 @@ export default function Navbar() {
                     return (
                     <div
                       key={parent.id}
-                      className="rounded-xl bg-white/5 border border-white/10 backdrop-blur-sm overflow-hidden"
+                      className="
+                          rounded-2xl
+                          bg-white/5
+                          border border-white/10
+                          backdrop-blur-sm
+                          overflow-hidden
+                          mb-3
+                          shadow-lg
+                        "
                     >
                         {/* المشروع الرئيسي */}
                         <div
@@ -407,6 +434,7 @@ export default function Navbar() {
                               cursor-pointer 
                               transition-all duration-200 
                               hover:bg-white/10 
+                              tracking-wide
                               active:scale-[0.98]
                             "
                               onClick={() => {
@@ -478,6 +506,9 @@ export default function Navbar() {
                       </div>
                     );
                   })}
+                    </motion.div>
+                  )}
+                </AnimatePresence>
                 </div>
               ))}
 
