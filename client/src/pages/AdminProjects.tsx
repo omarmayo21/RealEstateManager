@@ -570,7 +570,7 @@ export default function AdminProjects() {
                         )}
                         {project.appearsInCairoProjects && (
                           <span className="text-xs bg-green-500/10 text-orange-600 px-2.5 py-1 rounded-full font-medium">
-                            ريسيل الإسكندرية
+                           مشروعات القاهرة
                           </span>
                         )}
                         {/* حالة احتياطية لو مفيش أي فلاج متفعل */}
