@@ -105,6 +105,12 @@ export default function Home() {
       description: "فرص استثمارية مميزة",
       color: "text-primary",
     },
+    {
+      icon: Building2,
+      title:  " مشروعات القاهرة  ",
+      description: "أحدث المشروعات السكنية",
+      color: "text-primary",
+    },
   ];
 
   return (
