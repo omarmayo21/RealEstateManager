@@ -19,7 +19,7 @@ export const projects = pgTable("projects", {
   logoUrl: text("logo_url"),
   shortDescription: text("short_description"),
   amenities: text("amenities"),
-  
+  appearsInCairoProjects: boolean("appears_in_cairo_projects").default(false),
   createdAt: timestamp("created_at").defaultNow().notNull(),
   updatedAt: timestamp("updated_at").defaultNow().notNull(),
 

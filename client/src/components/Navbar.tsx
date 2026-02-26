@@ -52,14 +52,17 @@ export default function Navbar() {
   const resaleProjectsRaw = projects.filter((p) => p.appearsInResaleProjects);
   const newProjectsRaw = projects.filter((p) => p.appearsInProjects);
   const alexandriaProjectsRaw = projects.filter((p) => p.appearsInAlexandriaProjects);
+  
   const alexandriaResaleRaw = projects.filter((p) => p.appearsInAlexandriaResale);
-
+  const cairoProjectsRaw = projects.filter(
+    (p) => p.appearsInCairoProjects
+  );
   // ✨ المشاريع الرئيسية فقط لكل قائمة
   const resaleProjects = getParentProjects(resaleProjectsRaw);
   const newProjects = getParentProjects(newProjectsRaw);
   const alexandriaProjects = getParentProjects(alexandriaProjectsRaw);
   const alexandriaResale = getParentProjects(alexandriaResaleRaw);
-
+  const cairoProjects = getParentProjects(cairoProjectsRaw);
 
   // 🔥 Mega Menu احترافي (Parent + Children)
   // 🔥 Nested Dropdown احترافي (Vertical + Sub Projects)
@@ -254,6 +257,11 @@ export default function Navbar() {
               rawList={alexandriaResaleRaw}
             />
           </div>
+          <NestedMenu
+          title="مشروعات القاهرة"
+          parentItems={cairoProjects}
+          rawList={cairoProjectsRaw}
+            />
 
           <div className="flex items-center gap-4">
             {/* زر المينيو للموبايل */}
@@ -337,6 +345,11 @@ export default function Navbar() {
                   title: "ريسيل الإسكندرية",
                   parents: alexandriaResale,
                   raw: alexandriaResaleRaw,
+                },
+                {
+                title: "مشروعات القاهرة", // 👈 الجديد
+                parents: cairoProjects,
+                raw: cairoProjectsRaw,
                 },
               ].map((section) => (
                 <div key={section.title}>

@@ -47,6 +47,7 @@ const projectSchema = z.object({
   appearsInProjects: z.boolean(),
   appearsInAlexandriaProjects: z.boolean(),
   appearsInAlexandriaResale: z.boolean(),
+  appearsInCairoProjects: z.boolean().optional(),
   logoUrl: z.string().optional(),
   shortDescription: z.string().optional(),
   amenities: z.string().optional(),
@@ -255,9 +256,11 @@ export default function AdminProjects() {
       appearsInProjects: project.appearsInProjects,
       appearsInAlexandriaProjects: project.appearsInAlexandriaProjects,
       appearsInAlexandriaResale: project.appearsInAlexandriaResale,
+      appearsInCairoProjects: project.appearsInCairoProjects ?? false,
       logoUrl: project.logoUrl || "",
       shortDescription: project.shortDescription || "",
       amenities: project.amenities || "",
+      
     });
     setDialogOpen(true);
   };
@@ -294,6 +297,8 @@ export default function AdminProjects() {
                       appearsInResaleProjects: false,
                       appearsInProjects: false,
                       appearsInAlexandriaProjects: false,
+                      appearsInCairoProjects: false,
+
                       appearsInAlexandriaResale: false,
                       logoUrl: "",
                       shortDescription: "",
@@ -452,6 +457,7 @@ export default function AdminProjects() {
                         </FormItem>
                       )}
                     />
+                    
                     <FormField
                       control={form.control}
                       name="appearsInProjects"
@@ -488,6 +494,24 @@ export default function AdminProjects() {
                         </FormItem>
                       )}
                     />
+
+
+                    <FormField
+                    control={form.control}
+                    name="appearsInCairoProjects"
+                    render={({ field }) => (
+                      <FormItem className="flex items-center justify-between">
+                        <FormLabel>مشروعات القاهرة</FormLabel>
+                        <FormControl>
+                          <Switch
+                            checked={field.value}
+                            onCheckedChange={field.onChange}
+                            data-testid="switch-cairo-projects"
+                          />
+                        </FormControl>
+                      </FormItem>
+                    )}
+                  />
                   </div>
 
                   <Button type="submit" className="w-full bg-primary" data-testid="button-save-project">
