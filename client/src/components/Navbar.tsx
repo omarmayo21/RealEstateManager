@@ -256,12 +256,13 @@ export default function Navbar() {
               parentItems={alexandriaResale}
               rawList={alexandriaResaleRaw}
             />
-          </div>
-          <NestedMenu
-          title="مشروعات القاهرة"
-          parentItems={cairoProjects}
-          rawList={cairoProjectsRaw}
+            <NestedMenu
+              title="مشروعات القاهرة"
+              parentItems={cairoProjects}
+              rawList={cairoProjectsRaw}
             />
+          </div>
+
 
           <div className="flex items-center gap-4">
             {/* زر المينيو للموبايل */}
