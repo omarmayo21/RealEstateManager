@@ -83,13 +83,13 @@ export default function Home() {
   const categories = [
     {
       icon: TrendingUp,
-      title: "ريسيل مشروعات",
+      title: "ريسيل الساحل ",
       description: "مشروعات إعادة بيع بأفضل الأسعار",
       color: "text-primary",
     },
     {
       icon: Building2,
-      title: "مشروعات جديدة",
+      title: "مشروعات الساحل  ",
       description: "أحدث المشروعات السكنية",
       color: "text-primary",
     },

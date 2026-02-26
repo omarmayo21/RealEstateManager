@@ -450,7 +450,7 @@ export default function AdminProjects() {
                       name="appearsInResaleProjects"
                       render={({ field }) => (
                         <FormItem className="flex items-center justify-between">
-                          <FormLabel>ريسيل مشروعات</FormLabel>
+                          <FormLabel> ريسيل الساحل </FormLabel>
                           <FormControl>
                             <Switch checked={field.value} onCheckedChange={field.onChange} data-testid="switch-resale-projects" />
                           </FormControl>
@@ -463,7 +463,7 @@ export default function AdminProjects() {
                       name="appearsInProjects"
                       render={({ field }) => (
                         <FormItem className="flex items-center justify-between">
-                          <FormLabel>مشروعات</FormLabel>
+                          <FormLabel> مشروعات الساحل </FormLabel>
                           <FormControl>
                             <Switch checked={field.value} onCheckedChange={field.onChange} data-testid="switch-projects" />
                           </FormControl>
@@ -544,14 +544,14 @@ export default function AdminProjects() {
                         {/* 1️⃣ مشروعات (Primary) */}
                         {project.appearsInProjects && (
                           <span className="text-xs bg-emerald-500/10 text-emerald-600 px-2.5 py-1 rounded-full font-medium">
-                            مشروعات
+                             مشروعات الساحل 
                           </span>
                         )}
 
                         {/* 2️⃣ ريسيل مشروعات */}
                         {project.appearsInResaleProjects && (
                           <span className="text-xs bg-blue-500/10 text-blue-600 px-2.5 py-1 rounded-full font-medium">
-                            ريسيل مشروعات
+                             ريسيل الساحل
                           </span>
                         )}
 
@@ -568,12 +568,17 @@ export default function AdminProjects() {
                             ريسيل الإسكندرية
                           </span>
                         )}
-
+                        {project.appearsInCairoProjects && (
+                          <span className="text-xs bg-green-500/10 text-orange-600 px-2.5 py-1 rounded-full font-medium">
+                            ريسيل الإسكندرية
+                          </span>
+                        )}
                         {/* حالة احتياطية لو مفيش أي فلاج متفعل */}
                         {!project.appearsInProjects &&
                           !project.appearsInResaleProjects &&
                           !project.appearsInAlexandriaProjects &&
-                          !project.appearsInAlexandriaResale && (
+                          !project.appearsInAlexandriaResale &&
+                          !project.appearsInCairoProjects && (
                             <span className="text-xs bg-gray-500/10 text-gray-500 px-2.5 py-1 rounded-full">
                               غير مصنف
                             </span>

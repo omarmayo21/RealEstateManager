@@ -52,7 +52,7 @@ export default function Navbar() {
   const resaleProjectsRaw = projects.filter((p) => p.appearsInResaleProjects);
   const newProjectsRaw = projects.filter((p) => p.appearsInProjects);
   const alexandriaProjectsRaw = projects.filter((p) => p.appearsInAlexandriaProjects);
-  
+
   const alexandriaResaleRaw = projects.filter((p) => p.appearsInAlexandriaResale);
   const cairoProjectsRaw = projects.filter(
     (p) => p.appearsInCairoProjects
@@ -234,13 +234,13 @@ export default function Navbar() {
 
           <div className="hidden md:flex items-center gap-2">
             <NestedMenu
-              title="ريسيل مشروعات"
+              title=" ريسيل الساحل "
               parentItems={resaleProjects}
               rawList={resaleProjectsRaw}
             />
 
             <NestedMenu
-              title="مشروعات"
+              title=" مشروعات الساحل  "
               parentItems={newProjects}
               rawList={newProjectsRaw}
             />
@@ -327,12 +327,12 @@ export default function Navbar() {
               {/* 🔥 Helper Renderer */}
               {[
                 {
-                  title: "ريسيل مشروعات",
+                  title: " ريسيل الساحل ",
                   parents: resaleProjects,
                   raw: resaleProjectsRaw,
                 },
                 {
-                  title: "مشروعات",
+                  title: " مشروعات الساحل ",
                   parents: newProjects,
                   raw: newProjectsRaw,
                 },
