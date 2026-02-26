@@ -11,6 +11,7 @@ export default function Navbar() {
   const [location] = useLocation();
   const [isScrolled, setIsScrolled] = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const [mobileOpenSection, setMobileOpenSection] = useState<string | null>(null);
   const [mobileOpenParent, setMobileOpenParent] = useState<string | null>(null);
   const isHomePage = location === "/";
 
@@ -355,9 +356,29 @@ export default function Navbar() {
               ].map((section) => (
                 <div key={section.title}>
                   {/* عنوان القسم */}
-                  <p className="text-white font-bold mb-3 text-base">
-                    {section.title}
-                  </p>
+                  <div
+                    className="
+                      flex items-center justify-between
+                      text-white font-bold text-lg
+                      cursor-pointer
+                      py-3 px-2
+                      rounded-xl
+                      hover:bg-white/10
+                      transition-all duration-200
+                    "
+                    onClick={() =>
+                      setMobileOpenSection(
+                        mobileOpenSection === section.title ? null : section.title
+                      )
+                    }
+                  >
+                    <span>{section.title}</span>
+                    <ChevronDown
+                      className={`w-5 h-5 text-primary transition-transform duration-300 ${
+                        mobileOpenSection === section.title ? "rotate-180" : ""
+                      }`}
+                    />
+                  </div>
 
                   {section.parents.length === 0 && (
                     <div className="text-gray-400 text-sm py-2">
@@ -365,7 +386,8 @@ export default function Navbar() {
                     </div>
                   )}
 
-                  {section.parents.map((parent) => {
+                  {mobileOpenSection === section.title &&
+                    section.parents.map((parent) => {
                     const children = section.raw.filter(
                       (c) => c.parentProjectId === parent.id
                     );
