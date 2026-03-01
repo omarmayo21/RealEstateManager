@@ -375,7 +375,7 @@ const displayImage =
                   )}
                   {unit.type === 'resale' && (
                     <Badge variant="outline" data-testid="badge-resale">
-                      إعادة بيع
+                      ريسيل 
                     </Badge>
                   )}
                 </div>

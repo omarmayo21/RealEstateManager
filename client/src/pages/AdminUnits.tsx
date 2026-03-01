@@ -410,7 +410,7 @@ const onSubmit = async (data: UnitFormData) => {
                           </FormControl>
                           <SelectContent>
                             <SelectItem value="primary">جديد</SelectItem>
-                            <SelectItem value="resale">إعادة بيع</SelectItem>
+                            <SelectItem value="resale"> ريسيل </SelectItem>
                           </SelectContent>
                         </Select>
                         <FormMessage />
